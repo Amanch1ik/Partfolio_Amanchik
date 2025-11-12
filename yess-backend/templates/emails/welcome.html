@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Добро пожаловать в Yess Loyalty!</title>
+</head>
+<body>
+    <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">
+        <h1>Привет, {{ user.name }}!</h1>
+        <p>Спасибо, что присоединились к Yess Loyalty - программе лояльности нового поколения.</p>
+        
+        <div style="background-color: #f4f4f4; padding: 20px; border-radius: 5px;">
+            <h2>Ваш бонусный счет активирован</h2>
+            <p>Текущий баланс: <strong>{{ user.initial_bonus }} бонусов</strong></p>
+        </div>
+
+        <h3>Что вас ждет:</h3>
+        <ul>
+            <li>Накопление бонусов при покупках</li>
+            <li>Эксклюзивные предложения от партнеров</li>
+            <li>Персональные скидки</li>
+        </ul>
+
+        <p>Активируйте аккаунт, перейдя по ссылке: <a href="{{ activation_link }}">Активировать</a></p>
+
+        <footer>
+            <p>С уважением,<br>Команда Yess Loyalty</p>
+        </footer>
+    </div>
+</body>
+</html>

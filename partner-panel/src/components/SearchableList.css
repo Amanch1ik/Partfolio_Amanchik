@@ -1,0 +1,280 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.searchable-list-container {
+  border-radius: 16px;
+  box-shadow: 
+    0 4px 20px rgba(104, 144, 113, 0.15),
+    0 0 0 1px rgba(174, 195, 128, 0.2);
+  overflow: hidden;
+  width: 100%;
+  max-width: 400px;
+  background: #ffffff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.searchable-list-header {
+  background: linear-gradient(135deg, #375534 0%, #689071 50%, #AEC380 100%);
+  color: #fff;
+  padding: 32px 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.searchable-list-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 30px 30px;
+  animation: float 20s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes float {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate(50px, 50px) rotate(360deg);
+  }
+}
+
+.searchable-list-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(15, 42, 29, 0.3);
+  position: relative;
+  z-index: 1;
+}
+
+.searchable-list-subtitle {
+  display: inline-block;
+  margin: 8px 0 24px 0;
+  opacity: 0.95;
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.9);
+  position: relative;
+  z-index: 1;
+}
+
+.searchable-list-input-wrapper {
+  position: relative;
+  z-index: 1;
+}
+
+.searchable-list-input {
+  background-color: rgba(255, 255, 255, 0.25) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 50px !important;
+  color: #ffffff !important;
+  font-size: 14px !important;
+  padding: 12px 20px 12px 45px !important;
+  width: 100% !important;
+  height: 48px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 2px 8px rgba(15, 42, 29, 0.2) !important;
+}
+
+.searchable-list-input::placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.searchable-list-input .anticon {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.searchable-list-input:hover {
+  background-color: rgba(255, 255, 255, 0.3) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 4px 12px rgba(15, 42, 29, 0.3) !important;
+}
+
+.searchable-list-input:focus,
+.searchable-list-input.ant-input-focused {
+  background-color: rgba(255, 255, 255, 0.35) !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 
+    0 0 0 3px rgba(255, 255, 255, 0.2),
+    0 4px 16px rgba(15, 42, 29, 0.4) !important;
+}
+
+.searchable-list-input .ant-input {
+  background: transparent !important;
+  border: none !important;
+  color: #ffffff !important;
+  font-size: 14px !important;
+}
+
+.searchable-list-input .ant-input::placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.searchable-list {
+  background-color: #ffffff;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #AEC380 #E3EED4;
+}
+
+.searchable-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.searchable-list::-webkit-scrollbar-track {
+  background: #E3EED4;
+}
+
+.searchable-list::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #689071 0%, #AEC380 100%);
+  border-radius: 4px;
+}
+
+.searchable-list::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #375534 0%, #689071 100%);
+}
+
+.searchable-list-item {
+  display: flex;
+  align-items: center;
+  padding: 20px 24px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-left: 4px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.searchable-list-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(135deg, #689071 0%, #AEC380 100%);
+  transform: scaleY(0);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.searchable-list-item:hover {
+  background: linear-gradient(90deg, #E3EED4 0%, rgba(227, 238, 212, 0.5) 100%);
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(104, 144, 113, 0.1);
+}
+
+.searchable-list-item:hover::before {
+  transform: scaleY(1);
+}
+
+.searchable-list-item:active {
+  transform: translateX(2px);
+  background: linear-gradient(90deg, #AEC380 0%, rgba(174, 195, 128, 0.3) 100%);
+}
+
+.searchable-list-avatar {
+  flex-shrink: 0;
+  border: 3px solid #E3EED4;
+  box-shadow: 0 2px 8px rgba(104, 144, 113, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.searchable-list-item:hover .searchable-list-avatar {
+  border-color: #689071;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(104, 144, 113, 0.3);
+}
+
+.searchable-list-user-info {
+  margin-left: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.searchable-list-user-name {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #375534;
+  line-height: 1.3;
+  transition: color 0.3s ease;
+}
+
+.searchable-list-item:hover .searchable-list-user-name {
+  color: #0F2A1D;
+}
+
+.searchable-list-user-description {
+  font-size: 13px;
+  color: #689071;
+  margin: 0;
+  line-height: 1.4;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.searchable-list-item:hover .searchable-list-user-description {
+  opacity: 1;
+  color: #375534;
+}
+
+.searchable-list-item:not(:last-of-type) {
+  border-bottom: 1px solid #E3EED4;
+}
+
+.searchable-list-empty {
+  padding: 40px 24px;
+  text-align: center;
+  list-style: none;
+}
+
+.searchable-list-empty .ant-empty-description {
+  color: #689071;
+  font-size: 14px;
+}
+
+/* Анимация появления элементов */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.searchable-list-item {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .searchable-list-container {
+    max-width: 100%;
+  }
+
+  .searchable-list-header {
+    padding: 24px 20px;
+  }
+
+  .searchable-list-title {
+    font-size: 20px;
+  }
+
+  .searchable-list-item {
+    padding: 16px 20px;
+  }
+}
+

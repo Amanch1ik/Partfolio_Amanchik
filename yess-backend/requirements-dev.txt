@@ -1,0 +1,18 @@
+# Development dependencies
+-r requirements.prod.txt
+
+# Testing
+pytest==7.4.0
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+httpx==0.24.1
+locust==2.17.0  # Нагрузочное тестирование для 4000+ пользователей
+
+# Code quality
+black==23.7.0
+flake8==6.1.0
+mypy==1.5.1
+
+# Development tools
+ipython==8.14.0
+ipdb==0.13.13

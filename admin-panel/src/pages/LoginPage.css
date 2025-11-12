@@ -1,0 +1,412 @@
+/* Стили для страницы входа */
+
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0F2A1D 0%, #375534 25%, #689071 50%, #AEC380 75%, #E3EED4 100%);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+}
+
+/* Анимация градиента */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Декоративные элементы фона */
+.login-container::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: float 20s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.login-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(15, 42, 29, 0.1) 0%, rgba(55, 85, 52, 0.1) 25%, rgba(104, 144, 113, 0.1) 50%, rgba(174, 195, 128, 0.1) 75%, rgba(227, 238, 212, 0.1) 100%);
+  pointer-events: none;
+}
+
+.login-right {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 480px;
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.login-form-container {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 48px 40px;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-form-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #0F2A1D 0%, #375534 25%, #689071 50%, #AEC380 75%, #689071 100%);
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+
+.login-form-container:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 24px 80px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+}
+
+/* Логотип/Название приложения */
+.login-logo {
+  text-align: center;
+  margin-bottom: 32px;
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.05s both;
+}
+
+.login-logo h1 {
+  margin: 0;
+  font-size: 56px;
+  font-weight: 800;
+  /* Белый цвет для лучшей видимости */
+  color: #ffffff;
+  letter-spacing: 3px;
+  /* Тени для контраста на светлом фоне */
+  text-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    0 0 20px rgba(255, 255, 255, 0.5);
+  position: relative;
+}
+
+/* Fallback для браузеров без поддержки text-shadow */
+@supports not (text-shadow: 0 0 0) {
+  .login-logo h1 {
+    color: #ffffff;
+  }
+}
+
+/* Заголовок */
+.login-header {
+  text-align: center;
+  margin-bottom: 32px;
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both;
+}
+
+.login-header h2 {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  background: linear-gradient(135deg, #0F2A1D 0%, #689071 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+}
+
+.login-header p {
+  font-size: 16px;
+  color: #689071;
+  margin: 0;
+  font-weight: 400;
+}
+
+
+/* Форма */
+.login-form {
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+}
+
+/* Поля ввода */
+.login-form .ant-form-item-label > label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0F2A1D;
+  margin-bottom: 8px;
+}
+
+.login-input {
+  border-radius: 12px !important;
+  border: 2px solid #E3EED4 !important;
+  padding: 12px 16px !important;
+  font-size: 15px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  background: #ffffff !important;
+  height: 48px !important;
+}
+
+.login-input:hover {
+  border-color: #AEC380 !important;
+  box-shadow: 0 0 0 4px rgba(174, 195, 128, 0.1) !important;
+}
+
+.login-input:focus,
+.login-input.ant-input-focused {
+  border-color: #689071 !important;
+  box-shadow: 0 0 0 4px rgba(104, 144, 113, 0.15) !important;
+  transform: translateY(-1px);
+}
+
+.login-input.ant-input-status-error {
+  border-color: #ff4d4f !important;
+  animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+.login-input .anticon {
+  color: #689071;
+  font-size: 16px;
+}
+
+/* Кнопка входа */
+.login-button {
+  height: 52px !important;
+  border-radius: 12px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  background: linear-gradient(135deg, #689071 0%, #AEC380 100%) !important;
+  border: none !important;
+  box-shadow: 
+    0 4px 16px rgba(104, 144, 113, 0.4),
+    0 0 0 0 rgba(104, 144, 113, 0.4) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  margin-top: 8px !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.login-button:hover::before {
+  left: 100%;
+}
+
+.login-button:hover {
+  background: linear-gradient(135deg, #375534 0%, #689071 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 24px rgba(104, 144, 113, 0.5),
+    0 0 0 0 rgba(104, 144, 113, 0.4) !important;
+}
+
+.login-button:active {
+  transform: translateY(0);
+  box-shadow: 
+    0 4px 12px rgba(104, 144, 113, 0.4),
+    0 0 0 0 rgba(104, 144, 113, 0.4) !important;
+}
+
+.login-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Сообщение об ошибке */
+.login-error-alert {
+  border-radius: 12px !important;
+  border: 2px solid #ff4d4f !important;
+  background: linear-gradient(135deg, #fff1f0 0%, #fff2f0 100%) !important;
+  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.login-error-alert .ant-alert-message {
+  color: #ff4d4f;
+  font-weight: 500;
+}
+
+/* Демо данные */
+.login-demo {
+  margin-top: 24px;
+  padding: 16px;
+  background: linear-gradient(135deg, #F0F7EB 0%, #E3EED4 100%);
+  border-radius: 12px;
+  border: 1px solid #AEC380;
+  text-align: center;
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both;
+}
+
+.login-demo p {
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  color: #689071;
+  font-weight: 500;
+}
+
+.login-demo code {
+  display: block;
+  font-size: 13px;
+  color: #0F2A1D;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-family: 'Courier New', monospace;
+  margin: 4px 0;
+  border: 1px solid #E3EED4;
+  transition: all 0.2s;
+}
+
+.login-demo code:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(104, 144, 113, 0.2);
+}
+
+/* Футер */
+.login-footer {
+  text-align: center;
+  margin-top: 32px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 400;
+  animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both;
+  position: relative;
+  z-index: 1;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .login-form-container {
+    padding: 32px 24px;
+    border-radius: 20px;
+  }
+
+  .login-header h2 {
+    font-size: 28px;
+  }
+
+  .login-header p {
+    font-size: 14px;
+  }
+
+  .login-button {
+    height: 48px !important;
+    font-size: 15px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 16px;
+  }
+
+  .login-form-container {
+    padding: 24px 20px;
+  }
+
+  .login-header h2 {
+    font-size: 24px;
+  }
+}
+
+/* Дополнительные эффекты */
+.login-form-container {
+  position: relative;
+}
+
+.login-form-container::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(135deg, #0F2A1D, #375534, #689071, #AEC380, #689071);
+  border-radius: 24px;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s;
+  filter: blur(8px);
+}
+
+.login-form-container:hover::after {
+  opacity: 0.3;
+}
+
+/* Дополнительные улучшения для соответствия Mood Board */
+.login-logo {
+  background: linear-gradient(135deg, #0F2A1D 0%, #375534 50%, #689071 100%);
+  box-shadow: 0 8px 24px rgba(15, 42, 29, 0.4);
+}
+
+.login-header h2 {
+  background: linear-gradient(135deg, #0F2A1D 0%, #375534 50%, #689071 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.login-header p {
+  color: #689071;
+}
+
+.login-demo {
+  background: linear-gradient(135deg, #E3EED4 0%, #F0F7EB 100%);
+  border: 1px solid #AEC380;
+}
+
+.login-demo p {
+  color: #375534;
+  font-weight: 600;
+}
+
+.login-demo code {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #AEC380;
+  color: #0F2A1D;
+}
+
+.login-demo code:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: #689071;
+  box-shadow: 0 2px 8px rgba(104, 144, 113, 0.25);
+}
+

@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yess-api-gateway
+  labels:
+    app: yess-api-gateway
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: yess-api-gateway
+  template:
+    metadata:
+      labels:
+        app: yess-api-gateway
+    spec:
+      containers:
+      - name: yess-api-gateway
+        image: yess-loyalty/api-gateway:v1.0.0
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        ports:
+        - containerPort: 8000
+        env:
+        - name: ENVIRONMENT
+          value: production
+        - name: RATE_LIMIT
+          value: "100"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 15
+          periodSeconds: 10
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yess-api-gateway-service
+spec:
+  selector:
+    app: yess-api-gateway
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8000

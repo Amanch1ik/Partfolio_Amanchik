@@ -1,0 +1,33 @@
+# Основные зависимости
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+gunicorn>=23.0.0
+sqlalchemy>=2.0.0
+alembic>=1.13.0
+psycopg2-binary>=2.9.9
+
+# Безопасность
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+bcrypt>=4.2.0
+
+# Валидация
+pydantic>=2.9.0
+pydantic-settings>=2.5.0
+
+# Асинхронность
+asyncpg>=0.29.0
+
+# Мониторинг
+prometheus-client>=0.21.0
+sentry-sdk>=2.19.0
+
+# Дополнительно
+redis>=5.0.0
+celery>=5.4.0
+python-multipart>=0.0.12
+slowapi>=0.1.9
+
+# Деплой
+requests>=2.32.0
+urllib3>=2.2.0

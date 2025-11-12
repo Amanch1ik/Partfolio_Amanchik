@@ -1,0 +1,99 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./yess-backend
+      dockerfile: Dockerfile.prod
+    container_name: yess-backend-prod
+    restart: always
+    environment:
+      - ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - SECRET_KEY=${SECRET_KEY}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./yess-backend:/app
+      - ./uploads:/app/uploads
+    env_file:
+      - .env.production
+
+  postgres:
+    image: postgres:13
+    container_name: yess-postgres-prod
+    restart: always
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-yess_db}
+      - POSTGRES_USER=${POSTGRES_USER:-yess_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:alpine
+    container_name: yess-redis-prod
+    restart: always
+    ports:
+      - "6379:6379"
+
+  nginx:
+    image: nginx:latest
+    container_name: yess-nginx-prod
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+
+  certbot:
+    image: certbot/certbot
+    container_name: yess-go-app-backend-certbot-1
+    restart: always
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: >
+      /bin/sh -c '
+      trap exit TERM;
+      while :;
+      do
+        certbot renew;
+        sleep 12h & wait $${!};
+      done;
+      '
+
+  prometheus:
+    image: prom/prometheus
+    container_name: yess-prometheus-prod
+    restart: always
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana
+    container_name: yess-grafana-prod
+    restart: always
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
+  uploads:

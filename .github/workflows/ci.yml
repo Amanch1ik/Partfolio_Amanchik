@@ -1,0 +1,136 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: yess_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: yess_db_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install dependencies
+      working-directory: Yess-Money---app-master/yess-backend
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+    
+    - name: Run linters
+      working-directory: Yess-Money---app-master/yess-backend
+      run: |
+        flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        black app/ --check
+    
+    - name: Run tests
+      working-directory: Yess-Money---app-master/yess-backend
+      env:
+        DATABASE_URL: postgresql://yess_user:test_password@localhost:5432/yess_db_test
+        REDIS_URL: redis://localhost:6379/0
+        SECRET_KEY: test_secret_key_for_ci_min_32_chars_long
+        JWT_SECRET_KEY: test_jwt_secret_key_for_ci_min_32_chars
+        ADMIN_SECRET_KEY: test_admin_secret_key_for_ci_min_32_chars
+      run: |
+        pytest tests/ -v --cov=app --cov-report=xml --cov-report=html
+    
+    - name: Upload coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./Yess-Money---app-master/yess-backend/coverage.xml
+        flags: backend
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Install dependencies (Admin Panel)
+      working-directory: Yess-Money---app-master/admin-panel
+      run: npm ci
+    
+    - name: Run linter (Admin Panel)
+      working-directory: Yess-Money---app-master/admin-panel
+      run: npm run lint || true
+    
+    - name: Build (Admin Panel)
+      working-directory: Yess-Money---app-master/admin-panel
+      run: npm run build
+    
+    - name: Install dependencies (Partner Panel)
+      working-directory: Yess-Money---app-master/partner-panel
+      run: npm ci
+    
+    - name: Run linter (Partner Panel)
+      working-directory: Yess-Money---app-master/partner-panel
+      run: npm run lint || true
+    
+    - name: Build (Partner Panel)
+      working-directory: Yess-Money---app-master/partner-panel
+      run: npm run build
+
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install security tools
+      working-directory: Yess-Money---app-master/yess-backend
+      run: |
+        pip install safety bandit
+    
+    - name: Run safety check
+      working-directory: Yess-Money---app-master/yess-backend
+      run: |
+        safety check --json || true
+    
+    - name: Run bandit security scan
+      working-directory: Yess-Money---app-master/yess-backend
+      run: |
+        bandit -r app/ -f json -o bandit-report.json || true
+

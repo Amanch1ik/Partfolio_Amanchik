@@ -1,0 +1,18 @@
+ИНСТРУКЦИЯ ПО ЗАПУСКУ BACKEND
+============================
+
+1. Откройте PowerShell в директории: Yess-Money---app-master\yess-backend
+
+2. Активируйте виртуальное окружение:
+   .\venv\Scripts\Activate.ps1
+
+3. Запустите сервер командой:
+   uvicorn app.main:app --reload --port 8000
+
+ВАЖНО: Команда должна быть полной: "app.main:app" (не "app.main:")
+
+Сервер будет доступен на:
+- API: http://localhost:8000
+- Swagger: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
+

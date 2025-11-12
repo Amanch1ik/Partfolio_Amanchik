@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:YessLoyaltyApp.ViewModels"
+             x:Class="YessLoyaltyApp.Views.BonusSystemPage"
+             Title="Бонусная система">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#007A51" Offset="0.0"/>
+                <GradientStop Color="#00945E" Offset="1.0"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <!-- Баланс и уровень -->
+        <VerticalStackLayout Grid.Row="0" Padding="16">
+            <Label Text="Ваш баланс" 
+                   TextColor="White"
+                   FontSize="16"
+                   HorizontalOptions="Center"/>
+            
+            <Label Text="{Binding Balance, StringFormat='{0} YesCoin'}" 
+                   TextColor="White"
+                   FontSize="32"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"/>
+            
+            <Border BackgroundColor="White" 
+                    Stroke="Transparent"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="16"
+                    Margin="0,16,0,0">
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="16">
+                    <Label Text="Уровень:" 
+                           VerticalOptions="Center"/>
+                    <Label Text="{Binding LoyaltyLevel}" 
+                           FontAttributes="Bold"
+                           VerticalOptions="Center"/>
+                    <ProgressBar 
+                        Progress="{Binding LoyaltyProgress}"
+                        WidthRequest="100"
+                        HeightRequest="10"
+                        ProgressColor="#007A51"/>
+                </HorizontalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+
+        <!-- История транзакций -->
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Transactions}"
+                        BackgroundColor="White"
+                        Margin="16">
+            <CollectionView.Header>
+                <Label Text="История транзакций" 
+                       FontSize="18" 
+                       FontAttributes="Bold"
+                       Margin="0,0,0,16"
+                       HorizontalOptions="Center"/>
+            </CollectionView.Header>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Padding="16,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <VerticalStackLayout Grid.Column="0">
+                            <Label Text="{Binding PartnerName}" 
+                                   FontAttributes="Bold"/>
+                            <Label Text="{Binding Date, StringFormat='{0:dd MMM yyyy HH:mm'}"
+                                   TextColor="Gray"
+                                   FontSize="12"/>
+                        </VerticalStackLayout>
+
+                        <Label Grid.Column="1"
+                               Text="{Binding Amount, StringFormat='{0} YesCoin'}"
+                               TextColor="{Binding IsPositive, Converter={StaticResource BoolToColorConverter}}"
+                               VerticalOptions="Center"/>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Кнопки действий -->
+        <HorizontalStackLayout Grid.Row="2" 
+                                Spacing="16" 
+                                Padding="16"
+                                HorizontalOptions="Center">
+            <Button Text="Пополнить" 
+                    Command="{Binding TopUpCommand}"
+                    BackgroundColor="#007A51"
+                    TextColor="White"
+                    CornerRadius="16"/>
+            
+            <Button Text="Списать" 
+                    Command="{Binding WithdrawCommand}"
+                    BackgroundColor="White"
+                    BorderColor="#007A51"
+                    BorderWidth="1"
+                    TextColor="#007A51"
+                    CornerRadius="16"/>
+        </HorizontalStackLayout>
+    </Grid>
+</ContentPage>
