@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: yess-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: yess_user
+      POSTGRES_PASSWORD: secure_password
+      POSTGRES_DB: yess_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - yess_pg_data:/var/lib/postgresql/data
+    networks:
+      - yess-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yess_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: yess-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - yess-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  yess_pg_data:
+
+networks:
+  yess-network:
+    driver: bridge
+
