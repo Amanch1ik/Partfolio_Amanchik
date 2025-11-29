@@ -488,6 +488,29 @@ const partnerApi = {
       },
     });
   },
+
+  // Wallet
+  async getWalletBalance(userId?: number) {
+    try {
+      const params = userId ? { user_id: userId } : {};
+      return await apiClient.get('/wallet/balance', { params });
+    } catch (error) {
+      console.error('Error fetching wallet balance:', error);
+      throw error;
+    }
+  },
+
+  async syncWallet(userId: number, deviceId?: string) {
+    try {
+      return await apiClient.post('/wallet/sync', {
+        user_id: userId,
+        device_id: deviceId,
+      });
+    } catch (error) {
+      console.error('Error syncing wallet:', error);
+      throw error;
+    }
+  },
 };
 
 export default partnerApi;

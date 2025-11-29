@@ -29,18 +29,9 @@ class WalletSyncService {
    */
   async getBalance(userId: number): Promise<WalletBalance | null> {
     try {
-      // TODO: Добавить endpoint в partnerApi
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/wallet/balance?user_id=${userId}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('partner_token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch balance');
-      }
-
-      return await response.json();
+      const partnerApi = await import('./partnerApi');
+      const response = await partnerApi.default.getWalletBalance(userId);
+      return response.data;
     } catch (error) {
       console.error('Error fetching balance:', error);
       return null;
@@ -58,23 +49,9 @@ class WalletSyncService {
     this.isSyncing = true;
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/wallet/sync`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('partner_token')}`,
-        },
-        body: JSON.stringify({
-          user_id: userId,
-          device_id: deviceId,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Sync failed');
-      }
-
-      const result: SyncResult = await response.json();
+      const partnerApi = await import('./partnerApi');
+      const response = await partnerApi.default.syncWallet(userId, deviceId);
+      const result: SyncResult = response.data;
       this.lastSyncTime = Date.now();
       
       return result;
