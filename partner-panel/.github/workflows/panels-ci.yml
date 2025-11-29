@@ -1,0 +1,46 @@
+name: Panels CI (Partner)
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies (Partner Panel)
+        run: |
+          cd panels-source/partner-panel
+          npm ci
+
+      - name: Run unit tests
+        run: |
+          cd panels-source/partner-panel
+          npm test
+
+      - name: Install Playwright dependencies
+        run: |
+          cd panels-source/partner-panel
+          npm i -D playwright
+          npx playwright install --with-deps
+
+      - name: Run Playwright E2E tests
+        run: |
+          cd panels-source/partner-panel
+          npx playwright test
+
+      - name: Post changelog to PR
+        if: github.event_name == 'pull_request'
+        run: |
+          bash ../../shared-scripts/generate_changelog.sh || true
+          bash ../../shared-scripts/embed_changelog_in_pr.sh CHANGELOG.md ${{ github.event.pull_request.number || github.event.pull_request.id }} || true
+
+

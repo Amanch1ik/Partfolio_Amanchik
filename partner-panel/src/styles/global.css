@@ -1,0 +1,167 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #E3EED4 0%, #F0F7EB 100%);
+  color: #0F2A1D;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Улучшенные стили Ant Design компонентов для партнер-панели */
+
+.ant-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ant-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(15, 42, 29, 0.12) !important;
+}
+
+.hover-lift-green {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift-green:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(15, 42, 29, 0.12) !important;
+}
+
+.ant-btn-primary {
+  background: linear-gradient(135deg, #689071 0%, #AEC380 100%);
+  border: none;
+  box-shadow: 0 4px 12px rgba(104, 144, 113, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ant-btn-primary:hover {
+  background: linear-gradient(135deg, #375534 0%, #689071 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(104, 144, 113, 0.4);
+}
+
+.ant-input,
+.ant-input-number,
+.ant-select-selector {
+  border-color: #E3EED4 !important;
+  border-radius: 12px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ant-input:hover,
+.ant-input-number:hover,
+.ant-select-selector:hover {
+  border-color: #AEC380 !important;
+}
+
+.ant-input:focus,
+.ant-input:focus-visible,
+.ant-input-number:focus,
+.ant-input-number:focus-visible,
+.ant-select-focused .ant-select-selector {
+  border-color: #689071 !important;
+  box-shadow: 0 0 0 3px rgba(104, 144, 113, 0.15) !important;
+}
+
+.ant-table {
+  background: transparent;
+}
+
+.ant-table-thead > tr > th {
+  background: linear-gradient(135deg, #F0F7EB 0%, #E3EED4 100%) !important;
+  color: #0F2A1D !important;
+  font-weight: 600;
+  border-color: #E3EED4;
+}
+
+.ant-table-tbody > tr {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ant-table-tbody > tr:hover > td {
+  background: #F0F7EB !important;
+  transform: scale(1.01);
+}
+
+.ant-pagination-item-active {
+  background: linear-gradient(135deg, #689071 0%, #AEC380 100%) !important;
+  border-color: #689071 !important;
+}
+
+.ant-pagination-item-active a {
+  color: #ffffff !important;
+}
+
+.ant-tag {
+  border-radius: 12px;
+  border: none;
+}
+
+.ant-modal-content {
+  border-radius: 16px !important;
+}
+
+.ant-modal-header {
+  border-radius: 16px 16px 0 0 !important;
+  border-color: #E3EED4 !important;
+}
+
+.ant-form-item-label > label {
+  color: #0F2A1D;
+  font-weight: 600;
+}
+
+/* Smooth transitions */
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.scale-in {
+  animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-delay-100 {
+  animation-delay: 0.1s;
+}
+
+.animate-delay-200 {
+  animation-delay: 0.2s;
+}
+
+.animate-delay-300 {
+  animation-delay: 0.3s;
+}
+
+.animate-delay-400 {
+  animation-delay: 0.4s;
+}
+

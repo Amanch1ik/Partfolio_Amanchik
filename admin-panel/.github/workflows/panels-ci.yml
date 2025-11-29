@@ -1,0 +1,63 @@
+name: Panels CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies (Admin Panel)
+        run: |
+          cd panels-source/admin-panel
+          npm ci
+
+      - name: Lint (optional)
+        run: |
+          cd panels-source/admin-panel
+          npm run lint || true
+
+      - name: Run unit tests
+        run: |
+          cd panels-source/admin-panel
+          npm test
+
+      - name: Install Playwright dependencies
+        run: |
+          cd panels-source/admin-panel
+          npm i -D playwright
+          npx playwright install --with-deps
+
+      - name: Run Playwright E2E tests
+        run: |
+          cd panels-source/admin-panel
+          npx playwright test
+  - name: Run i18n-context tests
+    run: |
+      cd panels-source/admin-panel
+      npm test -- -t i18nMultiPage
+  - name: Post changelog to PR
+        if: github.event_name == 'pull_request'
+        run: |
+          bash ../../shared-scripts/generate_changelog.sh || true
+          bash ../../shared-scripts/embed_changelog_in_pr.sh CHANGELOG.md ${{ github.event.pull_request.number || github.event.pull_request.id }} || true
+      - name: Build docs Docker image
+        run: |
+          cd panels-source/admin-panel/docs
+          docker build -t panels-admin-docs .
+      - name: Generate changelog
+        run: |
+          cd panels-source/admin-panel
+          npm install --no-audit --no-fund -D conventional-changelog-cli || true
+          npx conventional-changelog -p angular -i CHANGELOG.md -s || true
+
+

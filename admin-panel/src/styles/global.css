@@ -1,0 +1,299 @@
+/* Глобальные стили для Yess!Go Admin Panel */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, #F0F7EB 0%, #E3EED4 100%);
+  min-height: 100vh;
+}
+
+/* Кастомные скроллбары */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F0F7EB;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #689071 0%, #AEC380 100%);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #375534 0%, #689071 100%);
+}
+
+/* Стили для Ant Design компонентов */
+.ant-card {
+  border-radius: 16px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.ant-card-head {
+  border-bottom: 1px solid #E3EED4 !important;
+}
+
+.ant-card-head-title {
+  color: #0F2A1D !important;
+  font-weight: 600 !important;
+}
+
+.ant-btn-primary {
+  background: linear-gradient(135deg, #689071 0%, #AEC380 100%) !important;
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(104, 144, 113, 0.3) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.ant-btn-primary:hover {
+  background: linear-gradient(135deg, #375534 0%, #689071 100%) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(104, 144, 113, 0.4) !important;
+}
+
+.ant-btn-primary:active {
+  transform: translateY(0) !important;
+}
+
+.ant-table {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+.ant-table-thead > tr > th {
+  background: #F0F7EB !important;
+  color: #0F2A1D !important;
+  font-weight: 600 !important;
+  border-bottom: 2px solid #E3EED4 !important;
+}
+
+.ant-table-tbody > tr:hover > td {
+  background: #F0F7EB !important;
+}
+
+.ant-table-tbody > tr > td {
+  border-bottom: 1px solid #E3EED4 !important;
+}
+
+.ant-input:focus,
+.ant-input-focused {
+  border-color: #689071 !important;
+  box-shadow: 0 0 0 3px rgba(104, 144, 113, 0.15) !important;
+}
+
+.ant-select:not(.ant-select-disabled):hover .ant-select-selector {
+  border-color: #AEC380 !important;
+}
+
+.ant-select-focused:not(.ant-select-disabled).ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  border-color: #689071 !important;
+  box-shadow: 0 0 0 3px rgba(104, 144, 113, 0.15) !important;
+}
+
+.ant-tag {
+  border-radius: 8px !important;
+  padding: 2px 8px !important;
+  font-weight: 500 !important;
+}
+
+.ant-tag-green {
+  background: linear-gradient(135deg, #E3EED4 0%, #F0F7EB 100%) !important;
+  color: #689071 !important;
+  border: 1px solid #AEC380 !important;
+}
+
+.ant-tag-red {
+  background: linear-gradient(135deg, #fff1f0 0%, #fff2f0 100%) !important;
+  color: #ff4d4f !important;
+  border: 1px solid #ffccc7 !important;
+}
+
+.ant-tag-blue {
+  background: linear-gradient(135deg, #e6f7ff 0%, #f0f9ff 100%) !important;
+  color: #1890ff !important;
+  border: 1px solid #91d5ff !important;
+}
+
+.ant-tag-orange {
+  background: linear-gradient(135deg, #fff7e6 0%, #fffbe6 100%) !important;
+  color: #faad14 !important;
+  border: 1px solid #ffe58f !important;
+}
+
+/* Модальные окна */
+.ant-modal-content {
+  border-radius: 16px !important;
+  overflow: hidden !important;
+}
+
+.ant-modal-header {
+  background: linear-gradient(135deg, #F0F7EB 0%, #ffffff 100%) !important;
+  border-bottom: 1px solid #E3EED4 !important;
+}
+
+.ant-modal-title {
+  color: #0F2A1D !important;
+  font-weight: 600 !important;
+}
+
+.ant-modal-footer {
+  border-top: 1px solid #E3EED4 !important;
+  padding: 16px 24px !important;
+}
+
+/* Уведомления */
+.ant-message {
+  z-index: 9999 !important;
+}
+
+.ant-message-notice-content {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(15, 42, 29, 0.15) !important;
+}
+
+/* Dropdown меню */
+.ant-dropdown-menu {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(15, 42, 29, 0.15) !important;
+  border: 1px solid #E3EED4 !important;
+}
+
+.ant-dropdown-menu-item:hover {
+  background: #F0F7EB !important;
+}
+
+.ant-dropdown-menu-item-selected {
+  background: linear-gradient(135deg, #E3EED4 0%, #F0F7EB 100%) !important;
+  color: #0F2A1D !important;
+}
+
+/* Календарь */
+.ant-picker-calendar {
+  background: transparent !important;
+}
+
+.ant-picker-calendar-date {
+  border-radius: 8px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.ant-picker-calendar-date:hover {
+  background: #F0F7EB !important;
+}
+
+.ant-picker-calendar-date-selected {
+  background: linear-gradient(135deg, #689071 0%, #AEC380 100%) !important;
+  color: #ffffff !important;
+}
+
+/* Tabs */
+.ant-tabs-tab {
+  border-radius: 8px 8px 0 0 !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.ant-tabs-tab:hover {
+  color: #689071 !important;
+}
+
+.ant-tabs-tab-active {
+  color: #689071 !important;
+}
+
+.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #689071 !important;
+  font-weight: 600 !important;
+}
+
+.ant-tabs-ink-bar {
+  background: linear-gradient(135deg, #689071 0%, #AEC380 100%) !important;
+  height: 3px !important;
+}
+
+/* Badge */
+.ant-badge-count {
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%) !important;
+  box-shadow: 0 2px 4px rgba(82, 196, 26, 0.3) !important;
+}
+
+/* Tooltip */
+.ant-tooltip-inner {
+  background: #0F2A1D !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+}
+
+.ant-tooltip-arrow::before {
+  background: #0F2A1D !important;
+}
+
+/* Loading */
+.ant-spin-dot-item {
+  background-color: #689071 !important;
+}
+
+/* Select */
+.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background: #F0F7EB !important;
+  color: #689071 !important;
+  font-weight: 500 !important;
+}
+
+.ant-select-item-option:hover {
+  background: #F0F7EB !important;
+}
+
+/* Form */
+.ant-form-item-label > label {
+  color: #0F2A1D !important;
+  font-weight: 500 !important;
+}
+
+/* Statistic */
+.ant-statistic-title {
+  color: #689071 !important;
+}
+
+.ant-statistic-content {
+  color: #0F2A1D !important;
+}
+
+/* Улучшенные эффекты для интерактивных элементов */
+.interactive-element {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.interactive-element:hover {
+  transform: translateY(-2px);
+}
+
+.interactive-element:active {
+  transform: translateY(0);
+}
+
+/* Градиентный текст */
+.gradient-text {
+  background: linear-gradient(135deg, #689071 0%, #AEC380 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
+/* Анимация для появления страниц */
+.page-enter {
+  animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+

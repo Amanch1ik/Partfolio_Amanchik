@@ -1,0 +1,271 @@
+/* Система тем для партнер-панели */
+
+/* Светлая тема (по умолчанию) */
+:root,
+[data-theme="light"] {
+  /* Основные цвета */
+  --color-primary: #689071;
+  --color-primary-light: #AEC380;
+  --color-primary-dark: #375534;
+  --color-primary-bg: #F0F7EB;
+  
+  /* Фоны */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #F0F7EB;
+  --color-bg-tertiary: #E3EED4;
+  --color-bg-hover: rgba(104, 144, 113, 0.1);
+  
+  /* Текст */
+  --color-text-primary: #0F2A1D;
+  --color-text-secondary: #689071;
+  --color-text-tertiary: #8a9a8f;
+  --color-text-inverse: #ffffff;
+  
+  /* Границы */
+  --color-border: #E3EED4;
+  --color-border-hover: #AEC380;
+  
+  /* Тени */
+  --shadow-sm: 0 2px 8px rgba(15, 42, 29, 0.06);
+  --shadow-md: 0 4px 12px rgba(15, 42, 29, 0.08);
+  --shadow-lg: 0 8px 24px rgba(15, 42, 29, 0.12);
+  
+  /* Статусы */
+  --color-success: #52c41a;
+  --color-warning: #faad14;
+  --color-error: #ff4d4f;
+  --color-info: #1890ff;
+  
+  /* Sidebar */
+  --sidebar-bg: #0F2A1D;
+  --sidebar-text: rgba(255, 255, 255, 0.85);
+  --sidebar-text-active: #ffffff;
+  --sidebar-item-hover: rgba(104, 144, 113, 0.3);
+  --sidebar-item-active: #689071;
+  
+  /* Header */
+  --header-bg: #ffffff;
+  --header-border: #E3EED4;
+  
+  /* Cards */
+  --card-bg: linear-gradient(135deg, #ffffff 0%, #F0F7EB 100%);
+  --card-border: #E3EED4;
+  --card-shadow: 0 2px 12px rgba(15, 42, 29, 0.08);
+  
+  /* Inputs */
+  --input-bg: #ffffff;
+  --input-border: #d9d9d9;
+  --input-border-hover: #AEC380;
+  --input-border-focus: #689071;
+  
+  /* Charts */
+  --chart-grid: #E3EED4;
+  --chart-tooltip-bg: #ffffff;
+}
+
+/* Тёмная тема */
+[data-theme="dark"] {
+  /* Основные цвета */
+  --color-primary: #AEC380;
+  --color-primary-light: #c4d8a0;
+  --color-primary-dark: #689071;
+  --color-primary-bg: #1a2f1f;
+  
+  /* Фоны */
+  --color-bg-primary: #0d1a12;
+  --color-bg-secondary: #142318;
+  --color-bg-tertiary: #1a2f1f;
+  --color-bg-hover: rgba(174, 195, 128, 0.1);
+  
+  /* Текст */
+  --color-text-primary: #e8f0e3;
+  --color-text-secondary: #AEC380;
+  --color-text-tertiary: #7a9a7f;
+  --color-text-inverse: #0d1a12;
+  
+  /* Границы */
+  --color-border: #2d4a35;
+  --color-border-hover: #689071;
+  
+  /* Тени */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  
+  /* Статусы */
+  --color-success: #73d13d;
+  --color-warning: #ffc53d;
+  --color-error: #ff7875;
+  --color-info: #40a9ff;
+  
+  /* Sidebar */
+  --sidebar-bg: #0a1410;
+  --sidebar-text: rgba(232, 240, 227, 0.85);
+  --sidebar-text-active: #e8f0e3;
+  --sidebar-item-hover: rgba(174, 195, 128, 0.2);
+  --sidebar-item-active: #689071;
+  
+  /* Header */
+  --header-bg: #142318;
+  --header-border: #2d4a35;
+  
+  /* Cards */
+  --card-bg: linear-gradient(135deg, #142318 0%, #1a2f1f 100%);
+  --card-border: #2d4a35;
+  --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  
+  /* Inputs */
+  --input-bg: #1a2f1f;
+  --input-border: #2d4a35;
+  --input-border-hover: #689071;
+  --input-border-focus: #AEC380;
+  
+  /* Charts */
+  --chart-grid: #2d4a35;
+  --chart-tooltip-bg: #142318;
+}
+
+/* Применение переменных к элементам */
+body {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Карточки */
+.ant-card {
+  background: var(--card-bg) !important;
+  border-color: var(--card-border) !important;
+  box-shadow: var(--card-shadow) !important;
+}
+
+.ant-card-head {
+  border-bottom-color: var(--color-border) !important;
+}
+
+.ant-card-head-title {
+  color: var(--color-text-primary) !important;
+}
+
+/* Таблицы */
+.ant-table {
+  background: var(--color-bg-primary) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.ant-table-thead > tr > th {
+  background: var(--color-bg-tertiary) !important;
+  color: var(--color-text-primary) !important;
+  border-bottom-color: var(--color-border) !important;
+}
+
+.ant-table-tbody > tr > td {
+  border-bottom-color: var(--color-border) !important;
+}
+
+.ant-table-tbody > tr:hover > td {
+  background: var(--color-bg-hover) !important;
+}
+
+/* Модальные окна */
+.ant-modal-content {
+  background: var(--color-bg-primary) !important;
+}
+
+.ant-modal-header {
+  background: var(--color-bg-primary) !important;
+  border-bottom-color: var(--color-border) !important;
+}
+
+.ant-modal-title {
+  color: var(--color-text-primary) !important;
+}
+
+/* Формы */
+.ant-input,
+.ant-input-affix-wrapper,
+.ant-select-selector,
+.ant-picker {
+  background-color: var(--input-bg) !important;
+  border-color: var(--input-border) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.ant-input:hover,
+.ant-input-affix-wrapper:hover,
+.ant-select-selector:hover,
+.ant-picker:hover {
+  border-color: var(--input-border-hover) !important;
+}
+
+.ant-input:focus,
+.ant-input-affix-wrapper:focus,
+.ant-input-affix-wrapper-focused,
+.ant-select-focused .ant-select-selector,
+.ant-picker-focused {
+  border-color: var(--input-border-focus) !important;
+  box-shadow: 0 0 0 2px rgba(104, 144, 113, 0.2) !important;
+}
+
+.ant-form-item-label > label {
+  color: var(--color-text-primary) !important;
+}
+
+/* Dropdown и Select */
+.ant-select-dropdown,
+.ant-dropdown-menu {
+  background: var(--color-bg-primary) !important;
+}
+
+.ant-select-item,
+.ant-dropdown-menu-item {
+  color: var(--color-text-primary) !important;
+}
+
+.ant-select-item:hover,
+.ant-dropdown-menu-item:hover {
+  background: var(--color-bg-hover) !important;
+}
+
+.ant-select-item-option-selected {
+  background: var(--color-primary-bg) !important;
+}
+
+/* Статистика */
+.ant-statistic-title {
+  color: var(--color-text-secondary) !important;
+}
+
+.ant-statistic-content {
+  color: var(--color-text-primary) !important;
+}
+
+/* Теги */
+.ant-tag {
+  background: var(--color-bg-tertiary);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+/* Переключатель темы */
+.theme-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.theme-switch:hover {
+  background: var(--color-bg-hover);
+}
+
+/* Анимация перехода между темами */
+* {
+  transition: background-color 0.3s ease, 
+              border-color 0.3s ease, 
+              box-shadow 0.3s ease;
+}
+

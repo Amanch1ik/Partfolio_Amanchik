@@ -1,0 +1,8 @@
+<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="192" height="192" rx="24" fill="#689071"/>
+  <path d="M96 40L120 64H104L88 80L104 96H120L96 120L72 96H88L104 80L88 64H72L96 40Z" fill="white"/>
+  <circle cx="96" cy="96" r="20" fill="#AEC380"/>
+  <path d="M76 76L116 116" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  <path d="M116 76L76 116" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  <text x="96" y="140" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">YESS</text>
+</svg>
