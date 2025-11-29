@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Button, Input, Form, message, Space, Alert } from 'antd';
+import { Button, Input, Form, Space, Alert, App } from 'antd';
 import { UserOutlined, LockOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -7,6 +7,7 @@ import { api } from '@/services/api';
 import './LoginPage.css';
 
 export const LoginPage = () => {
+  const { message } = App.useApp();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);

@@ -105,17 +105,21 @@ export const DashboardPage = () => {
         // Логируем детали ошибки для отладки
         console.error('Dashboard stats error:', error);
         if (error?.response?.status === 500) {
-          toast.error('Ошибка сервера при загрузке статистики. Проверьте логи бэкенда.', {
-            duration: 5,
-            description: 'Возможно, требуется перезапуск бэкенда после обновления кода.',
+          const errorDetail = error?.response?.data?.detail || error?.message || 'Internal Server Error';
+          toast.error('Ошибка сервера при загрузке статистики', {
+            duration: 8,
+            description: errorDetail.includes('DateTime') || errorDetail.includes('timestamp')
+              ? 'Проблема с форматом даты на сервере. Требуется перезапуск бэкенда.'
+              : 'Проверьте логи бэкенда. Возможно, требуется перезапуск после обновления кода.',
           });
         }
-        throw error;
+        // Не пробрасываем ошибку дальше, чтобы показать пустой дашборд вместо поломанной страницы
+        return null;
       }
     },
-    retry: 2,
-    retryDelay: 2000,
-    refetchInterval: 30000, // Обновление каждые 30 секунд
+    retry: 1, // Уменьшаем количество попыток
+    retryDelay: 3000,
+    refetchInterval: 60000, // Увеличиваем интервал до 60 секунд при ошибках
   });
 
   const { data: recentTransactions } = useQuery({
