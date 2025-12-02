@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Button, Input, Form, message, Space, Alert } from 'antd';
+import { Button, Input, Form, Space, Alert, App } from 'antd';
 import { UserOutlined, LockOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -7,6 +7,7 @@ import { api } from '@/services/api';
 import './LoginPage.css';
 
 export const LoginPage = () => {
+  const { message } = App.useApp();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -91,7 +92,35 @@ export const LoginPage = () => {
           const status = error.response.status;
           const data = error.response.data || {};
           // Извлекаем сообщение об ошибке из разных возможных полей
-          const detail = data.detail || data.error || data.message || '';
+          let detail = data.detail || data.error || data.message || '';
+          
+          // Обрабатываем массив ошибок валидации от Pydantic (422)
+          if (Array.isArray(detail)) {
+            const validationErrors = detail
+              .map((err: any) => {
+                if (typeof err === 'string') return err;
+                if (err && typeof err === 'object') {
+                  // Обрабатываем формат Pydantic: {type, loc, msg, input}
+                  const msg = err.msg || err.message;
+                  const loc = Array.isArray(err.loc) ? err.loc.join('.') : '';
+                  if (msg) {
+                    return loc ? `${loc}: ${msg}` : msg;
+                  }
+                  // Если нет msg, пытаемся извлечь из других полей
+                  return err.message || JSON.stringify(err);
+                }
+                return String(err);
+              })
+              .filter(Boolean)
+              .join(', ');
+            detail = validationErrors || 'Ошибка валидации данных';
+          } else if (detail && typeof detail === 'object') {
+            // Если detail - объект, извлекаем сообщение
+            // Обрабатываем формат Pydantic: {type, loc, msg, input}
+            const msg = detail.msg || detail.message;
+            const loc = Array.isArray(detail.loc) ? detail.loc.join('.') : '';
+            detail = msg ? (loc ? `${loc}: ${msg}` : msg) : JSON.stringify(detail);
+          }
           
           switch (status) {
             case 401:
@@ -116,6 +145,14 @@ export const LoginPage = () => {
                 errorText = '👤 Пользователь не найден. Проверьте правильность имени пользователя.';
               }
               break;
+            case 422:
+              // Ошибка валидации данных
+              if (detail && typeof detail === 'string') {
+                errorText = `⚠️ Ошибка валидации: ${detail}`;
+              } else {
+                errorText = '⚠️ Ошибка валидации данных. Проверьте правильность введенных данных.';
+              }
+              break;
             case 408:
               errorText = '⏱️ Превышено время ожидания ответа от сервера. Возможно, интернет-соединение слишком медленное. Проверьте подключение и попробуйте снова.';
               break;
@@ -126,7 +163,7 @@ export const LoginPage = () => {
               break;
             default:
               // Используем detail если есть, иначе общее сообщение
-              if (detail) {
+              if (detail && typeof detail === 'string') {
                 errorText = detail;
               } else {
                 errorText = `Ошибка ${status}. Попробуйте снова.`;
@@ -142,12 +179,17 @@ export const LoginPage = () => {
           }
         }
         
-        setErrorMessage(errorText);
+        // Убеждаемся, что errorText всегда строка перед использованием
+        const errorTextStr = typeof errorText === 'string' ? errorText : String(errorText || 'Ошибка при входе');
+        setErrorMessage(errorTextStr);
+        
         // Убираем эмодзи из toast сообщения без использования сложных RegExp,
         // чтобы избежать ошибок линтера no-misleading-character-class
         const toastMessage = ['❌', '🚫', '👤', '⏱️', '🔧', '🌐', '🔤', '⚠️'].reduce(
-          (acc, icon) => acc.split(icon).join(''),
-          errorText
+          (acc: string, icon: string) => {
+            return typeof acc === 'string' ? acc.split(icon).join('') : String(acc || '');
+          },
+          errorTextStr
         ).trim();
         message.error(toastMessage || 'Ошибка при входе');
     } finally {
@@ -161,7 +203,18 @@ export const LoginPage = () => {
     const firstError = errorInfo.errorFields?.[0];
     if (firstError) {
       const fieldName = firstError.name[0];
-      const errorMsg = firstError.errors[0];
+      const errorObj = firstError.errors[0];
+      
+      // Извлекаем строку из ошибки (может быть объектом или строкой)
+      let errorMsg = '';
+      if (typeof errorObj === 'string') {
+        errorMsg = errorObj;
+      } else if (errorObj && typeof errorObj === 'object') {
+        // Если это объект ошибки (например, от Zod), извлекаем msg или message
+        errorMsg = errorObj.msg || errorObj.message || errorObj.toString() || 'Ошибка валидации';
+      } else {
+        errorMsg = String(errorObj || 'Ошибка валидации');
+      }
       
       let errorText = '';
       if (fieldName === 'username') {
@@ -193,8 +246,8 @@ export const LoginPage = () => {
 
           {errorMessage && (
             <Alert
-              message={errorMessage}
-              type={errorMessage.includes('⚠️') ? 'warning' : 'error'}
+              message={typeof errorMessage === 'string' ? errorMessage : String(errorMessage)}
+              type={typeof errorMessage === 'string' && errorMessage.includes('⚠️') ? 'warning' : 'error'}
               icon={<ExclamationCircleOutlined />}
               showIcon
               closable
@@ -202,7 +255,7 @@ export const LoginPage = () => {
               style={{ marginBottom: 24 }}
               className="login-error-alert"
               action={
-                errorMessage.includes('кодирования') || errorMessage.includes('кеш') ? (
+                typeof errorMessage === 'string' && (errorMessage.includes('кодирования') || errorMessage.includes('кеш')) ? (
                   <Button
                     size="small"
                     onClick={() => {

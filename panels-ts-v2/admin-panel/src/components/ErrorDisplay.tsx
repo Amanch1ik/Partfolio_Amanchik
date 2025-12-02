@@ -19,7 +19,19 @@ export const ErrorDisplay = ({
 }: ErrorDisplayProps) => {
   const navigate = useNavigate();
   
-  const errorMessage = error instanceof Error ? error.message : error || 'Неизвестная ошибка';
+  // Безопасное извлечение строки из ошибки
+  let errorMessage = 'Неизвестная ошибка';
+  if (error instanceof Error) {
+    errorMessage = error.message;
+  } else if (typeof error === 'string') {
+    errorMessage = error;
+  } else if (error && typeof error === 'object') {
+    // Если это объект ошибки, извлекаем сообщение
+    errorMessage = (error as any).msg || (error as any).message || String(error);
+  } else if (error) {
+    errorMessage = String(error);
+  }
+  
   const displaySubTitle = subTitle || errorMessage;
 
   return (

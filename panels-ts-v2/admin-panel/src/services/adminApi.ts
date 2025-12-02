@@ -203,65 +203,53 @@ let devApiKeyId = 1;
 const adminApi = {
   // Аутентификация
   async login(username: string, password: string) {
+    // Определяем, является ли введенное значение email или username
+    const isEmail = username.includes('@');
+    const loginData = isEmail 
+      ? { email: username, password: password }
+      : { username: username, password: password };
+    
+    // Проверяем, что пароль не пустой
+    if (!password || password.trim() === '') {
+      throw new Error('Пароль не может быть пустым');
+    }
+    
     try {
-      console.log('📡 adminApi.login: Отправляем запрос на', `${API_PATH}/auth/login`);
-      // Пробуем использовать JSON endpoint аутентификации
-      const response = await axios.post(`${API_PATH}/auth/login/json`, {
-        phone: username,
-        password: password,
-      }, {
-        headers: { 'Content-Type': 'application/json' }
+      // Роутер админа имеет префикс /admin, поэтому путь /admin/auth/login
+      const loginUrl = `${API_PATH}/admin/auth/login`;
+      console.log('📡 adminApi.login: Отправляем запрос на', loginUrl);
+      console.log('📦 Данные запроса:', JSON.stringify(loginData, null, 2));
+      // Используем admin login endpoint
+      const response = await axios.post(loginUrl, loginData, {
+        headers: { 'Content-Type': 'application/json' },
+        timeout: 10000,
       });
 
       if (response.data.access_token) {
+        console.log('💾 adminApi.login: Сохраняем токен в localStorage');
         localStorage.setItem('admin_token', response.data.access_token);
         return {
           access_token: response.data.access_token,
-          admin: response.data.user || {
-            id: response.data.user?.id?.toString() || '1',
+          admin: response.data.admin || {
+            id: '1',
             email: username,
             role: 'admin' as const,
           },
         };
       }
-      throw new Error('Invalid response');
+      throw new Error('Invalid response: no access_token');
     } catch (error: any) {
-      // Для тестирования используем обычный login endpoint
-      try {
-        const response = await axios.post(`${API_PATH}/auth/login`, {
-          phone: username,
-          password,
-        }, {
-          headers: { 'Content-Type': 'application/json' },
-          timeout: 10000,
-        });
-
-        if (response.data.access_token) {
-          console.log('💾 adminApi.login: Сохраняем токен в localStorage');
-          localStorage.setItem('admin_token', response.data.access_token);
-          return {
-            access_token: response.data.access_token,
-            admin: {
-              id: '1',
-              email: username,
-              role: 'admin' as const,
-            },
-          };
+      // Обрабатываем ошибки подключения
+      if (!error.response && error.request) {
+        if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+          throw new Error('Превышено время ожидания. Проверьте подключение к интернету.');
+        } else if (error.code === 'ERR_NETWORK' || error.message?.includes('Network Error') || error.message?.includes('Failed to fetch')) {
+          throw new Error(`Не удалось подключиться к серверу. Убедитесь, что бэкенд запущен на порту 8001`);
+        } else {
+          throw new Error(`Не удалось подключиться к серверу. Проверьте, что бэкенд запущен на порту 8001`);
         }
-      } catch (adminError: any) {
-        // Обрабатываем ошибки подключения
-        if (!adminError.response && adminError.request) {
-          if (adminError.code === 'ECONNABORTED' || adminError.message?.includes('timeout')) {
-            throw new Error('Превышено время ожидания. Проверьте подключение к интернету.');
-          } else if (adminError.code === 'ERR_NETWORK' || adminError.message?.includes('Network Error') || adminError.message?.includes('Failed to fetch')) {
-            throw new Error(`Не удалось подключиться к серверу. Убедитесь, что бэкенд запущен на порту 8000`);
-          } else {
-            throw new Error(`Не удалось подключиться к серверу. Проверьте, что бэкенд запущен на порту 8000`);
-          }
-        }
-        throw adminError; // Возвращаем ошибку admin endpoint
       }
-      throw error;
+      throw error; // Возвращаем ошибку для обработки в LoginPage
     }
   },
 
