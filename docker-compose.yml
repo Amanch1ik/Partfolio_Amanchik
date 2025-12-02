@@ -1,15 +1,15 @@
 services:
-<<<<<<< HEAD
+  # PostgreSQL Database
   postgres:
     image: postgres:15
     container_name: yess-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: yess_user
-      POSTGRES_PASSWORD: secure_password
+      POSTGRES_PASSWORD: dev_password
       POSTGRES_DB: yess_db
     ports:
-      - "5432:5432"
+      - "5433:5432"  # Изменен порт, чтобы не конфликтовать с локальным PostgreSQL
     volumes:
       - yess_pg_data:/var/lib/postgresql/data
     networks:
@@ -20,12 +20,13 @@ services:
       timeout: 5s
       retries: 5
 
+  # Redis Cache
   redis:
     image: redis:7-alpine
     container_name: yess-redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "6380:6379"  # Изменен порт, чтобы не конфликтовать с локальным Redis
     networks:
       - yess-network
     healthcheck:
@@ -34,136 +35,56 @@ services:
       timeout: 5s
       retries: 5
 
-  csharp-backend:
-    build:
-      context: ./YessBackend-master
-      dockerfile: Dockerfile
-    container_name: yess-backend
-    restart: unless-stopped
-    ports:
-      - "8000:8000"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:8000
-      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=yess_db;User Id=yess_user;Password=secure_password
-      - Redis__ConnectionString=redis:6379
-      - Jwt__SecretKey=GENERATE_LONG_RANDOM_SECRET_KEY_HERE_MINIMUM_32_CHARS
-      - Jwt__Issuer=yess-loyalty
-      - Jwt__Audience=yess-loyalty
-      - Jwt__AccessTokenExpireMinutes=60
-      - Jwt__RefreshTokenExpireDays=7
-    networks:
-      - yess-network
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    volumes:
-      - yess_uploads:/app/uploads
-
-  admin-panel:
-    build:
-      context: ./panels-ts-v2
-      dockerfile: admin-panel/Dockerfile
-    container_name: yess-admin-panel
-    restart: unless-stopped
-    ports:
-      - "8083:80"
-    depends_on:
-      csharp-backend:
-        condition: service_started
-    networks:
-      - yess-network
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    environment:
-      - NODE_ENV=production
-
-  partner-panel:
-    build:
-      context: ./panels-ts-v2
-      dockerfile: partner-panel/Dockerfile
-    container_name: yess-partner-panel
-    restart: unless-stopped
-    ports:
-      - "8081:80"
-    depends_on:
-      csharp-backend:
-        condition: service_started
-    networks:
-      - yess-network
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    environment:
-      - NODE_ENV=production
-
-volumes:
-  yess_pg_data:
-  yess_uploads:
-
-networks:
-  yess-network:
-    driver: bridge
-
-=======
+  # Python FastAPI Backend
   backend:
     build: 
       context: ./yess-backend
       dockerfile: Dockerfile.dev
+    container_name: yess-backend
+    restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "8001:8000"  # Изменен внешний порт на 8001, чтобы не конфликтовать с локальным Backend
     volumes:
       - ./yess-backend:/app
+      - /app/venv  # Исключаем venv из volume
     environment:
-      - DATABASE_URL=${DATABASE_URL:-postgresql://yess_user:${POSTGRES_PASSWORD:-dev_password}@postgres:5432/yess_db}
-      - ENVIRONMENT=${ENVIRONMENT:-development}
-      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
-      - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
+      - DATABASE_URL=postgresql://yess_user:dev_password@postgres:5432/yess_db
+      - POSTGRES_HOST=postgres
+      - POSTGRES_USER=yess_user
+      - POSTGRES_PASSWORD=dev_password
+      - POSTGRES_DB=yess_db
+      - ENVIRONMENT=development
+      - DEVELOPMENT_MODE=true
+      - DEBUG=true
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=dev-secret-key-change-in-production
+      - JWT_SECRET_KEY=dev-jwt-secret-key-change-in-production
     depends_on:
-      - postgres
-      - redis
-    env_file:
-      - .env
+      postgres:
+        condition: service_healthy
+    networks:
+      - yess-network
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
-  postgres:
-    image: postgres:13
-    environment:
-      - POSTGRES_DB=${POSTGRES_DB:-yess_db}
-      - POSTGRES_USER=${POSTGRES_USER:-yess_user}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dev_password}
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
+  # PgAdmin (опционально, для управления БД)
   pgadmin:
     image: dpage/pgadmin4
+    container_name: yess-pgadmin
+    restart: unless-stopped
     environment:
-      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL:-admin@yessloyalty.com}
-      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD:-admin}
+      - PGADMIN_DEFAULT_EMAIL=admin@yessloyalty.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
     ports:
       - "5050:80"
     depends_on:
       - postgres
-
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    command: redis-server --appendonly yes
+    networks:
+      - yess-network
 
 volumes:
-  postgres_data:
-  redis_data:
->>>>>>> fbeca546db7463a04490b22dcaacce1d07a7fa06
+  yess_pg_data:
+    driver: local
+
+networks:
+  yess-network:
+    driver: bridge

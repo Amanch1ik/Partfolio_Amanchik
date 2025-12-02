@@ -16,11 +16,11 @@ export default defineConfig(({ mode }) => {
       extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'],
     },
     server: {
-      port: 3001,
+      port: 3004,
       strictPort: true,
       proxy: {
         '/api': {
-          target: 'http://localhost:8000',
+          target: 'http://localhost:8001',  // Docker Backend на порту 8001
           changeOrigin: true,
         },
       },
