@@ -236,14 +236,12 @@ YessBackend.Infrastructure/
 ```
 
 ## 📚 API Документация
-
 ### 🔗 Основные ссылки
-
 После запуска Backend доступны:
-
 - **Swagger UI**: http://localhost:8000/docs
 - **Health Check**: http://localhost:8000/api/v1/health
 - **OpenAPI JSON**: http://localhost:8000/swagger/v1/swagger.json
+
 
 ### 🔐 Аутентификация
 
@@ -268,7 +266,6 @@ Content-Type: application/json
   "password": "Chillgu1"
 }
 ```
-
 #### Партнер
 ```http
 POST /api/v1/partner/auth/login
