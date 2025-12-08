@@ -95,7 +95,7 @@ export const RecentActivity = ({ activities: propActivities }: RecentActivityPro
         return null; // Пропускаем транзакции без даты
       }
       
-      let activityType: 'sale' | 'employee' | 'promotion' | 'payment' = 'payment';
+      let activityType: Activity['type'] = 'payment';
       let title = 'Платеж обработан';
       let description = `Платеж на сумму ${amount > 0 ? amount.toLocaleString('ru-RU') : Math.abs(amount).toLocaleString('ru-RU')} сом`;
       
@@ -109,20 +109,17 @@ export const RecentActivity = ({ activities: propActivities }: RecentActivityPro
         description = `Акция применена, сумма ${amount.toLocaleString('ru-RU')} сом`;
       }
       
-      const status: 'success' | 'pending' | 'failed' = 
-        transaction.status === 'completed' || transaction.status === 'success' ? 'success' : 
-        transaction.status === 'pending' ? 'pending' : 'success';
-      
       return {
         id: `transaction-${transaction.id || date}`,
         type: activityType,
         title,
         description,
         timestamp: date,
-        status,
+        status: transaction.status === 'completed' || transaction.status === 'success' ? 'success' : 
+                transaction.status === 'pending' ? 'pending' : 'success',
       };
     })
-    .filter((item) => item !== null) as Activity[]; // Удаляем null значения
+    .filter((item): item is Activity => item !== null); // Удаляем null значения
 
   // Используем ТОЛЬКО реальные данные из API - propActivities игнорируются
   const displayActivities = activities;

@@ -272,14 +272,6 @@ const getWebSocketUrl = (): string => {
     // В development используем полный URL до бэкенда
     return 'ws://localhost:8000/api/v1/ws';
   }
-  // В production используем относительный путь
-  const IS_PROD = import.meta.env.PROD;
-  if (IS_PROD) {
-    // В production используем протокол текущей страницы
-    const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = typeof window !== 'undefined' ? window.location.host : 'localhost';
-    return `${protocol}//${host}/ws`;
-  }
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
   const wsUrl = API_BASE_URL.replace('http://', 'ws://').replace('https://', 'wss://');
   return `${wsUrl}/api/v1/ws`;

@@ -11,7 +11,7 @@ import i18n, { type Language } from './i18n'; // Инициализация i18n
 import I18nProvider from './i18nGatewayContext';
 
 // Инициализация проверки совместимости браузера
-import { initBrowserCompatibility, setupOnlineStatusListener } from '@shared/utils/browserCompatibility';
+import { initBrowserCompatibility, setupOnlineStatusListener } from '../../shared/utils/browserCompatibility';
 
 // Настройка dayjs с поддержкой нескольких локалей
 import dayjs from 'dayjs';
@@ -55,15 +55,16 @@ setupOnlineStatusListener(
   }
 );
 
-// Инициализация темы при загрузке - всегда светлая
+// Инициализация темы при загрузке
 const initTheme = () => {
-  document.documentElement.setAttribute('data-theme', 'light');
-  localStorage.setItem('admin_panel_theme', 'light');
+  const savedTheme = localStorage.getItem('admin_panel_theme');
+  const theme = savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', theme);
   
   // Обновляем мета-тег для мобильных браузеров
   const metaThemeColor = document.querySelector('meta[name="theme-color"]');
   if (metaThemeColor) {
-    metaThemeColor.setAttribute('content', '#ffffff');
+    metaThemeColor.setAttribute('content', theme === 'dark' ? '#0d1a12' : '#ffffff');
   }
 };
 

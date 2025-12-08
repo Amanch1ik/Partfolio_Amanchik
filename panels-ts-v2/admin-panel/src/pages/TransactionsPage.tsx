@@ -9,10 +9,7 @@ import { exportToCSV, exportToExcel, exportToJSON } from '@/utils/exportUtils';
 import { formatDateTime } from '@/utils/dateUtils';
 import '../styles/animations.css';
 
-import { useDocumentTitle } from '@shared/hooks/useDocumentTitle';
-
 export const TransactionsPage = () => {
-  useDocumentTitle('Транзакции', 'YESS!GO Admin');
   const [page, setPage] = useState(1);
   const [type, setType] = useState<string>();
   const [status] = useState<string>();

@@ -8,7 +8,6 @@ import { exportToCSV, exportToExcel, exportToJSON } from '../utils/exportUtils';
 import { buildRoute, buildRouteViaBackend, buildTransitViaBackend, formatDistance, formatDuration } from '../services/mapService';
 import { DownOutlined } from '@ant-design/icons';
 import { AddressAutocomplete } from '../components/AddressAutocomplete';
-import { useDocumentTitle } from '@shared/hooks/useDocumentTitle';
 
 // Динамический импорт карты для избежания проблем с SSR
 const LocationMap = lazy(() => 
@@ -34,7 +33,6 @@ interface Location {
 // Моковые данные удалены - используем только данные из API
 
 export const LocationsPage = () => {
-  useDocumentTitle('Локации', 'YESS!GO Partner');
   const [searchText, setSearchText] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string | undefined>();
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);

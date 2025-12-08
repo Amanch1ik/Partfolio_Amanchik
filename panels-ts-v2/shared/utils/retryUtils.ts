@@ -2,9 +2,6 @@
  * Утилиты для повторных попыток запросов
  */
 
-// @ts-nocheck
-import axios from 'axios';
-
 export interface RetryOptions {
   maxRetries?: number;
   retryDelay?: number;
@@ -17,7 +14,7 @@ const DEFAULT_OPTIONS: Required<RetryOptions> = {
   maxRetries: 3,
   retryDelay: 1000,
   retryCondition: (error: any) => {
-    // Повторяем только при сетевых ошибках или временных 5xx ошибках
+    // Повторяем только при сетевых ошибках или 5xx ошибках
     if (!error) return false;
     
     // Сетевые ошибки (нет ответа от сервера)
@@ -25,18 +22,10 @@ const DEFAULT_OPTIONS: Required<RetryOptions> = {
       return true;
     }
     
-    // 5xx ошибки сервера - повторяем только 502, 503, 504 (временные)
-    // 500 (Internal Server Error) не повторяем, так как это обычно постоянная ошибка
+    // 5xx ошибки сервера
     if (error.response) {
       const status = error.response.status;
-      // Повторяем только временные ошибки сервера
-      if (status === 502 || status === 503 || status === 504) {
-        return true;
-      }
-      // 500 не повторяем - это обычно постоянная ошибка
-      if (status === 500) {
-        return false;
-      }
+      return status >= 500 && status < 600;
     }
     
     // Ошибки таймаута
@@ -123,6 +112,7 @@ export function createRetryInterceptor(options: RetryOptions = {}) {
       await new Promise((resolve) => setTimeout(resolve, delay));
       
       // Повторяем запрос
+      const axios = (await import('axios')).default;
       return axios(error.config);
     },
   };
@@ -165,30 +155,25 @@ export function isRetryableError(error: any): boolean {
     return true;
   }
   
-    // Временные 5xx ошибки сервера повторяемы
-    if (error.response) {
-      const status = error.response.status;
-      
-      // 502, 503, 504 - временные ошибки сервера (повторяем)
-      if (status === 502 || status === 503 || status === 504) {
-        return true;
-      }
-      
-      // 500 - Internal Server Error (не повторяем, обычно постоянная ошибка)
-      if (status === 500) {
-        return false;
-      }
-      
-      // 429 - слишком много запросов (повторяем через некоторое время)
-      if (status === 429) {
-        return true;
-      }
-      
-      // 408 - Request Timeout
-      if (status === 408) {
-        return true;
-      }
+  // 5xx ошибки сервера повторяемы
+  if (error.response) {
+    const status = error.response.status;
+    
+    // 500-599 - ошибки сервера
+    if (status >= 500 && status < 600) {
+      return true;
     }
+    
+    // 429 - слишком много запросов (повторяем через некоторое время)
+    if (status === 429) {
+      return true;
+    }
+    
+    // 408 - Request Timeout
+    if (status === 408) {
+      return true;
+    }
+  }
   
   return false;
 }

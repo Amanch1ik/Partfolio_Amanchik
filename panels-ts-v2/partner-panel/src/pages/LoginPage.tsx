@@ -202,18 +202,7 @@ export const LoginPage = () => {
     const firstError = errorInfo.errorFields?.[0];
     if (firstError) {
       const fieldName = firstError.name[0];
-      const errorObj = firstError.errors[0];
-      
-      // Извлекаем строку из ошибки (может быть объектом или строкой)
-      let errorMsg = '';
-      if (typeof errorObj === 'string') {
-        errorMsg = errorObj;
-      } else if (errorObj && typeof errorObj === 'object') {
-        // Если это объект ошибки (например, от Zod), извлекаем msg или message
-        errorMsg = errorObj.msg || errorObj.message || errorObj.toString() || 'Ошибка валидации';
-      } else {
-        errorMsg = String(errorObj || 'Ошибка валидации');
-      }
+      const errorMsg = firstError.errors[0];
       
       let errorText = '';
       if (fieldName === 'username') {

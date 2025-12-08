@@ -93,7 +93,7 @@ export const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
       placement="left"
       onClose={onClose}
       open={open}
-      styles={{ body: { padding: 0 } }}
+      bodyStyle={{ padding: 0 }}
       width={280}
     >
       <Menu

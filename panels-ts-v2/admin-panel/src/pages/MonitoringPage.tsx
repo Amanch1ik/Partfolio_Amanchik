@@ -16,7 +16,7 @@ import {
   apiMetricsCollector,
   errorLogger,
   performanceMonitor,
-} from '@shared/monitoring';
+} from '../../../../shared/monitoring';
 import type { ColumnsType } from 'antd/es/table';
 
 interface MonitoringReport {
@@ -189,9 +189,9 @@ export const MonitoringPage = () => {
     return <div>Загрузка...</div>;
   }
 
-  const successRate: string = report.api.totalRequests > 0
+  const successRate = report.api.totalRequests > 0
     ? ((report.api.successfulRequests / report.api.totalRequests) * 100).toFixed(1)
-    : '0';
+    : 0;
 
   return (
     <div style={{ padding: 24 }}>
@@ -252,7 +252,7 @@ export const MonitoringPage = () => {
               value={`${successRate}%`}
               prefix={<ClockCircleOutlined />}
               valueStyle={{ 
-                color: parseFloat(String(successRate || 0)) >= 95 ? '#3f8600' : parseFloat(String(successRate || 0)) >= 80 ? '#faad14' : '#cf1322' 
+                color: parseFloat(successRate) >= 95 ? '#3f8600' : parseFloat(successRate) >= 80 ? '#faad14' : '#cf1322' 
               }}
             />
           </Col>

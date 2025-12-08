@@ -1,5 +1,4 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
-// Типы для _retryCount определены в src/types/axios.d.ts и подхватываются автоматически
 import type {
   DashboardStats,
   User,
@@ -8,20 +7,20 @@ import type {
   Transaction,
   AdminUser,
 } from '@/types';
-import { createMetricsInterceptor, errorLogger } from '@shared/monitoring';
-import { getUserFriendlyMessage, logError, shouldRedirectToLogin } from '@shared/utils/errorHandler';
-import { createRetryInterceptor, isRetryableError } from '@shared/utils/retryUtils';
+import { createMetricsInterceptor, errorLogger } from '../../../shared/monitoring';
+import { getUserFriendlyMessage, logError, shouldRedirectToLogin } from '../../../shared/utils/errorHandler';
 
-// В development можем явно задать полный URL через VITE_API_URL (например, внешний стенд),
-// В production всегда используем относительный путь и прокси (nginx).
+// Базовый URL backend'a. Если задан VITE_API_URL, используем его (напр. https://api.yessgo.org),
+// иначе работаем через относительный путь и Vite/nginx proxy.
 const IS_DEV = import.meta.env.DEV;
-const IS_PROD = import.meta.env.PROD;
 const ENV_API_BASE = import.meta.env.VITE_API_URL || '';
 
-// В production всегда используем относительный путь, игнорируя VITE_API_URL
-const API_PATH = IS_PROD
-  ? '/api/v1'
-  : (IS_DEV && ENV_API_BASE ? `${ENV_API_BASE.replace(/\/$/, '')}/api/v1` : '/api/v1');
+const API_PATH = ENV_API_BASE
+  ? `${ENV_API_BASE.replace(/\/$/, '')}/api/v1`
+  : '/api/v1';
+
+// Demo‑режим: используем мок‑данные и не падаем, если backend недоступен
+const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
 
 // Создаем экземпляр axios
 const apiClient: AxiosInstance = axios.create({
@@ -29,19 +28,12 @@ const apiClient: AxiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 30000, // 30 секунд таймаут по умолчанию для всех запросов
+  // В разработке уменьшаем таймаут, чтобы UI не «подвисал» долго при неработающем бэкенде
+  timeout: IS_DEV ? 5000 : 30000,
 });
 
 // Создаем интерцептор метрик для отслеживания API запросов
 const metricsInterceptor = createMetricsInterceptor();
-
-// Создаем retry interceptor для автоматических повторов
-const retryInterceptor = createRetryInterceptor({
-  maxRetries: 3,
-  retryDelay: 1000,
-  exponentialBackoff: true,
-  maxRetryDelay: 30000,
-});
 
 // Интерцептор для добавления токена и метрик
 apiClient.interceptors.request.use(
@@ -49,10 +41,6 @@ apiClient.interceptors.request.use(
     const token = localStorage.getItem('admin_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-    }
-    // Инициализируем счетчик попыток
-    if (!config._retryCount) {
-      config._retryCount = 0;
     }
     // Добавляем отслеживание метрик
     return metricsInterceptor.request(config);
@@ -67,24 +55,9 @@ apiClient.interceptors.response.use(
   (response) => {
     // Записываем метрики успешного ответа
     metricsInterceptor.response(response);
-    // Сбрасываем счетчик попыток при успехе
-    if (response.config) {
-      response.config._retryCount = 0;
-    }
     return response;
   },
-  async (error: AxiosError) => {
-    // Пытаемся повторить запрос через retry interceptor
-    if (isRetryableError(error) && error.config) {
-      try {
-        const retryResult = await retryInterceptor.onRejected(error);
-        if (retryResult) {
-          return retryResult;
-        }
-      } catch (retryError) {
-        // Если retry не помог, продолжаем обычную обработку ошибки
-      }
-    }
+  (error: AxiosError) => {
     // Расширенная обработка ошибок
     if (error.response) {
       const status = error.response.status;
@@ -124,11 +97,10 @@ apiClient.interceptors.response.use(
           break;
         case 500: {
           const errorMsg = data?.detail || data?.message || 'Internal Server Error';
-          // Логируем только один раз, чтобы не засорять консоль
-          if (!(error.config as any)?._500Logged) {
-            console.error('⚠️ Ошибка сервера (500):', errorMsg);
-            console.warn('💡 Backend возвращает ошибки 500. Проверьте логи сервера.');
-            (error.config as any)._500Logged = true;
+          console.error('Ошибка сервера:', errorMsg);
+          // Показываем пользователю понятное сообщение
+          if (errorMsg.includes('DateTime') || errorMsg.includes('timestamp')) {
+            console.error('⚠️ Проблема с форматом даты. Убедитесь, что бэкенд обновлен с исправлениями DateTime.');
           }
           break;
         }
@@ -203,53 +175,78 @@ let devApiKeyId = 1;
 const adminApi = {
   // Аутентификация
   async login(username: string, password: string) {
-    // Определяем, является ли введенное значение email или username
-    const isEmail = username.includes('@');
-    const loginData = isEmail 
-      ? { email: username, password: password }
-      : { username: username, password: password };
-    
-    // Проверяем, что пароль не пустой
-    if (!password || password.trim() === '') {
-      throw new Error('Пароль не может быть пустым');
+    // В demo‑режиме не ходим на сервер вообще
+    if (DEMO_MODE) {
+      const demoToken = 'demo-admin-token';
+      localStorage.setItem('admin_token', demoToken);
+      return {
+        access_token: demoToken,
+        admin: {
+          id: 'demo-admin',
+          email: username || 'admin@yessgo.org',
+          role: 'admin' as const,
+        },
+      };
     }
-    
     try {
-      // Роутер админа имеет префикс /admin, поэтому путь /admin/auth/login
-      const loginUrl = `${API_PATH}/admin/auth/login`;
-      console.log('📡 adminApi.login: Отправляем запрос на', loginUrl);
-      console.log('📦 Данные запроса:', JSON.stringify(loginData, null, 2));
-      // Используем admin login endpoint
-      const response = await axios.post(loginUrl, loginData, {
-        headers: { 'Content-Type': 'application/json' },
-        timeout: 10000,
+      console.log('📡 adminApi.login: Отправляем запрос на', `${API_PATH}/auth/login`);
+      // Пробуем использовать JSON endpoint аутентификации
+      const response = await axios.post(`${API_PATH}/auth/login/json`, {
+        phone: username,
+        password: password,
+      }, {
+        headers: { 'Content-Type': 'application/json' }
       });
 
       if (response.data.access_token) {
-        console.log('💾 adminApi.login: Сохраняем токен в localStorage');
         localStorage.setItem('admin_token', response.data.access_token);
         return {
           access_token: response.data.access_token,
-          admin: response.data.admin || {
-            id: '1',
+          admin: response.data.user || {
+            id: response.data.user?.id?.toString() || '1',
             email: username,
             role: 'admin' as const,
           },
         };
       }
-      throw new Error('Invalid response: no access_token');
+      throw new Error('Invalid response');
     } catch (error: any) {
-      // Обрабатываем ошибки подключения
-      if (!error.response && error.request) {
-        if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
-          throw new Error('Превышено время ожидания. Проверьте подключение к интернету.');
-        } else if (error.code === 'ERR_NETWORK' || error.message?.includes('Network Error') || error.message?.includes('Failed to fetch')) {
-          throw new Error(`Не удалось подключиться к серверу. Убедитесь, что бэкенд запущен на порту 8001`);
-        } else {
-          throw new Error(`Не удалось подключиться к серверу. Проверьте, что бэкенд запущен на порту 8001`);
+      // Для тестирования используем обычный login endpoint
+      try {
+        const response = await axios.post(`${API_PATH}/auth/login`, {
+          phone: username,
+          password,
+        }, {
+          headers: { 'Content-Type': 'application/json' },
+          timeout: 10000,
+        });
+
+        if (response.data.access_token) {
+          console.log('💾 adminApi.login: Сохраняем токен в localStorage');
+          localStorage.setItem('admin_token', response.data.access_token);
+          return {
+            access_token: response.data.access_token,
+            admin: {
+              id: '1',
+              email: username,
+              role: 'admin' as const,
+            },
+          };
         }
+      } catch (adminError: any) {
+        // Обрабатываем ошибки подключения
+        if (!adminError.response && adminError.request) {
+          if (adminError.code === 'ECONNABORTED' || adminError.message?.includes('timeout')) {
+            throw new Error('Превышено время ожидания. Проверьте подключение к интернету.');
+          } else if (adminError.code === 'ERR_NETWORK' || adminError.message?.includes('Network Error') || adminError.message?.includes('Failed to fetch')) {
+            throw new Error(`Не удалось подключиться к серверу. Убедитесь, что бэкенд запущен на порту 8000`);
+          } else {
+            throw new Error(`Не удалось подключиться к серверу. Проверьте, что бэкенд запущен на порту 8000`);
+          }
+        }
+        throw adminError; // Возвращаем ошибку admin endpoint
       }
-      throw error; // Возвращаем ошибку для обработки в LoginPage
+      throw error;
     }
   },
 
@@ -276,16 +273,27 @@ const adminApi = {
         throw error; // Пробрасываем для обработки в интерцепторе
       }
       // Для других ошибок возвращаем безопасный ответ
-      // Не логируем ошибки 500 здесь - они уже обработаны в интерцепторе
-      if (error.response?.status !== 500) {
-        console.error('Error getting current user:', error);
-      }
+      console.error('Error getting current user:', error);
       throw error;
     }
   },
 
   // Dashboard
   async getDashboardStats(): Promise<ApiResponse<DashboardStats>> {
+    // В demo‑режиме возвращаем статичные, но «живые» данные без запроса к API
+    if (DEMO_MODE) {
+      return {
+        data: {
+          total_users: 12450,
+          active_users: 8732,
+          total_partners: 215,
+          total_transactions: 98234,
+          total_revenue: 1250000,
+          transactions_today: 345,
+          revenue_today: 18450,
+        } as DashboardStats,
+      };
+    }
     try {
       const response = await apiClient.get('/admin/dashboard/stats');
       // Безопасная обработка ответа
@@ -296,13 +304,10 @@ const adminApi = {
             total_users: 0,
             active_users: 0,
             total_partners: 0,
-            active_partners: 0,
             total_transactions: 0,
             total_revenue: 0,
             transactions_today: 0,
             revenue_today: 0,
-            users_growth: 0,
-            revenue_growth: 0,
           } as DashboardStats,
         };
       }
@@ -313,33 +318,24 @@ const adminApi = {
           total_users: statsData?.total_users ?? 0,
           active_users: statsData?.active_users ?? 0,
           total_partners: statsData?.total_partners ?? 0,
-          active_partners: statsData?.active_partners ?? statsData?.total_partners ?? 0,
           total_transactions: statsData?.total_transactions ?? 0,
           total_revenue: statsData?.total_revenue ?? 0,
           transactions_today: statsData?.transactions_today ?? 0,
           revenue_today: statsData?.revenue_today ?? 0,
-          users_growth: statsData?.users_growth ?? 0,
-          revenue_growth: statsData?.revenue_growth ?? 0,
         } as DashboardStats,
       };
     } catch (error: any) {
-      // Не логируем ошибки 500 - они уже обработаны в интерцепторе
-      if (error.response?.status !== 500) {
-        console.error('❌ getDashboardStats: Ошибка получения статистики:', error);
-      }
+      console.error('❌ getDashboardStats: Ошибка получения статистики:', error);
       // Возвращаем безопасные значения по умолчанию вместо падения
       return {
         data: {
           total_users: 0,
           active_users: 0,
           total_partners: 0,
-          active_partners: 0,
           total_transactions: 0,
           total_revenue: 0,
           transactions_today: 0,
           revenue_today: 0,
-          users_growth: 0,
-          revenue_growth: 0,
         } as DashboardStats,
       };
     }
@@ -347,6 +343,33 @@ const adminApi = {
 
   // Users
   async getUsers(page = 1, page_size = 20, search?: string): Promise<ApiResponse<PaginatedResponse<User>>> {
+    // Demo‑режим: возвращаем список фиктивных пользователей
+    if (DEMO_MODE) {
+      const items: User[] = [
+        {
+          id: 1,
+          email: 'user1@yessgo.org',
+          phone: '+996500000001',
+          status: 'active',
+          created_at: new Date().toISOString(),
+        } as any,
+        {
+          id: 2,
+          email: 'user2@yessgo.org',
+          phone: '+996500000002',
+          status: 'blocked',
+          created_at: new Date().toISOString(),
+        } as any,
+      ];
+      return {
+        data: {
+          items,
+          total: items.length,
+          page,
+          page_size,
+        },
+      };
+    }
     try {
       const params: any = { page, page_size };
       if (search && search.trim()) {
@@ -435,6 +458,30 @@ const adminApi = {
 
   // Partners
   async getPartners(page = 1, page_size = 20, search?: string, status?: string): Promise<ApiResponse<PaginatedResponse<Partner>>> {
+    if (DEMO_MODE) {
+      const items: Partner[] = [
+        {
+          id: 1,
+          name: 'Demo Coffee',
+          city: 'Бишкек',
+          status: 'active',
+        } as any,
+        {
+          id: 2,
+          name: 'Demo Market',
+          city: 'Ош',
+          status: 'pending',
+        } as any,
+      ];
+      return {
+        data: {
+          items,
+          total: items.length,
+          page,
+          page_size,
+        },
+      };
+    }
     try {
       const params: any = { page, page_size };
       if (search && search.trim()) {
@@ -503,6 +550,28 @@ const adminApi = {
 
   // Promotions
   async getPromotions(page = 1, page_size = 20): Promise<ApiResponse<PaginatedResponse<Promotion>>> {
+    if (DEMO_MODE) {
+      const items: Promotion[] = [
+        {
+          id: 1,
+          title: 'Скидка 10% на кофе',
+          is_active: true,
+        } as any,
+        {
+          id: 2,
+          title: 'Бонусные Yess!Coin за покупки',
+          is_active: false,
+        } as any,
+      ];
+      return {
+        data: {
+          items,
+          total: items.length,
+          page,
+          page_size,
+        },
+      };
+    }
     try {
       const response = await apiClient.get('/admin/promotions', {
         params: { page, page_size },
@@ -551,6 +620,30 @@ const adminApi = {
 
   // Transactions
   async getTransactions(page = 1, page_size = 20): Promise<ApiResponse<PaginatedResponse<Transaction>>> {
+    if (DEMO_MODE) {
+      const items: Transaction[] = [
+        {
+          id: 1,
+          amount: 150,
+          created_at: new Date().toISOString(),
+          status: 'completed',
+        } as any,
+        {
+          id: 2,
+          amount: 320,
+          created_at: new Date().toISOString(),
+          status: 'completed',
+        } as any,
+      ];
+      return {
+        data: {
+          items,
+          total: items.length,
+          page,
+          page_size,
+        },
+      };
+    }
     try {
       const response = await apiClient.get('/admin/transactions', {
         params: { page, page_size },
@@ -577,10 +670,7 @@ const adminApi = {
       };
       return { data: normalized };
     } catch (error: any) {
-      // Не логируем ошибки 500 - они уже обработаны в интерцепторе
-      if (error.response?.status !== 500) {
-        console.error('Error fetching transactions:', error);
-      }
+      console.error('Error fetching transactions:', error);
       // Возвращаем безопасный ответ вместо падения
       return {
         data: {
@@ -600,6 +690,25 @@ const adminApi = {
 
   // Notifications
   async getNotifications(page = 1, page_size = 20): Promise<ApiResponse<PaginatedResponse<any>>> {
+    if (DEMO_MODE) {
+      const items = [
+        {
+          id: 1,
+          title: 'Добро пожаловать в Yess!Admin',
+          message: 'Это демо‑режим панели управления.',
+          is_read: false,
+          created_at: new Date().toISOString(),
+        },
+      ];
+      return {
+        data: {
+          items,
+          total: items.length,
+          page,
+          page_size,
+        },
+      };
+    }
     try {
       const response = await apiClient.get('/admin/notifications', {
         params: { page, page_size },
@@ -639,11 +748,26 @@ const adminApi = {
 
   // Referrals
   async getReferrals(): Promise<ApiResponse<any[]>> {
+    if (DEMO_MODE) {
+      return {
+        data: [
+          { id: 1, inviter: 'Demo User', invited: 5 },
+        ],
+      };
+    }
     const response = await apiClient.get('/admin/referrals');
     return response.data;
   },
 
   async getReferralsStats(): Promise<ApiResponse<any>> {
+    if (DEMO_MODE) {
+      return {
+        data: {
+          total_referrals: 42,
+          active_referrals: 30,
+        },
+      };
+    }
     const response = await apiClient.get('/admin/referrals/stats');
     return response.data;
   },

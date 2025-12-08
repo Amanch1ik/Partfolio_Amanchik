@@ -1,6 +1,15 @@
 /**
  * Сервис для синхронизации баланса кошелька между сайтом и приложением
+ * Использует реальные API payments из backend (см. Swagger https://yessgo.org/docs/index.html)
+ * и поддерживает demo‑режим без запросов к серверу.
  */
+
+const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
+
+const ENV_API_BASE = (import.meta.env.VITE_API_URL as string | undefined) || '';
+const API_ROOT = ENV_API_BASE
+  ? `${ENV_API_BASE.replace(/\/$/, '')}/api/v1`
+  : '/api/v1';
 
 interface WalletBalance {
   id: number;
@@ -28,12 +37,21 @@ class WalletSyncService {
    * Получить баланс кошелька
    */
   async getBalance(userId: number): Promise<WalletBalance | null> {
+    // В demo‑режиме возвращаем фиктивный баланс без обращения к серверу
+    if (DEMO_MODE) {
+      return {
+        id: 1,
+        user_id: userId,
+        balance: 1500,
+        yescoin_balance: 320,
+        total_earned: 5000,
+        total_spent: 3500,
+        last_updated: new Date().toISOString(),
+      };
+    }
     try {
-      // TODO: Добавить endpoint в partnerApi
-      // В production используем относительный путь
-      const IS_PROD = import.meta.env.PROD;
-      const apiBase = IS_PROD ? '' : (import.meta.env.VITE_API_URL || 'http://localhost:8000');
-      const response = await fetch(`${apiBase}/api/v1/wallet/balance?user_id=${userId}`, {
+      // Реальный backend: /api/v1/payments/balance (см. ApiEndpoints.WalletEndpoints.Balance)
+      const response = await fetch(`${API_ROOT}/payments/balance?user_id=${userId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('partner_token')}`,
         },
@@ -60,11 +78,19 @@ class WalletSyncService {
 
     this.isSyncing = true;
 
+    // В demo‑режиме просто эмулируем успешную синхронизацию
+    if (DEMO_MODE) {
+      this.lastSyncTime = Date.now();
+      return {
+        success: true,
+        yescoin_balance: 320,
+        last_updated: new Date().toISOString(),
+        has_changes: false,
+      };
+    }
+
     try {
-      // В production используем относительный путь
-      const IS_PROD = import.meta.env.PROD;
-      const apiBase = IS_PROD ? '' : (import.meta.env.VITE_API_URL || 'http://localhost:8000');
-      const response = await fetch(`${apiBase}/api/v1/wallet/sync`, {
+      const response = await fetch(`${API_ROOT}/wallet/sync`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

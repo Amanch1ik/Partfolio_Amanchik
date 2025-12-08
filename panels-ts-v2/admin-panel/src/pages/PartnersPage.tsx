@@ -76,10 +76,7 @@ const DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-import { useDocumentTitle } from '@shared/hooks/useDocumentTitle';
-
 export const PartnersPage = () => {
-  useDocumentTitle('Партнеры', 'YESS!GO Admin');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [searchText, setSearchText] = useState('');

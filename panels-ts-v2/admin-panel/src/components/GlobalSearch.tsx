@@ -134,7 +134,7 @@ export const GlobalSearch = ({
           setSearchValue('');
         }}
         style={{ margin: -12, cursor: 'pointer' }}
-        styles={{ body: { padding: 12 } }}
+        bodyStyle={{ padding: 12 }}
       >
         <Space>
           {typeIcons[result.type]}

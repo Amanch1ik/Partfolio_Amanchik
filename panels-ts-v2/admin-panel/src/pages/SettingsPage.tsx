@@ -26,10 +26,7 @@ import { toArray } from '../utils/arrayUtils';
 import { DeleteButton } from '@/components/DeleteButton';
 import { t } from '@/i18n';
 
-import { useDocumentTitle } from '@shared/hooks/useDocumentTitle';
-
 export const SettingsPage = () => {
-  useDocumentTitle('Настройки', 'YESS!GO Admin');
   const [categoryForm] = Form.useForm();
   const [cityForm] = Form.useForm();
 

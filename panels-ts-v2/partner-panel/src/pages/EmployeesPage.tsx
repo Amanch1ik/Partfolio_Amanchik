@@ -4,10 +4,8 @@ import { ExportOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { employeesApi } from '../services/api';
 import { exportToCSV, exportToExcel, exportToJSON } from '../utils/exportUtils';
-import { useDocumentTitle } from '@shared/hooks/useDocumentTitle';
 
 export const EmployeesPage = () => {
-  useDocumentTitle('Сотрудники', 'YESS!GO Partner');
 
   // Загрузка сотрудников из API
   const { data: employeesResponse, isLoading } = useQuery({

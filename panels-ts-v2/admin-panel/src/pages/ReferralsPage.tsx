@@ -7,10 +7,8 @@ import { toArray } from '../utils/arrayUtils';
 import { t } from '@/i18n';
 import { exportToCSV, exportToJSON } from '@/utils/exportUtils';
 import '../styles/animations.css';
-import { useDocumentTitle } from '@shared/hooks/useDocumentTitle';
 
 export const ReferralsPage = () => {
-  useDocumentTitle('Реферальная программа', 'YESS!GO Admin');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
 

@@ -35,7 +35,6 @@ import { DeleteButton } from '@/components/DeleteButton';
 import { t } from '@/i18n';
 import dayjs from 'dayjs';
 import '../styles/animations.css';
-import { useDocumentTitle } from '@shared/hooks/useDocumentTitle';
 
 const { RangePicker } = DatePicker;
 const { TextArea } = Input;
@@ -70,7 +69,6 @@ interface Story {
 }
 
 export const StoriesPage = () => {
-  useDocumentTitle('Сторисы', 'YESS!GO Admin');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
   const [editingStory, setEditingStory] = useState<Story | null>(null);

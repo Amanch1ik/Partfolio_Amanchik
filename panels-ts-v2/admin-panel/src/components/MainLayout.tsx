@@ -28,6 +28,7 @@ import { NotificationCenter } from './NotificationCenter';
 import { SearchResults } from './SearchResults';
 import { useTheme } from '@/hooks/useTheme';
 import { useMessage } from '@/hooks/useMessage';
+import { SunOutlined, MoonOutlined } from '@ant-design/icons';
 import { MobileMenu } from './MobileMenu';
 import { useI18nContext } from '@/i18nGatewayContext';
 import './MainLayout.css';
@@ -62,7 +63,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-  const { theme } = useTheme();
+  const { theme, toggleTheme, isDark } = useTheme();
   const queryClient = useQueryClient();
   const searchInputRef = useRef<any>(null);
   const message = useMessage();
@@ -301,7 +302,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
         collapsible={false}
         width={250}
         style={{
-          background: 'linear-gradient(180deg, #689071 0%, #4a6b52 100%)',
+          background: 'var(--sidebar-bg)',
           boxShadow: 'var(--shadow-md)',
         }}
         role="navigation"
@@ -322,7 +323,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
             borderRight: 0,
             background: 'transparent',
           }}
-          theme="dark"
+          theme="light"
         />
         <div className="sidebar-bottom-menu">
           <Menu
@@ -397,6 +398,30 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
             </div>
           </div>
           <nav className="header-actions" aria-label={t('common.headerActions', 'Действия заголовка')}>
+            {/* Переключатель темы */}
+            <button
+              className="theme-switch"
+              onClick={toggleTheme}
+              aria-label={isDark ? t('common.lightTheme', 'Переключить на светлую тему') : t('common.darkTheme', 'Переключить на тёмную тему')}
+              title={isDark ? t('common.lightTheme', 'Светлая тема') : t('common.darkTheme', 'Тёмная тема')}
+              style={{
+                cursor: 'pointer',
+                padding: '8px',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'background 0.2s',
+                border: 'none',
+                background: 'transparent',
+              }}
+            >
+              {isDark ? (
+                <SunOutlined style={{ fontSize: 18, color: 'var(--color-text-secondary)' }} aria-hidden="true" />
+              ) : (
+                <MoonOutlined style={{ fontSize: 18, color: 'var(--color-text-primary)' }} aria-hidden="true" />
+              )}
+            </button>
             <Select
               value={language}
               onChange={handleLanguageChange}

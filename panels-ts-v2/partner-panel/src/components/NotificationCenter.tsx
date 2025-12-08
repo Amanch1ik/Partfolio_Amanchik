@@ -29,10 +29,10 @@ export const NotificationCenter = ({ open, onClose }: NotificationCenterProps) =
       try {
         const response = await notificationsApi.getNotifications({ page: 1, limit: 50 });
         // Обрабатываем разные форматы ответа
-        const responseData = (response as any)?.data || response;
         const notifications = toArray(
-          responseData?.notifications || 
-          (Array.isArray(responseData) ? responseData : []) || 
+          response?.data?.notifications || 
+          response?.data || 
+          response?.notifications || 
           [],
           []
         );

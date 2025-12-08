@@ -33,7 +33,8 @@ class PerformanceMonitor {
   private reportCallback?: (report: PerformanceReport) => void;
 
   constructor() {
-    this.enabled = import.meta.env.VITE_ENABLE_PERFORMANCE_MONITORING !== 'false';
+    // По умолчанию отключено, включается только при явном VITE_ENABLE_PERFORMANCE_MONITORING="true"
+    this.enabled = import.meta.env.VITE_ENABLE_PERFORMANCE_MONITORING === 'true';
     
     if (this.enabled) {
       this.initializeObservers();

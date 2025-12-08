@@ -10,13 +10,11 @@ import { t } from '@/i18n';
 import dayjs from 'dayjs';
 import { toArray } from '../utils/arrayUtils';
 import '../styles/animations.css';
-import { useDocumentTitle } from '@shared/hooks/useDocumentTitle';
 
 const { RangePicker } = DatePicker;
 const { TextArea } = Input;
 
 export const PromotionsPage = () => {
-  useDocumentTitle('Промоакции', 'YESS!GO Admin');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPromotion, setEditingPromotion] = useState<Promotion | null>(null);
   const [activeTab, setActiveTab] = useState('active');

@@ -5,7 +5,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #0F2A1D 0%, #375534 25%, #689071 50%, #AEC380 75%, #E3EED4 100%);
+  /* Более светлый фон для страницы логина */
+  background: linear-gradient(135deg, #F0F7EB 0%, #E3EED4 40%, #ffffff 100%);
   background-size: 400% 400%;
   animation: gradientShift 15s ease infinite;
   position: relative;
@@ -169,6 +170,30 @@
   height: 48px !important;
 }
 
+/* Гарантируем светлый фон и границы для обёрток Ant Design на странице логина,
+   даже если глобально включена тёмная тема */
+.login-form-container .ant-input-affix-wrapper,
+.login-form-container .ant-input,
+.login-form-container .ant-input-password {
+  background-color: #ffffff !important;
+  border-color: #E3EED4 !important;
+  color: #0F2A1D !important;
+}
+
+.login-form-container .ant-input-affix-wrapper:hover,
+.login-form-container .ant-input:hover,
+.login-form-container .ant-input-password:hover {
+  border-color: #AEC380 !important;
+  box-shadow: 0 0 0 4px rgba(174, 195, 128, 0.1) !important;
+}
+
+.login-form-container .ant-input-affix-wrapper-focused,
+.login-form-container .ant-input:focus,
+.login-form-container .ant-input-password:focus {
+  border-color: #689071 !important;
+  box-shadow: 0 0 0 4px rgba(104, 144, 113, 0.15) !important;
+}
+
 .login-input:hover {
   border-color: #AEC380 !important;
   box-shadow: 0 0 0 4px rgba(174, 195, 128, 0.1) !important;
@@ -301,7 +326,8 @@
   text-align: center;
   margin-top: 32px;
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.9);
+  /* Темный текст на светлом фоне */
+  color: rgba(15, 42, 29, 0.7);
   font-weight: 400;
   animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both;
   position: relative;

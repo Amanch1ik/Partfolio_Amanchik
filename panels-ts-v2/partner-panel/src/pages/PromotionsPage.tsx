@@ -5,10 +5,8 @@ import { promotionsApi } from '../services/api';
 import { exportToCSV, exportToExcel, exportToJSON } from '../utils/exportUtils';
 
 import { toArray } from '../utils/arrayUtils';
-import { useDocumentTitle } from '@shared/hooks/useDocumentTitle';
 
 export const PromotionsPage = () => {
-  useDocumentTitle('Промоакции', 'YESS!GO Partner');
 
   // Загрузка акций из API
   const { data: promotionsResponse, isLoading } = useQuery({

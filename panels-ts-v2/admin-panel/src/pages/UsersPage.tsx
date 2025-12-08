@@ -49,10 +49,7 @@ import { toArray } from '../utils/arrayUtils';
 
 const { RangePicker } = DatePicker;
 
-import { useDocumentTitle } from '@shared/hooks/useDocumentTitle';
-
 export const UsersPage = () => {
-  useDocumentTitle('Пользователи', 'YESS!GO Admin');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [searchText, setSearchText] = useState('');

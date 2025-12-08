@@ -31,7 +31,8 @@ class ErrorLogger {
   private errorHandlers: Array<(error: ErrorLog) => void> = [];
 
   constructor() {
-    this.enabled = import.meta.env.VITE_ENABLE_ERROR_LOGGING !== 'false';
+    // По умолчанию отключено, включается только при явном VITE_ENABLE_ERROR_LOGGING="true"
+    this.enabled = import.meta.env.VITE_ENABLE_ERROR_LOGGING === 'true';
     
     if (this.enabled) {
       this.initializeGlobalHandlers();
@@ -111,17 +112,9 @@ class ErrorLogger {
       this.saveToStorage();
     }
 
-    // В development выводим в консоль (но не для каждой ошибки 500, чтобы не засорять)
+    // В development выводим в консоль
     if (import.meta.env.DEV) {
-      // Для ошибок 500 логируем только каждую 10-ю, чтобы не засорять консоль
-      if (errorLog.additionalData?.status === 500) {
-        const error500Count = this.errors.filter(e => e.additionalData?.status === 500).length;
-        if (error500Count % 10 === 0 || error500Count === 1) {
-          console.warn(`⚠️ Ошибка 500 (всего: ${error500Count}):`, errorLog.message);
-        }
-      } else {
-        console.error('🚨 Error logged:', errorLog);
-      }
+      console.error('🚨 Error logged:', errorLog);
     }
   }
 

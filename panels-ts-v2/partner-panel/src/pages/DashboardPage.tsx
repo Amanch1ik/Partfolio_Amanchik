@@ -18,13 +18,11 @@ import { connectWebSocket, wsService } from '../services/websocket';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { t } from '@/i18n';
-import { useDocumentTitle } from '@shared/hooks/useDocumentTitle';
 
 // Цвета для графиков
 const CHART_COLORS = ['#689071', '#AEC380', '#375534', '#E3EED4', '#0F2A1D'];
 
 export const DashboardPage = () => {
-  useDocumentTitle('Главная', 'YESS!GO Partner');
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [chartPeriod, setChartPeriod] = useState<'7' | '30' | '90'>('7');
@@ -34,16 +32,8 @@ export const DashboardPage = () => {
     const wsEnabled = import.meta.env.VITE_WS_ENABLED !== 'false';
     if (!wsEnabled) return;
 
-    // В production используем относительный путь, в dev - из env или localhost
-    const IS_PROD = import.meta.env.PROD;
-    let wsUrl: string;
-    if (IS_PROD) {
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      wsUrl = `${protocol}//${window.location.host}/ws`;
-    } else {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-      wsUrl = apiUrl.replace(/^http/, 'ws') + '/ws';
-    }
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    const wsUrl = apiUrl.replace(/^http/, 'ws') + '/ws';
     
     if (!wsService.hasConnectionFailed()) {
       connectWebSocket(wsUrl);

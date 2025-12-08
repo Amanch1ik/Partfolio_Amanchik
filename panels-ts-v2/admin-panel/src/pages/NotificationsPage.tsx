@@ -23,10 +23,8 @@ import { notificationsApi } from '@/services/api';
 import { t } from '@/i18n';
 import { formatDateTime } from '@/utils/dateUtils';
 import '../styles/animations.css';
-import { useDocumentTitle } from '@shared/hooks/useDocumentTitle';
 
 export const NotificationsPage = () => {
-  useDocumentTitle('Уведомления', 'YESS!GO Admin');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [isModalOpen, setIsModalOpen] = useState(false);

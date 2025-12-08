@@ -3,6 +3,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/services/api';
 
+const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
+
 export const useAuth = () => {
   const { user, isAuthenticated, isLoading, setUser, setLoading, logout: logoutStore } = useAuthStore();
   const queryClient = useQueryClient();
@@ -28,7 +30,7 @@ export const useAuth = () => {
         return null;
       }
     },
-    enabled: !!localStorage.getItem('partner_token'),
+    enabled: !DEMO_MODE && !!localStorage.getItem('partner_token'),
     staleTime: 5 * 60 * 1000, // 5 минут - данные считаются свежими
     gcTime: 10 * 60 * 1000, // 10 минут в кэше
     retry: 1,
@@ -43,6 +45,25 @@ export const useAuth = () => {
     const checkAuth = () => {
       const token = localStorage.getItem('partner_token');
       const savedUser = localStorage.getItem('partner_user');
+
+      // В demo‑режиме сразу выставляем фиктивного пользователя и токен
+      if (DEMO_MODE) {
+        const demoToken = token || 'demo-partner-token';
+        if (!token) {
+          localStorage.setItem('partner_token', demoToken);
+        }
+        const demoUser = {
+          id: 'demo-partner',
+          email: 'partner@yessgo.org',
+          username: 'Demo Partner',
+          role: 'partner' as const,
+          avatar_url: undefined,
+        };
+        setUser(demoUser);
+        localStorage.setItem('partner_user', JSON.stringify(demoUser));
+        setLoading(false);
+        return;
+      }
 
       if (!token) {
         setUser(null);

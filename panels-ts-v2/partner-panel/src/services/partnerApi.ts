@@ -1,19 +1,16 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
-// Типы для _retryCount определены в src/types/axios.d.ts и подхватываются автоматически
-import { createMetricsInterceptor, errorLogger } from '@shared/monitoring';
-import { getUserFriendlyMessage, logError, shouldRedirectToLogin } from '@shared/utils/errorHandler';
-import { createRetryInterceptor, isRetryableError } from '@shared/utils/retryUtils';
+import { createMetricsInterceptor, errorLogger } from '../../../shared/monitoring';
+import { getUserFriendlyMessage, logError, shouldRedirectToLogin } from '../../../shared/utils/errorHandler';
 
-// В dev можно явно указать удалённый backend через VITE_API_URL.
-// В production всегда используем относительный путь и прокси (nginx).
-const IS_DEV = import.meta.env.DEV;
-const IS_PROD = import.meta.env.PROD;
+// Базовый URL backend'a. Если задан VITE_API_URL (напр. https://api.yessgo.org),
+// используем его, иначе работаем через относительный путь и Vite/nginx proxy.
 const ENV_API_BASE = import.meta.env.VITE_API_URL || '';
+const API_BASE_URL = ENV_API_BASE
+  ? ENV_API_BASE.replace(/\/$/, '')
+  : '';
 
-// В production всегда используем относительный путь, игнорируя VITE_API_URL
-const API_BASE_URL = IS_PROD 
-  ? '' 
-  : (IS_DEV && ENV_API_BASE ? ENV_API_BASE.replace(/\/$/, '') : '');
+// Demo‑режим для партнёрской панели
+const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
 
 // Создаем экземпляр axios
 const apiClient: AxiosInstance = axios.create({
@@ -27,24 +24,12 @@ const apiClient: AxiosInstance = axios.create({
 // Создаем интерцептор метрик для отслеживания API запросов
 const metricsInterceptor = createMetricsInterceptor();
 
-// Создаем retry interceptor для автоматических повторов
-const retryInterceptor = createRetryInterceptor({
-  maxRetries: 3,
-  retryDelay: 1000,
-  exponentialBackoff: true,
-  maxRetryDelay: 30000,
-});
-
 // Интерцептор для добавления токена и метрик
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('partner_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-    }
-    // Инициализируем счетчик попыток
-    if (!config._retryCount) {
-      config._retryCount = 0;
     }
     // Добавляем отслеживание метрик
     return metricsInterceptor.request(config);
@@ -59,24 +44,9 @@ apiClient.interceptors.response.use(
   (response) => {
     // Записываем метрики успешного ответа
     metricsInterceptor.response(response);
-    // Сбрасываем счетчик попыток при успехе
-    if (response.config) {
-      response.config._retryCount = 0;
-    }
     return response;
   },
-  async (error: AxiosError) => {
-    // Пытаемся повторить запрос через retry interceptor
-    if (isRetryableError(error) && error.config) {
-      try {
-        const retryResult = await retryInterceptor.onRejected(error);
-        if (retryResult) {
-          return retryResult;
-        }
-      } catch (retryError) {
-        // Если retry не помог, продолжаем обычную обработку ошибки
-      }
-    }
+  (error: AxiosError) => {
     // Расширенная обработка ошибок
     if (error.response) {
       const status = error.response.status;
@@ -156,9 +126,27 @@ apiClient.interceptors.response.use(
 const partnerApi = {
   // Аутентификация
   async login(username: string, password: string) {
+    // В demo‑режиме не ходим на сервер: авторизуем «фиктивного» партнёра
+    if (DEMO_MODE) {
+      const demoToken = 'demo-partner-token';
+      localStorage.setItem('partner_token', demoToken);
+      const demoPartner = {
+        id: 'demo-partner',
+        email: username || 'partner@yessgo.org',
+        username: 'Demo Partner',
+        role: 'partner' as const,
+      };
+      localStorage.setItem('partner_user', JSON.stringify(demoPartner));
+      return {
+        access_token: demoToken,
+        user_id: demoPartner.id,
+        partner: demoPartner,
+      };
+    }
     try {
       // Используем партнерский endpoint
-      const response = await axios.post(`${API_BASE_URL}/api/v1/partner/auth/login`, {
+      const base = API_BASE_URL ? `${API_BASE_URL}/api/v1` : '/api/v1';
+      const response = await axios.post(`${base}/partner/auth/login`, {
         username,
         password,
       }, {
@@ -237,6 +225,16 @@ const partnerApi = {
 
   // Dashboard
   async getDashboardStats() {
+    if (DEMO_MODE) {
+      return {
+        data: {
+          total_transactions: 1200,
+          total_revenue: 540000,
+          today_transactions: 34,
+          today_revenue: 12500,
+        },
+      } as any;
+    }
     return apiClient.get('/partner/dashboard/stats');
   },
 
@@ -256,6 +254,19 @@ const partnerApi = {
 
   // Locations
   async getLocations() {
+    if (DEMO_MODE) {
+      return {
+        data: [
+          {
+            id: 1,
+            name: 'Demo Coffee',
+            address: 'ул. Киевская 1',
+            latitude: 42.8746,
+            longitude: 74.5698,
+          },
+        ],
+      };
+    }
     try {
       const response = await apiClient.get('/partner/locations');
       return response;
@@ -295,6 +306,17 @@ const partnerApi = {
 
   // Promotions
   async getPromotions() {
+    if (DEMO_MODE) {
+      return {
+        data: [
+          {
+            id: 1,
+            title: '2 по цене 1',
+            is_active: true,
+          },
+        ],
+      };
+    }
     try {
       const response = await apiClient.get('/promotions');
       return response;
@@ -334,6 +356,18 @@ const partnerApi = {
 
   // Transactions
   async getTransactions(params?: { page?: number; limit?: number; start_date?: string; end_date?: string }) {
+    if (DEMO_MODE) {
+      return {
+        data: [
+          {
+            id: 1,
+            amount: 250,
+            created_at: new Date().toISOString(),
+            status: 'completed',
+          },
+        ],
+      };
+    }
     try {
       const response = await apiClient.get('/partner/transactions', { params });
       return response;
@@ -350,6 +384,17 @@ const partnerApi = {
 
   // Employees
   async getEmployees() {
+    if (DEMO_MODE) {
+      return {
+        data: [
+          {
+            id: 1,
+            name: 'Demo Employee',
+            role: 'cashier',
+          },
+        ],
+      };
+    }
     try {
       const response = await apiClient.get('/partner/employees');
       return response;
@@ -389,10 +434,29 @@ const partnerApi = {
 
   // Billing
   async getBillingInfo() {
+    if (DEMO_MODE) {
+      return {
+        data: {
+          balance: 12000,
+          next_invoice_date: new Date().toISOString(),
+        },
+      } as any;
+    }
     return apiClient.get('/partner/billing');
   },
 
   async getBillingHistory() {
+    if (DEMO_MODE) {
+      return {
+        data: [
+          {
+            id: 1,
+            amount: 5000,
+            created_at: new Date().toISOString(),
+          },
+        ],
+      } as any;
+    }
     return apiClient.get('/partner/billing/history');
   },
 
@@ -458,6 +522,19 @@ const partnerApi = {
 
   // Notifications
   async getNotifications(params?: { page?: number; limit?: number }) {
+    if (DEMO_MODE) {
+      return {
+        data: [
+          {
+            id: 1,
+            title: 'Новая акция',
+            message: 'Запущена демо‑акция для партнёров',
+            is_read: false,
+            created_at: new Date().toISOString(),
+          },
+        ],
+      };
+    }
     try {
       // Используем endpoint для текущего пользователя
       const response = await apiClient.get('/notifications/me', { params });

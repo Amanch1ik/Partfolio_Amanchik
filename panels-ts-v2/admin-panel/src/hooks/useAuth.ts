@@ -2,11 +2,10 @@ import { useEffect, useRef } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/services/api';
 
+const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
+
 // Глобальный флаг для предотвращения множественных запросов
 let globalCheckInProgress = false;
-// Время последней ошибки 500 - блокируем повторные попытки на 30 секунд
-let last500ErrorTime = 0;
-const ERROR_500_BACKOFF = 30 * 1000; // 30 секунд
 
 export const useAuth = () => {
   const { 
@@ -25,11 +24,33 @@ export const useAuth = () => {
   } = useAuthStore();
   
   const hasCheckedRef = useRef(false);
-  const checkAuthRef = useRef<(() => Promise<void>) | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem('admin_token');
+
+      // В demo‑режиме не дергаем backend: сразу устанавливаем демо‑пользователя
+      if (DEMO_MODE) {
+        const demoToken = token || 'demo-admin-token';
+        if (!token) {
+          localStorage.setItem('admin_token', demoToken);
+        }
+        const demoUser = {
+          id: 'demo-admin',
+          email: 'admin@yessgo.org',
+          role: 'admin' as const,
+          username: 'Demo Admin',
+          avatar_url: undefined,
+          firstName: 'Demo',
+          lastName: 'Admin',
+        };
+        setUser(demoUser);
+        setLastCheckTime(Date.now());
+        setLoading(false);
+        setChecking(false);
+        globalCheckInProgress = false;
+        return;
+      }
 
       if (!token) {
         setUser(null);
@@ -53,14 +74,6 @@ export const useAuth = () => {
       // Rate limit проверка
       if (rateLimitUntil && Date.now() < rateLimitUntil) {
         console.log('🚫 useAuth: Rate limit активен');
-        setLoading(false);
-        return;
-      }
-
-      // Блокируем повторные попытки после ошибки 500 на 30 секунд
-      if (last500ErrorTime > 0 && Date.now() - last500ErrorTime < ERROR_500_BACKOFF) {
-        const remaining = Math.ceil((ERROR_500_BACKOFF - (Date.now() - last500ErrorTime)) / 1000);
-        console.log(`🚫 useAuth: Блокировка после ошибки 500. Повтор через ${remaining} сек.`);
         setLoading(false);
         return;
       }
@@ -108,11 +121,6 @@ export const useAuth = () => {
         if (status === 429) {
           console.log('⏰ useAuth: Rate limit достигнут');
           setRateLimitUntil(Date.now() + 60 * 1000);
-        } else if (status === 500) {
-          // Ошибка 500 - блокируем повторные попытки на 30 секунд
-          console.log('🚫 useAuth: Ошибка 500 - блокируем повторные попытки на 30 секунд');
-          last500ErrorTime = Date.now();
-          if (!user) setUser(null);
         } else if (error?.code === 'ERR_NETWORK' || status === 401) {
           console.log('🚫 useAuth: Токен невалиден');
           localStorage.removeItem('admin_token');
@@ -128,22 +136,12 @@ export const useAuth = () => {
       }
     };
 
-    // Сохраняем функцию для возможного повторного использования
-    checkAuthRef.current = checkAuth;
-
     // Проверяем только один раз при монтировании
     if (!hasCheckedRef.current) {
       checkAuth();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Пустой массив зависимостей - выполняется только один раз
-
-  // Очистка при размонтировании
-  useEffect(() => {
-    return () => {
-      globalCheckInProgress = false;
-    };
-  }, []);
 
   const tokenExists = !!localStorage.getItem('admin_token');
   

@@ -28,13 +28,11 @@ import { SkeletonLoader } from '@/components/SkeletonLoader';
 import { ErrorDisplay } from '@/components/ErrorDisplay';
 import { EmptyState } from '@/components/EmptyState';
 import { useToast } from '@/hooks/useToast';
-import { useDocumentTitle } from '@shared/hooks/useDocumentTitle';
 import '../styles/animations.css';
 
 const { RangePicker } = DatePicker;
 
 export const DashboardPage = () => {
-  useDocumentTitle('Главная', 'YESS!GO Admin');
   const queryClient = useQueryClient();
   const [dateRange, setDateRange] = useState<[Dayjs, Dayjs]>(() => {
     try {

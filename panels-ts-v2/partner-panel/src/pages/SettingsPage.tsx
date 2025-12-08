@@ -5,10 +5,8 @@ import { DeleteOutlined } from '@ant-design/icons';
 import { taxRulesApi, shippingMethodsApi } from '@/services/api';
 import { integrationsApi } from '@/services/api';
 import { t } from '@/i18n';
-import { useDocumentTitle } from '@shared/hooks/useDocumentTitle';
 
 export const SettingsPage = () => {
-  useDocumentTitle('Настройки', 'YESS!GO Partner');
   const [form] = Form.useForm();
   const queryClient = useQueryClient();
 

@@ -32,8 +32,8 @@ class ApiMetricsCollector {
   private readonly enabled: boolean;
 
   constructor() {
-    // Включено всегда, но можно отключить через env
-    this.enabled = import.meta.env.VITE_ENABLE_METRICS !== 'false';
+    // По умолчанию отключено, включается только при явном VITE_ENABLE_METRICS="true"
+    this.enabled = import.meta.env.VITE_ENABLE_METRICS === 'true';
     
     // Загружаем сохраненные метрики при инициализации
     this.loadFromStorage();

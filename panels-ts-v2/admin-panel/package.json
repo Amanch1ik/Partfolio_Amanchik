@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:prod": "tsc --skipLibCheck && vite build --mode production",
+    "build:prod": "tsc && vite build --mode production",
     "preview": "vite preview",
     "preview:prod": "vite preview --mode production",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",

@@ -11,8 +11,7 @@ import { LoginPage } from '@/pages/LoginPage';
 import { Suspense, lazy } from 'react';
 import React from 'react';
 import { useI18nContext } from '@/i18nGatewayContext';
-import { initializeMonitoring } from '@shared/monitoring';
-import { OfflineIndicator } from '@shared/components/OfflineIndicator';
+import { initializeMonitoring } from '../../shared/monitoring';
 
 // Lazy loading для страниц
 const DashboardPage = lazy(() => import('@/pages/DashboardPage').then(module => ({ default: module.DashboardPage })));
@@ -32,63 +31,31 @@ const MonitoringPage = lazy(() => import('@/pages/MonitoringPage').then(module =
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // Включаем автоматическое обновление при подключении к сети (для офлайн режима)
-      refetchOnReconnect: true,
-      // Отключаем автоматическое обновление при фокусе окна (чтобы не было лишних запросов)
+      // Отключаем автоматическое обновление при фокусе окна
       refetchOnWindowFocus: false,
-      // Включаем обновление при монтировании только если данные устарели
-      refetchOnMount: true,
+      // Отключаем автоматическое обновление при подключении к сети
+      refetchOnReconnect: false,
       // Устанавливаем разумное время жизни кэша
       staleTime: 5 * 60 * 1000, // 5 минут
       gcTime: 10 * 60 * 1000, // 10 минут (время жизни в GC)
-      // Повторяем запрос при ошибках сети и временных ошибках сервера
-      retry: (failureCount, error: any) => {
-        // Не повторяем при 4xx ошибках (клиентские ошибки), кроме 408 и 429
-        if (error?.response?.status) {
-          const status = error.response.status;
-          if (status >= 400 && status < 500 && status !== 408 && status !== 429) {
-            return false;
-          }
-          // Не повторяем при 500 ошибке (Internal Server Error) - обычно постоянная ошибка
-          if (status === 500) {
-            return false;
-          }
-          // Повторяем только временные ошибки сервера (502, 503, 504)
-          if (status >= 500 && status < 600 && status !== 502 && status !== 503 && status !== 504) {
+      // Повторяем запрос только при ошибках сети
+      retry: (failureCount, error) => {
+        // Не повторяем при 4xx ошибках (клиентские ошибки)
+        if (error && typeof error === 'object' && 'status' in error) {
+          const status = (error as any).status;
+          if (status >= 400 && status < 500) {
             return false;
           }
         }
-        // Не повторяем при отмененных запросах
-        if (error?.name === 'CanceledError' || error?.message?.includes('canceled')) {
-          return false;
-        }
-        // Повторяем до 2 раз при сетевых ошибках и временных 5xx
-        return failureCount < 2;
+        // Повторяем до 3 раз при других ошибках
+        return failureCount < 3;
       },
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-      // Включаем структурное сравнение для лучшей дедупликации
-      structuralSharing: true,
-      // Настройки для офлайн режима
-      networkMode: 'online',
     },
     mutations: {
       // Для мутаций используем оптимистичные обновления где возможно
-      retry: (failureCount, error: any) => {
-        // Повторяем только при сетевых ошибках и 5xx
-        if (error?.response?.status) {
-          const status = error.response.status;
-          if (status >= 500 || status === 408 || status === 429) {
-            return failureCount < 2;
-          }
-        }
-        // Повторяем при сетевых ошибках
-        if (error?.code === 'ERR_NETWORK' || error?.request) {
-          return failureCount < 2;
-        }
-        return false;
-      },
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
-      networkMode: 'online',
+      retry: 1,
+      retryDelay: 1000,
     },
   },
 });
@@ -111,8 +78,30 @@ function App() {
   const { language } = useI18nContext();
   const antdLocale = language === 'en' ? enUS : ruRU; // Для кыргызского пока используем русский
   
-  // Всегда используем светлую тему
-  const [isDark] = React.useState(false);
+  // Получаем текущую тему для динамического изменения Ant Design темы
+  const [isDark, setIsDark] = React.useState(() => {
+    const savedTheme = localStorage.getItem('admin_panel_theme');
+    return savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  });
+  
+  // Слушаем изменения темы
+  React.useEffect(() => {
+    const observer = new MutationObserver(() => {
+      const theme = document.documentElement.getAttribute('data-theme');
+      setIsDark(theme === 'dark');
+    });
+    
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+    
+    // Устанавливаем начальное значение
+    const theme = document.documentElement.getAttribute('data-theme');
+    setIsDark(theme === 'dark');
+    
+    return () => observer.disconnect();
+  }, []);
   
   // Инициализация системы мониторинга при загрузке приложения
   React.useEffect(() => {
@@ -178,7 +167,7 @@ function App() {
               colorWarning: '#AEC380',
               colorInfo: '#1890ff',
               colorBgBase: isDark ? '#0d1a12' : '#ffffff',
-              colorText: '#1a1a1a',
+              colorText: isDark ? '#e8f0e3' : '#0F2A1D',
             },
             components: {
               Menu: {
@@ -206,7 +195,7 @@ function App() {
               Table: {
                 borderRadius: 12,
                 headerBg: 'var(--color-bg-tertiary)',
-                headerColor: '#1a1a1a',
+                headerColor: 'var(--color-text-primary)',
               },
             },
           }}
@@ -218,7 +207,6 @@ function App() {
             }}
           >
             <AntApp>
-              <OfflineIndicator />
               <Suspense fallback={<LoadingFallback />}>
                 <Routes>
                   <Route path="/login" element={<LoginPage />} />

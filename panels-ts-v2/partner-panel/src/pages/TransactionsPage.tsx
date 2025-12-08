@@ -6,13 +6,11 @@ import { transactionsApi } from '../services/api';
 import { exportToCSV, exportToExcel, exportToJSON } from '../utils/exportUtils';
 import dayjs from 'dayjs';
 import { toArray } from '../utils/arrayUtils';
-import { useDocumentTitle } from '@shared/hooks/useDocumentTitle';
 import 'dayjs/locale/ru';
 
 const { RangePicker } = DatePicker;
 
 export const TransactionsPage = () => {
-  useDocumentTitle('Транзакции', 'YESS!GO Partner');
   const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
 
 

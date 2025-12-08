@@ -40,7 +40,7 @@ export function ResponsiveTable<T extends Record<string, any>>({
           <Card
             key={tableProps.rowKey ? String(record[tableProps.rowKey as string]) : index}
             style={{ marginBottom: 16, borderRadius: 8 }}
-            styles={{ body: { padding: 16 } }}
+            bodyStyle={{ padding: 16 }}
           >
             {mobileCardRender(record)}
             {showActions && (

@@ -19,7 +19,7 @@ import { SearchResults } from './SearchResults';
 import { MobileMenu } from './MobileMenu';
 import { t } from '@/i18n';
 import { useTheme } from '@/hooks/useTheme';
-import { MenuOutlined } from '@ant-design/icons';
+import { SunOutlined, MoonOutlined, MenuOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { notificationsApi } from '@/services/api';
 import { toArray } from '@/utils/arrayUtils';
@@ -44,7 +44,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user: authUser, setUser: setAuthUser, logout } = useAuth();
-  const { theme } = useTheme();
+  const { toggleTheme, isDark } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -60,10 +60,10 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
     queryFn: async () => {
       try {
         const response = await notificationsApi.getNotifications({ page: 1, limit: 50 });
-        const responseData = (response as any)?.data || response;
         const notifications = toArray(
-          responseData?.notifications || 
-          (Array.isArray(responseData) ? responseData : []) || 
+          response?.data?.notifications || 
+          response?.data || 
+          response?.notifications || 
           [],
           []
         );
@@ -222,7 +222,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
         collapsible={false}
         width={250}
         style={{
-          background: 'linear-gradient(180deg, #689071 0%, #4a6b52 100%)',
+          background: 'var(--sidebar-bg)',
           boxShadow: 'var(--shadow-md)',
         }}
       >
@@ -239,7 +239,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
             borderRight: 0,
             background: 'transparent',
           }}
-          theme="dark"
+          theme={isDark ? 'dark' : 'light'}
         />
       </Sider>
       <Layout style={{ marginLeft: 0, transition: 'margin-left 0.3s ease' }}>
@@ -313,6 +313,26 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
             </div>
           </div>
           <div className="partner-header-actions">
+            {/* Переключатель темы */}
+            <div 
+              className="theme-switch"
+              onClick={toggleTheme}
+              title={isDark ? 'Светлая тема' : 'Тёмная тема'}
+              style={{
+                cursor: 'pointer',
+                padding: '8px',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {isDark ? (
+                <SunOutlined style={{ fontSize: 18, color: '#AEC380' }} />
+              ) : (
+                <MoonOutlined style={{ fontSize: 18, color: '#0F2A1D' }} />
+              )}
+            </div>
             <Select
               value={language}
               onChange={handleLanguageChange}

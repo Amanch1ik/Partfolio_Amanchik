@@ -3,10 +3,8 @@ import { Card, Form, Input, Upload, Avatar, Row, Col, Spin, Divider, InputNumber
 import { UserOutlined, MailOutlined, PhoneOutlined, GlobalOutlined, BankOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import partnerApi from '@/services/partnerApi';
-import { useDocumentTitle } from '@shared/hooks/useDocumentTitle';
 
 export const ProfilePage = () => {
-  useDocumentTitle('Профиль', 'YESS!GO Partner');
   const [form] = Form.useForm();
   const [avatarList, setAvatarList] = useState<any[]>([]);
 

@@ -1,5 +1,6 @@
-/* Светлая тема для админ-панели - улучшенная читаемость */
+/* Система тем для админ-панели */
 
+/* Светлая тема (по умолчанию) */
 :root,
 [data-theme="light"] {
   /* Основные цвета */
@@ -8,29 +9,26 @@
   --color-primary-dark: #375534;
   --color-primary-bg: #F0F7EB;
   
-  /* Фоны - яркие и чистые */
+  /* Фоны */
   --color-bg-primary: #ffffff;
-  --color-bg-secondary: #F8FBF9;
-  --color-bg-tertiary: #F0F7EB;
-  --color-bg-hover: rgba(104, 144, 113, 0.08);
+  --color-bg-secondary: #F0F7EB;
+  --color-bg-tertiary: #E3EED4;
+  --color-bg-hover: rgba(104, 144, 113, 0.1);
   
-  /* Текст - высокий контраст для читаемости */
-  --color-text-primary: #1a1a1a;
-  --color-text-secondary: #2d4a35;
-  --color-text-tertiary: #5a6b5f;
+  /* Текст */
+  --color-text-primary: #0F2A1D;
+  --color-text-secondary: #689071;
+  --color-text-tertiary: #8a9a8f;
   --color-text-inverse: #ffffff;
-  --color-text-muted: #8a9a8f;
   
   /* Границы */
   --color-border: #E3EED4;
   --color-border-hover: #AEC380;
-  --color-border-light: #F0F7EB;
   
-  /* Тени - мягкие и элегантные */
+  /* Тени */
   --shadow-sm: 0 2px 8px rgba(15, 42, 29, 0.06);
-  --shadow-md: 0 4px 16px rgba(15, 42, 29, 0.08);
+  --shadow-md: 0 4px 12px rgba(15, 42, 29, 0.08);
   --shadow-lg: 0 8px 24px rgba(15, 42, 29, 0.12);
-  --shadow-xl: 0 12px 32px rgba(15, 42, 29, 0.15);
   
   /* Статусы */
   --color-success: #52c41a;
@@ -38,60 +36,100 @@
   --color-error: #ff4d4f;
   --color-info: #1890ff;
   
-  /* Sidebar - красивый зеленый градиент */
-  --sidebar-bg: linear-gradient(180deg, #689071 0%, #4a6b52 100%);
-  --sidebar-bg-solid: #689071;
-  --sidebar-text: rgba(255, 255, 255, 0.95);
+  /* Sidebar */
+  --sidebar-bg: #0F2A1D;
+  --sidebar-text: rgba(255, 255, 255, 0.85);
   --sidebar-text-active: #ffffff;
-  --sidebar-item-hover: rgba(255, 255, 255, 0.15);
-  --sidebar-item-active: rgba(255, 255, 255, 0.25);
+  --sidebar-item-hover: rgba(104, 144, 113, 0.3);
+  --sidebar-item-active: #689071;
   
   /* Header */
   --header-bg: #ffffff;
   --header-border: #E3EED4;
-  --header-text: #1a1a1a;
   
   /* Cards */
-  --card-bg: #ffffff;
-  --card-bg-gradient: linear-gradient(135deg, #ffffff 0%, #F8FBF9 100%);
+  --card-bg: linear-gradient(135deg, #ffffff 0%, #F0F7EB 100%);
   --card-border: #E3EED4;
   --card-shadow: 0 2px 12px rgba(15, 42, 29, 0.08);
-  --card-hover-shadow: 0 4px 20px rgba(15, 42, 29, 0.12);
   
   /* Inputs */
   --input-bg: #ffffff;
   --input-border: #d9d9d9;
   --input-border-hover: #AEC380;
   --input-border-focus: #689071;
-  --input-text: #1a1a1a;
-  --input-placeholder: #8a9a8f;
   
   /* Charts */
   --chart-grid: #E3EED4;
   --chart-tooltip-bg: #ffffff;
-  --chart-text: #1a1a1a;
+}
+
+/* Тёмная тема */
+[data-theme="dark"] {
+  /* Основные цвета */
+  --color-primary: #AEC380;
+  --color-primary-light: #c4d8a0;
+  --color-primary-dark: #689071;
+  --color-primary-bg: #1a2f1f;
+  
+  /* Фоны */
+  --color-bg-primary: #0d1a12;
+  --color-bg-secondary: #142318;
+  --color-bg-tertiary: #1a2f1f;
+  --color-bg-hover: rgba(174, 195, 128, 0.1);
+  
+  /* Текст */
+  --color-text-primary: #e8f0e3;
+  --color-text-secondary: #AEC380;
+  --color-text-tertiary: #7a9a7f;
+  --color-text-inverse: #0d1a12;
+  
+  /* Границы */
+  --color-border: #2d4a35;
+  --color-border-hover: #689071;
+  
+  /* Тени */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  
+  /* Статусы */
+  --color-success: #73d13d;
+  --color-warning: #ffc53d;
+  --color-error: #ff7875;
+  --color-info: #40a9ff;
+  
+  /* Sidebar */
+  --sidebar-bg: #0a1410;
+  --sidebar-text: rgba(232, 240, 227, 0.85);
+  --sidebar-text-active: #e8f0e3;
+  --sidebar-item-hover: rgba(174, 195, 128, 0.2);
+  --sidebar-item-active: #689071;
+  
+  /* Header */
+  --header-bg: #142318;
+  --header-border: #2d4a35;
+  
+  /* Cards */
+  --card-bg: linear-gradient(135deg, #142318 0%, #1a2f1f 100%);
+  --card-border: #2d4a35;
+  --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  
+  /* Inputs */
+  --input-bg: #1a2f1f;
+  --input-border: #2d4a35;
+  --input-border-hover: #689071;
+  --input-border-focus: #AEC380;
+  
+  /* Charts */
+  --chart-grid: #2d4a35;
+  --chart-tooltip-bg: #142318;
 }
 
 /* Применение переменных к элементам */
 body {
   background-color: var(--color-bg-secondary);
   color: var(--color-text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  font-size: 14px;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Улучшенная читаемость текста */
-h1, h2, h3, h4, h5, h6 {
-  color: var(--color-text-primary);
-  font-weight: 600;
-  line-height: 1.4;
-}
-
-p, span, div {
-  color: var(--color-text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Карточки */
@@ -99,26 +137,13 @@ p, span, div {
   background: var(--card-bg) !important;
   border-color: var(--card-border) !important;
   box-shadow: var(--card-shadow) !important;
-  border-radius: 12px;
-  transition: all 0.3s ease;
-}
-
-.ant-card:hover {
-  box-shadow: var(--card-hover-shadow) !important;
 }
 
 .ant-card-head {
   border-bottom-color: var(--color-border) !important;
-  background: transparent !important;
 }
 
 .ant-card-head-title {
-  color: var(--color-text-primary) !important;
-  font-weight: 600;
-  font-size: 16px;
-}
-
-.ant-card-body {
   color: var(--color-text-primary) !important;
 }
 
@@ -131,13 +156,11 @@ p, span, div {
 .ant-table-thead > tr > th {
   background: var(--color-bg-tertiary) !important;
   color: var(--color-text-primary) !important;
-  font-weight: 600;
   border-bottom-color: var(--color-border) !important;
 }
 
 .ant-table-tbody > tr > td {
   border-bottom-color: var(--color-border) !important;
-  color: var(--color-text-primary) !important;
 }
 
 .ant-table-tbody > tr:hover > td {
@@ -147,7 +170,6 @@ p, span, div {
 /* Модальные окна */
 .ant-modal-content {
   background: var(--color-bg-primary) !important;
-  border-radius: 12px;
 }
 
 .ant-modal-header {
@@ -156,11 +178,6 @@ p, span, div {
 }
 
 .ant-modal-title {
-  color: var(--color-text-primary) !important;
-  font-weight: 600;
-}
-
-.ant-modal-body {
   color: var(--color-text-primary) !important;
 }
 
@@ -171,13 +188,7 @@ p, span, div {
 .ant-picker {
   background-color: var(--input-bg) !important;
   border-color: var(--input-border) !important;
-  color: var(--input-text) !important;
-  font-size: 14px;
-}
-
-.ant-input::placeholder,
-.ant-input-affix-wrapper input::placeholder {
-  color: var(--input-placeholder) !important;
+  color: var(--color-text-primary) !important;
 }
 
 .ant-input:hover,
@@ -193,20 +204,17 @@ p, span, div {
 .ant-select-focused .ant-select-selector,
 .ant-picker-focused {
   border-color: var(--input-border-focus) !important;
-  box-shadow: 0 0 0 2px rgba(104, 144, 113, 0.15) !important;
+  box-shadow: 0 0 0 2px rgba(104, 144, 113, 0.2) !important;
 }
 
 .ant-form-item-label > label {
   color: var(--color-text-primary) !important;
-  font-weight: 500;
 }
 
 /* Dropdown и Select */
 .ant-select-dropdown,
 .ant-dropdown-menu {
   background: var(--color-bg-primary) !important;
-  border-radius: 8px;
-  box-shadow: var(--shadow-lg) !important;
 }
 
 .ant-select-item,
@@ -221,20 +229,15 @@ p, span, div {
 
 .ant-select-item-option-selected {
   background: var(--color-primary-bg) !important;
-  color: var(--color-primary) !important;
-  font-weight: 500;
 }
 
 /* Статистика */
 .ant-statistic-title {
   color: var(--color-text-secondary) !important;
-  font-size: 14px;
-  font-weight: 500;
 }
 
 .ant-statistic-content {
   color: var(--color-text-primary) !important;
-  font-weight: 600;
 }
 
 /* Теги */
@@ -242,26 +245,27 @@ p, span, div {
   background: var(--color-bg-tertiary);
   border-color: var(--color-border);
   color: var(--color-text-primary);
-  font-weight: 500;
 }
 
-/* Кнопки */
-.ant-btn-primary {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
-  border: none;
-  font-weight: 500;
-  box-shadow: var(--shadow-sm);
+/* Переключатель темы */
+.theme-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
-.ant-btn-primary:hover {
-  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
-  box-shadow: var(--shadow-md);
+.theme-switch:hover {
+  background: var(--color-bg-hover);
 }
 
-/* Плавные переходы */
+/* Анимация перехода между темами */
 * {
-  transition: background-color 0.2s ease, 
-              border-color 0.2s ease, 
-              box-shadow 0.2s ease,
-              color 0.2s ease;
+  transition: background-color 0.3s ease, 
+              border-color 0.3s ease, 
+              box-shadow 0.3s ease;
 }
+

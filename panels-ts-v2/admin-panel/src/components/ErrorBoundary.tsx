@@ -1,7 +1,7 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { Result, Button } from 'antd';
 import { HomeOutlined, ReloadOutlined } from '@ant-design/icons';
-import { errorLogger } from '@shared/monitoring';
+import { errorLogger } from '../../../shared/monitoring';
 
 interface Props {
   children: ReactNode;

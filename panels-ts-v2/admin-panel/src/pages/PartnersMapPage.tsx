@@ -394,7 +394,7 @@ export const PartnersMapPage = () => {
     if (Notification.permission === 'granted') {
       const notification = new Notification(title, {
         body,
-        icon: icon || '/app-icon.svg',
+        icon: icon || '/favicon.ico',
         tag: 'partner-notification', // группировка уведомлений
       });
 

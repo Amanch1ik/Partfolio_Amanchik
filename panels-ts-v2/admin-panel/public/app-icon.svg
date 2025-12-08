@@ -1,24 +1,25 @@
 <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-  <!-- Красивый зеленый фон с градиентом -->
   <defs>
-    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#689071;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#4a6b52;stop-opacity:1" />
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#008b5f"/>
+      <stop offset="100%" stop-color="#00c97a"/>
     </linearGradient>
   </defs>
-  <rect width="512" height="512" fill="url(#bgGradient)" rx="100"/>
-  
-  <!-- Белая буква Y - красивая и четкая -->
-  <text 
-    x="256" 
-    y="360" 
-    font-family="'Segoe UI', 'Arial', 'Helvetica Neue', sans-serif" 
-    font-size="380" 
-    font-weight="900" 
-    fill="#ffffff" 
-    text-anchor="middle" 
-    dominant-baseline="central"
-    letter-spacing="-10"
-    style="text-rendering: optimizeLegibility; font-variant-numeric: normal;"
-  >Y</text>
+  <rect x="0" y="0" width="512" height="512" fill="url(#bg)"/>
+  <!-- stylized phi / Yess mark -->
+  <path
+    d="M 176 160
+       C 176 240 256 216 256 256
+       C 256 296 208 296 208 360
+       M 256 256
+       C 256 216 336 224 336 176
+       C 336 144 312 120 280 120"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="40"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
 </svg>
+
+

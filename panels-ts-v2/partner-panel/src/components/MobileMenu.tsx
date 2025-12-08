@@ -58,10 +58,8 @@ export const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
       placement="left"
       onClose={onClose}
       open={open}
-      styles={{
-        body: { padding: 0, background: 'linear-gradient(180deg, #689071 0%, #4a6b52 100%)' },
-        header: { background: 'linear-gradient(180deg, #689071 0%, #4a6b52 100%)', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }
-      }}
+      bodyStyle={{ padding: 0, background: 'var(--sidebar-bg)' }}
+      headerStyle={{ background: 'var(--sidebar-bg)', borderBottom: '1px solid var(--color-border)' }}
       width={280}
     >
       <Menu
@@ -77,7 +75,7 @@ export const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
           background: 'transparent',
           color: 'var(--sidebar-text)',
         }}
-        theme="light"
+        theme="dark"
       />
     </Drawer>
   );
