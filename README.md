@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # 🚀 YessBackend - Complete Loyalty Platform
 <div align="center">
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?style=for-the-badge&logo=dotnet)](https://dotnet.microsoft.com/)
