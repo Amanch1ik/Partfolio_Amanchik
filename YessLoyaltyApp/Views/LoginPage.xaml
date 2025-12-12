@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="YessLoyaltyApp.Views.LoginPage"
+             Title="Вход"
+             BackgroundColor="#007A51">
+
+    <Grid RowDefinition="*,Auto,Auto" 
+          Padding="24" 
+          RowSpacing="16" 
+          BackgroundColor="Transparent">
+        
+        <!-- Gradient Background -->
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#007A51" Offset="0.0"/>
+                <GradientStop Color="#00945E" Offset="1.0"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <!-- Login Form -->
+        <VerticalStackLayout Grid.Row="1" 
+                              Spacing="16" 
+                              VerticalOptions="Center">
+            
+            <Border BackgroundColor="White" 
+                    Stroke="Transparent" 
+                    StrokeShape="RoundRectangle 16"
+                    HeightRequest="56">
+                <Entry Placeholder="E-mail" 
+                       PlaceholderColor="Gray"
+                       Text="{Binding Email}"
+                       Keyboard="Email"
+                       VerticalOptions="Center"
+                       BackgroundColor="Transparent"
+                       FontSize="16"/>
+            </Border>
+
+            <Border BackgroundColor="White" 
+                    Stroke="Transparent" 
+                    StrokeShape="RoundRectangle 16"
+                    HeightRequest="56">
+                <Entry Placeholder="Пароль" 
+                       PlaceholderColor="Gray"
+                       Text="{Binding Password}"
+                       IsPassword="True"
+                       VerticalOptions="Center"
+                       BackgroundColor="Transparent"
+                       FontSize="16"/>
+            </Border>
+
+            <HorizontalStackLayout Spacing="8">
+                <CheckBox Color="#007A51"/>
+                <Label Text="Запомнить меня" 
+                       VerticalOptions="Center" 
+                       TextColor="White"/>
+            </HorizontalStackLayout>
+
+            <Button Text="Войти" 
+                    BackgroundColor="#004D3A" 
+                    TextColor="White"
+                    CornerRadius="16"
+                    HeightRequest="56"
+                    Command="{Binding LoginCommand}"/>
+
+            <Label Text="Забыли пароль?" 
+                   HorizontalOptions="Center" 
+                   TextColor="White"
+                   TextDecorations="Underline"/>
+        </VerticalStackLayout>
+
+        <!-- External Login Options -->
+        <VerticalStackLayout Grid.Row="2" 
+                              Spacing="16">
+            <Label Text="или войдите через" 
+                   HorizontalOptions="Center"
+                   TextColor="White"/>
+
+            <HorizontalStackLayout Spacing="16" 
+                                   HorizontalOptions="Center">
+                <!-- Google Login Button -->
+                <Button Text="Google" 
+                        BackgroundColor="White"
+                        TextColor="Black"
+                        CornerRadius="16"
+                        HeightRequest="56"
+                        WidthRequest="150"
+                        Command="{Binding GoogleLoginCommand}">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="Material" 
+                                         Glyph="{x:Static material:MaterialIcons.Google}"
+                                         Color="Black"/>
+                    </Button.ImageSource>
+                </Button>
+
+                <!-- Apple Login Button -->
+                <Button Text="Apple" 
+                        BackgroundColor="White"
+                        TextColor="Black"
+                        CornerRadius="16"
+                        HeightRequest="56"
+                        WidthRequest="150"
+                        Command="{Binding AppleLoginCommand}">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="Material" 
+                                         Glyph="{x:Static material:MaterialIcons.Apple}"
+                                         Color="Black"/>
+                    </Button.ImageSource>
+                </Button>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

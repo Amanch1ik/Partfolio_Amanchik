@@ -1,0 +1,24 @@
+<svg width="192" height="192" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Красивый зеленый фон с градиентом -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#689071;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4a6b52;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bgGradient)" rx="100"/>
+  
+  <!-- Белая буква Y - красивая и четкая -->
+  <text 
+    x="256" 
+    y="360" 
+    font-family="'Segoe UI', 'Arial', 'Helvetica Neue', sans-serif" 
+    font-size="380" 
+    font-weight="900" 
+    fill="#ffffff" 
+    text-anchor="middle" 
+    dominant-baseline="central"
+    letter-spacing="-10"
+    style="text-rendering: optimizeLegibility; font-variant-numeric: normal;"
+  >Y</text>
+</svg>

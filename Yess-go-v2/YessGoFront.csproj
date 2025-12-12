@@ -1,0 +1,101 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net9.0-android;net9.0-ios</TargetFrameworks>
+		<OutputType>Exe</OutputType>
+		<RootNamespace>YessGoFront</RootNamespace>
+		<UseMaui>true</UseMaui>
+		<SingleProject>true</SingleProject>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+
+		<ApplicationTitle>YESS Go Front</ApplicationTitle>
+		<ApplicationId>com.yessgo.front</ApplicationId>
+		<ApplicationIdGuid>5F4C77F0-AC7A-4C4E-9E8B-32B6B1C9F22F</ApplicationIdGuid>
+
+		<!-- Минимальные версии платформ -->
+		<SupportedOSPlatformVersion Condition="$(TargetFramework.Contains('-android'))">21</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$(TargetFramework.Contains('-ios'))">15.0</SupportedOSPlatformVersion>
+
+		<!-- Подавление предупреждений о версиях пакетов -->
+		<NoWarn>$(NoWarn);NU1608;XC0045</NoWarn>
+
+		<!-- Включение компиляции биндингов с Source для производительности -->
+		<MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
+
+		<!-- Отключение XAML предупреждений для MainPage.xaml -->
+		<MauiDisableXamlWarnings>MainPage.xaml</MauiDisableXamlWarnings>
+	</PropertyGroup>
+
+	<!-- ✅ Android -->
+	<PropertyGroup Condition="$(TargetFramework.Contains('-android'))">
+		<RuntimeIdentifiers>android-arm64;android-x64</RuntimeIdentifiers>
+	</PropertyGroup>
+
+	<!-- ✅ iOS -->
+	<PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
+		<!-- Если собираешь под симулятор -->
+		<RuntimeIdentifier>iossimulator-arm64</RuntimeIdentifier>
+		<!-- Если нужно под реальное устройство, укажи при сборке:
+		     dotnet build -f net9.0-ios -r ios-arm64 -->
+	</PropertyGroup>
+
+	<!-- ✅ Ресурсы -->
+	<ItemGroup>
+		<MauiImage Include="Resources\Images\**" />
+		<MauiFont Include="Resources\Fonts\**" />
+		<MauiSplashScreen Include="Resources\Splash\**" Color="FFFFFF" />
+		<!-- Иконка приложения - MAUI автоматически создаст все необходимые размеры для Android и iOS -->
+		<MauiIcon Include="Resources\AppIcon\appicon.png" />
+	</ItemGroup>
+
+	<!-- ✅ Пакеты -->
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+		<PackageReference Include="Mapsui" Version="4.1.9" />
+		<PackageReference Include="Mapsui.Maui" Version="4.1.9" />
+		<PackageReference Include="Mapsui.Tiling" Version="4.1.9" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.100" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.100" />
+		<PackageReference Include="Microsoft.Maui.Controls.Maps" Version="9.0.100" />
+		<PackageReference Include="Microsoft.Maui.Essentials" Version="9.0.100" />
+		<PackageReference Include="Plugin.Fingerprint" Version="2.1.5" />
+		<PackageReference Include="SkiaSharp" Version="2.88.9" />
+		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.9" />
+		<PackageReference Include="Svg.Skia" Version="1.0.0.3" />
+		<PackageReference Include="ZXing.Net.Maui.Controls" Version="0.6.0" />
+		<!-- Xamarin.AndroidX.Emoji2.ViewsHelper удален - несовместим с .NET 9 -->
+		<!-- Используем TextWatcher вместо IInputFilter для блокировки emoji -->
+	</ItemGroup>
+
+	<ItemGroup>
+		<MauiXaml Update="Views\**\*.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+	</ItemGroup>
+
+	<!-- Исключаем тестовые файлы из компиляции основного проекта -->
+	<ItemGroup>
+		<Compile Remove="Tests\**" />
+		<EmbeddedResource Remove="Tests\**" />
+		<None Remove="Tests\**" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Update="Pages\PartnerDetailViewPage.xaml.cs">
+	    <DependentUpon>PartnerDetailViewPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\ContactsPage.xaml.cs">
+	    <DependentUpon>ContactsPage.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+	<ItemGroup>
+	  <None Update="Views\FeedbackPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </None>
+	</ItemGroup>
+
+</Project>

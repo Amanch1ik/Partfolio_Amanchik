@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="YessGoFront.Views.LoginPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:YessGoFront.Converters"
+    xmlns:components="clr-namespace:YessGoFront.Components"
+    Title="Вход"
+    BackgroundColor="#007A51"
+    Shell.NavBarIsVisible="False">
+    
+    <ContentPage.Resources>
+        <converters:InverseBoolConverter x:Key="InvertedBoolConverter"/>
+    </ContentPage.Resources>
+
+	<Grid RowDefinitions="Auto,*,Auto" Padding="24" RowSpacing="16">
+		<!-- Фон с градиентом -->
+		<Grid.Background>
+			<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+				<GradientStop Color="#007A51" Offset="0.0"/>
+				<GradientStop Color="#00C97B" Offset="1.0"/>
+			</LinearGradientBrush>
+		</Grid.Background>
+
+		<!-- Карточка -->
+		<Frame Grid.Row="1" Padding="20" CornerRadius="24" HasShadow="True" BackgroundColor="White">
+			<VerticalStackLayout Spacing="16">
+
+				<!-- Вкладки (Вход / Регистрация) -->
+				<Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="16" Margin="0,0,0,8">
+					<Label Text="Вход" FontAttributes="Bold" TextColor="#0B4A3B"/>
+					<Label Grid.Column="1" Text="Регистрация" TextColor="#B0B0B0">
+						<Label.GestureRecognizers>
+							<TapGestureRecognizer Tapped="OpenRegister_Tapped"/>
+						</Label.GestureRecognizers>
+					</Label>
+				</Grid>
+
+				<!-- Поле Телефон -->
+				<components:PhoneEntry x:Name="PhoneEntryControl"
+                                       FullPhoneNumber="{Binding Phone, Mode=TwoWay}" />
+
+				<!-- Поле Пароль -->
+				<Border BackgroundColor="#E0EFE9" Stroke="Transparent" StrokeShape="RoundRectangle 16" HeightRequest="52">
+					<Grid Padding="12,0" ColumnDefinitions="*,Auto">
+						<Entry x:Name="PasswordEntry" 
+                                Placeholder="Пароль" 
+                                IsPassword="True" 
+                                BackgroundColor="Transparent"
+                                Text="{Binding Password, Mode=TwoWay}" />
+						<Label Grid.Column="1" 
+                               Text="👁" 
+                               FontSize="20" 
+                               VerticalOptions="Center" 
+                               HorizontalOptions="Center"
+                               Padding="8,0"
+                               TextColor="#666666">
+							<Label.GestureRecognizers>
+								<TapGestureRecognizer Tapped="TogglePassword_Tapped"/>
+							</Label.GestureRecognizers>
+						</Label>
+					</Grid>
+				</Border>
+
+				<!-- Сообщение об ошибке -->
+				<Label Text="{Binding ErrorMessage}" 
+                       IsVisible="{Binding HasError}"
+                       TextColor="#D32F2F" 
+                       FontSize="12"
+                       Margin="0,-8,0,0"/>
+
+				<!-- Запомнить меня -->
+				<HorizontalStackLayout Spacing="8">
+					<CheckBox x:Name="RememberCheck" Color="#007A51" IsChecked="{Binding RememberMe}"/>
+                    <Label Text="Запомнить меня" TextColor="#B0B0B0" VerticalOptions="Center"/>
+				</HorizontalStackLayout>
+
+				<!-- Кнопка входа -->
+				<Grid HeightRequest="52">
+					<Button Text="Войти"
+                            HeightRequest="52"
+                            CornerRadius="16"
+                            BackgroundColor="#0B4A3B"
+                            TextColor="White"
+                            Command="{Binding LoginCommand}"
+                            IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}">
+						<Button.Triggers>
+							<DataTrigger TargetType="Button" Binding="{Binding IsBusy}" Value="True">
+								<Setter Property="Text" Value="Вход..." />
+								<Setter Property="Opacity" Value="0.7" />
+							</DataTrigger>
+						</Button.Triggers>
+					</Button>
+					<ActivityIndicator IsRunning="{Binding IsBusy}" 
+                                      IsVisible="{Binding IsBusy}"
+                                      Color="White"
+                                      VerticalOptions="Center"
+                                      HorizontalOptions="Center" />
+				</Grid>
+
+                <Label Text="Создать новый аккаунт"
+					TextColor="#0B4A3B"
+					FontSize="16"
+					TextDecorations="Underline"
+					HorizontalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnRegistrationPage" />
+                    </Label.GestureRecognizers>
+                </Label>
+
+
+                <BoxView HeightRequest="1" Color="#E0E0E0" Margin="0,8"/>
+
+                
+
+
+                <Label Text="Забыли пароль?" HorizontalOptions="Center" TextColor="#0B4A3B" />
+
+				<!-- Вход через Google -->
+				<Button Text="Войти с помощью Google"
+                        HeightRequest="48"
+                        CornerRadius="12"
+                        BackgroundColor="White"
+                        TextColor="Black"/>
+			</VerticalStackLayout>
+		</Frame>
+	</Grid>
+</ContentPage>

@@ -1,0 +1,20 @@
+БЫСТРОЕ ИСПРАВЛЕНИЕ ОШИБКИ С ЗАВИСИМОСТЯМИ
+==========================================
+
+Если вы получили ошибку "email-validator is not installed":
+
+1. Убедитесь, что виртуальное окружение активировано:
+   .\venv\Scripts\Activate.ps1
+
+2. Установите недостающие зависимости:
+   pip install -r requirements.txt
+
+   ИЛИ установите только email-validator:
+   pip install email-validator
+
+3. После установки запустите сервер снова:
+   uvicorn app.main:app --reload --port 8000
+
+Альтернативный способ - установить pydantic с email поддержкой:
+   pip install 'pydantic[email]'
+

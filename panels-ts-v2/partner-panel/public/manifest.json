@@ -1,0 +1,91 @@
+{
+  "name": "YESS!GO - Partner Panel",
+  "short_name": "YESS Partner",
+  "description": "Партнерская панель системы лояльности YESS!GO",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#689071",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "ru",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/app-icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Дашборд",
+      "short_name": "Главная",
+      "description": "Перейти к главной панели",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/app-icon.svg",
+          "sizes": "512x512",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Профиль",
+      "short_name": "Профиль",
+      "description": "Управление профилем",
+      "url": "/profile",
+      "icons": [
+        {
+          "src": "/app-icon.svg",
+          "sizes": "512x512",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Точки",
+      "short_name": "Точки",
+      "description": "Управление точками продаж",
+      "url": "/locations",
+      "icons": [
+        {
+          "src": "/app-icon.svg",
+          "sizes": "512x512",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Акции",
+      "short_name": "Акции",
+      "description": "Управление акциями",
+      "url": "/promotions",
+      "icons": [
+        {
+          "src": "/app-icon.svg",
+          "sizes": "512x512",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

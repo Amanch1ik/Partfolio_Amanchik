@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="YessGoFront.Views.CertificatePage">
+    <VerticalStackLayout>
+        <Grid Padding="16,44,16,8" BackgroundColor="#0F6B53">
+            <Grid ColumnDefinitions="Auto,*,Auto" VerticalOptions="Center">
+                <Border WidthRequest="36" HeightRequest="36"
+                    StrokeThickness="0"
+                    BackgroundColor="#FFFFFF"
+                    StrokeShape="RoundRectangle8">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnBackTapped" />
+                    </Border.GestureRecognizers>
+                    <Image Source="back_arrow_icon.png" 
+                        Aspect="AspectFit" 
+                        Margin="8" />
+                </Border>
+
+                <Label Grid.Column="1"
+                    Text="Сертификаты"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    FontSize="18"/>
+            </Grid>
+        </Grid>
+        <Label
+            Text
+            ="ДАННАЯ ФУНКЦИЯ В РАЗРАБОТКЕ"
+            TextColor="#6B7280"
+            FontSize="14"
+            FontAttributes="Bold"
+            HorizontalOptions="Center"
+            VerticalOptions="Center"/>
+    </VerticalStackLayout>
+</ContentPage>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="YessLoyaltyApp.Views.RegisterPage"
+             Title="Регистрация"
+             BackgroundColor="#007A51">
+
+    <Grid RowDefinition="*,Auto" 
+          Padding="24" 
+          RowSpacing="16" 
+          BackgroundColor="Transparent">
+        
+        <!-- Gradient Background -->
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#007A51" Offset="0.0"/>
+                <GradientStop Color="#00945E" Offset="1.0"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <!-- Registration Form -->
+        <VerticalStackLayout Grid.Row="0" 
+                              Spacing="16" 
+                              VerticalOptions="Center">
+            
+            <Border BackgroundColor="White" 
+                    Stroke="Transparent" 
+                    StrokeShape="RoundRectangle 16"
+                    HeightRequest="56">
+                <Entry Placeholder="Имя" 
+                       PlaceholderColor="Gray"
+                       Text="{Binding FirstName}"
+                       VerticalOptions="Center"
+                       BackgroundColor="Transparent"
+                       FontSize="16"/>
+            </Border>
+
+            <Border BackgroundColor="White" 
+                    Stroke="Transparent" 
+                    StrokeShape="RoundRectangle 16"
+                    HeightRequest="56">
+                <Entry Placeholder="Фамилия" 
+                       PlaceholderColor="Gray"
+                       Text="{Binding LastName}"
+                       VerticalOptions="Center"
+                       BackgroundColor="Transparent"
+                       FontSize="16"/>
+            </Border>
+
+            <Border BackgroundColor="White" 
+                    Stroke="Transparent" 
+                    StrokeShape="RoundRectangle 16"
+                    HeightRequest="56">
+                <Entry Placeholder="E-mail" 
+                       PlaceholderColor="Gray"
+                       Text="{Binding Email}"
+                       Keyboard="Email"
+                       VerticalOptions="Center"
+                       BackgroundColor="Transparent"
+                       FontSize="16"/>
+            </Border>
+
+            <Border BackgroundColor="White" 
+                    Stroke="Transparent" 
+                    StrokeShape="RoundRectangle 16"
+                    HeightRequest="56">
+                <Entry Placeholder="Пароль" 
+                       PlaceholderColor="Gray"
+                       Text="{Binding Password}"
+                       IsPassword="True"
+                       VerticalOptions="Center"
+                       BackgroundColor="Transparent"
+                       FontSize="16"/>
+            </Border>
+
+            <Button Text="Регистрация" 
+                    BackgroundColor="#004D3A" 
+                    TextColor="White"
+                    CornerRadius="16"
+                    HeightRequest="56"
+                    Command="{Binding RegisterCommand}"/>
+        </VerticalStackLayout>
+
+        <!-- Google Registration -->
+        <Button Grid.Row="1" 
+                Text="Продолжить с Google" 
+                BackgroundColor="White"
+                TextColor="Black"
+                CornerRadius="16"
+                HeightRequest="56"
+                Margin="0,16,0,0"
+                Command="{Binding GoogleRegisterCommand}">
+            <Button.ImageSource>
+                <FontImageSource FontFamily="Material" 
+                                 Glyph="{x:Static material:MaterialIcons.Google}"
+                                 Color="Black"/>
+            </Button.ImageSource>
+        </Button>
+    </Grid>
+</ContentPage>

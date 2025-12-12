@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage 
+    x:Class="YessGoFront.Views.NotificationsPage"
+    x:Name="NotificationsPageRoot"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:YessGoFront.Views.Controls"
+    Shell.NavBarIsVisible="False"
+    BackgroundColor="#F4F6F8"
+    x:DataType="viewModel:NotificationsViewModel"
+    xmlns:viewModel="clr-namespace:YessGoFront.ViewModels"
+    xmlns:entities="clr-namespace:YessGoFront.Data.Entities">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <!-- Header -->
+        <Grid Grid.Row="0" Padding="16,12" BackgroundColor="#007A51">
+            <Label Text="Уведомления" 
+                   TextColor="White" 
+                   FontSize="20" 
+                   FontAttributes="Bold"
+                   VerticalTextAlignment="Center"/>
+        </Grid>
+
+        <!-- Notifications list -->
+        <RefreshView Grid.Row="1" Command="{Binding RefreshCommand}" IsRefreshing="{Binding IsRefreshing}">
+            <ScrollView>
+                <VerticalStackLayout Padding="16" Spacing="12">
+                    <!-- Loading indicator -->
+                    <ActivityIndicator IsRunning="{Binding IsBusy}" 
+                                     IsVisible="{Binding IsBusy}"
+                                     HorizontalOptions="Center"
+                                     VerticalOptions="Center"
+                                     HeightRequest="40"/>
+
+                    <!-- Error message -->
+                    <Frame BackgroundColor="#FEE2E2" 
+                           CornerRadius="8" 
+                           Padding="12"
+                           IsVisible="{Binding HasError}"
+                           HasShadow="False">
+                        <StackLayout Spacing="4">
+                            <Label Text="Ошибка загрузки уведомлений" 
+                                   TextColor="#991B1B" 
+                                   FontAttributes="Bold"/>
+                            <Label Text="{Binding ErrorMessage}" 
+                                   TextColor="#7F1D1D" 
+                                   FontSize="12"/>
+                        </StackLayout>
+                    </Frame>
+
+                    <!-- Empty state -->
+                    <StackLayout IsVisible="{Binding Notifications.Count, Converter={StaticResource InverseBoolConverter}}"
+                                 HorizontalOptions="Center"
+                                 VerticalOptions="Center"
+                                 Spacing="12">
+                        <Label Text="🔔" 
+                               FontSize="48" 
+                               HorizontalOptions="Center"/>
+                        <Label Text="У вас пока нет уведомлений" 
+                               TextColor="#6B7280" 
+                               HorizontalOptions="Center"/>
+                    </StackLayout>
+
+                    <!-- Notifications collection -->
+                    <CollectionView ItemsSource="{Binding Notifications}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="entities:Notification">
+                                <Frame CornerRadius="12" 
+                                       BackgroundColor="#F9FAFB" 
+                                       HasShadow="True" 
+                                       Padding="0"
+                                       Margin="0,0,0,12">
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.MarkAsReadCommand}" 
+                                                            CommandParameter="{Binding .}"/>
+                                    </Frame.GestureRecognizers>
+                                    
+                                    <Grid Padding="16" ColumnDefinitions="Auto,*" ColumnSpacing="16">
+                                        <!-- Notification Icon -->
+                                        <Frame Grid.Column="0" 
+                                               BackgroundColor="#F3F4F6" 
+                                               CornerRadius="12" 
+                                               Padding="12"
+                                               HeightRequest="56"
+                                               WidthRequest="56"
+                                               VerticalOptions="Start"
+                                               HasShadow="False">
+                                            <Label Text="{Binding Icon}" 
+                                                   FontSize="28"
+                                                   HorizontalTextAlignment="Center"
+                                                   VerticalTextAlignment="Center"/>
+                                        </Frame>
+                                        
+                                        <!-- Notification Content -->
+                                        <StackLayout Grid.Column="1" Spacing="6" VerticalOptions="Start">
+                                            <Label Text="{Binding Message}" 
+                                                   FontSize="14" 
+                                                   TextColor="#111827"
+                                                   LineBreakMode="WordWrap"
+                                                   VerticalOptions="Start"/>
+                                            <Label Text="{Binding CreatedAt, StringFormat='{0:dd.MM.yyyy, HH:mm}'}" 
+                                                   FontSize="12" 
+                                                   TextColor="#9CA3AF"
+                                                   Margin="0,4,0,0"/>
+                                        </StackLayout>
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </ScrollView>
+        </RefreshView>
+        <controls:BottomNavBar x:Name="BottomBar" Grid.Row="2" />
+    </Grid>
+</ContentPage>

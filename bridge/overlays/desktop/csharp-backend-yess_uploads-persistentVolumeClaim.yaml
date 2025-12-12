@@ -1,0 +1,9 @@
+#! csharp-backend-yess_uploads-persistentVolumeClaim.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: csharp-backend-yess-uploads
+    namespace: yessbackend-master
+spec:
+    storageClassName: "hostpath" # see docker/desktop-storage-provisioner

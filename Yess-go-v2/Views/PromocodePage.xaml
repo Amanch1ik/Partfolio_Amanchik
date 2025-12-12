@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="YessGoFront.Views.PromocodePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewmodels="clr-namespace:YessGoFront.ViewModels"
+    x:DataType="viewmodels:PromocodeViewModel"
+    Shell.NavBarIsVisible="False"
+    BackgroundColor="#F4F6F8">
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- Header -->
+        <Grid Grid.Row="0" RowDefinitions="Auto" Padding="16,44,16,8" BackgroundColor="#0F6B53">
+            <Grid ColumnDefinitions="Auto,*,Auto" VerticalOptions="Center">
+                <Border WidthRequest="36" HeightRequest="36"
+                        StrokeThickness="0"
+                        BackgroundColor="#FFFFFF"
+                        StrokeShape="RoundRectangle8">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnBackTapped" />
+                    </Border.GestureRecognizers>
+                    <Image Source="back_arrow_icon.png" 
+                           Aspect="AspectFit" 
+                           Margin="8" />
+                </Border>
+
+                <Label Grid.Column="1"
+                       Text="Промокод"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       TextColor="White"
+                       FontAttributes="Bold"
+                       FontSize="18"/>
+            </Grid>
+        </Grid>
+
+        <!-- Content -->
+        <ScrollView Grid.Row="1" Padding="16">
+            <VerticalStackLayout Spacing="20">
+                
+                <!-- Информационная карточка -->
+                <Frame BackgroundColor="White" 
+                       CornerRadius="16" 
+                       HasShadow="True" 
+                       Padding="20">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Введите промокод"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="#111827"/>
+                        <Label Text="Получите скидку или бонусы, используя промокод от наших партнеров"
+                               FontSize="14"
+                               TextColor="#6B7280"
+                               LineBreakMode="WordWrap"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Поле ввода промокода -->
+                <Frame BackgroundColor="White" 
+                       CornerRadius="16" 
+                       HasShadow="True" 
+                       Padding="0">
+                    <VerticalStackLayout Spacing="12" Padding="16">
+                        <Label Text="Промокод"
+                               FontSize="14"
+                               FontAttributes="Bold"
+                               TextColor="#374151"/>
+                        
+                        <Entry Text="{Binding PromoCode, Mode=TwoWay}"
+                               Placeholder="Введите промокод"
+                               FontSize="16"
+                               TextColor="#111827"
+                               PlaceholderColor="#9CA3AF"
+                               BackgroundColor="#F9FAFB"
+                               HeightRequest="50"/>
+                        
+                        <!-- Сообщение об ошибке или успехе -->
+                        <Label Text="{Binding Message}"
+                               FontSize="13"
+                               TextColor="{Binding MessageColor}"
+                               IsVisible="{Binding HasMessage}"
+                               LineBreakMode="WordWrap"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Кнопка применения -->
+                <Button Text="Применить промокод"
+                        Command="{Binding ApplyPromoCodeCommand}"
+                        BackgroundColor="#0F6B53"
+                        TextColor="White"
+                        FontSize="16"
+                        FontAttributes="Bold"
+                        CornerRadius="12"
+                        HeightRequest="50"
+                        IsEnabled="{Binding CanApply}"/>
+
+                <!-- Информация о промокоде (если применен) -->
+                <Frame BackgroundColor="#E6F5EF" 
+                       CornerRadius="16" 
+                       HasShadow="False" 
+                       Padding="20"
+                       IsVisible="{Binding IsPromoCodeApplied}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="✓ Промокод применен"
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               TextColor="#0F6B53"/>
+                        <Label Text="{Binding PromoCodeInfo}"
+                               FontSize="14"
+                               TextColor="#065F46"
+                               LineBreakMode="WordWrap"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- История промокодов (если есть) -->
+                <Frame BackgroundColor="White" 
+                       CornerRadius="16" 
+                       HasShadow="True" 
+                       Padding="16"
+                       IsVisible="{Binding HasPromoCodeHistory}">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Мои промокоды"
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               TextColor="#111827"/>
+                        
+                        <CollectionView ItemsSource="{Binding PromoCodeHistory}"
+                                        ItemTemplate="{StaticResource PromoCodeItemTemplate}">
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Frame>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+
+    <ContentPage.Resources>
+        <DataTemplate x:Key="PromoCodeItemTemplate" x:DataType="viewmodels:PromoCodeHistoryItem">
+            <Frame BackgroundColor="#F9FAFB" 
+                   CornerRadius="12" 
+                   HasShadow="False" 
+                   Padding="12"
+                   Margin="0,0,0,8">
+                <Grid ColumnDefinitions="*,Auto">
+                    <VerticalStackLayout Grid.Column="0" Spacing="4">
+                        <Label Text="{Binding Code}"
+                               FontSize="14"
+                               FontAttributes="Bold"
+                               TextColor="#111827"/>
+                        <Label Text="{Binding Description}"
+                               FontSize="12"
+                               TextColor="#6B7280"
+                               LineBreakMode="TailTruncation"/>
+                        <Label Text="{Binding UsedAt, StringFormat='Использован: {0:dd.MM.yyyy HH:mm}'}"
+                               FontSize="11"
+                               TextColor="#9CA3AF"/>
+                    </VerticalStackLayout>
+                    <Label Grid.Column="1"
+                           Text="{Binding Discount, StringFormat='-{0}%'}"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="#0F6B53"
+                           VerticalOptions="Center"/>
+                </Grid>
+            </Frame>
+        </DataTemplate>
+    </ContentPage.Resources>
+</ContentPage>
+

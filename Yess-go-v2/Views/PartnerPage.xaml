@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="YessGoFront.Views.PartnerPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:YessGoFront.Views.Controls"
+    Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto"
+          BackgroundColor="#F4F6F8">
+
+       
+
+        <!-- Поиск -->
+        <StackLayout x:Name="SearchContainer"
+                     Grid.Row="1"
+                     Orientation="Horizontal"
+                     Margin="16,16,16,0"
+                     VerticalOptions="Center"
+                     Opacity="0"
+                     TranslationY="-20">
+
+            <Frame CornerRadius="10"
+                   Padding="0"
+                   HasShadow="False"
+                   BackgroundColor="White"
+                   HeightRequest="40"
+                   HorizontalOptions="FillAndExpand">
+                <SearchBar x:Name="SearchBar"
+                           Placeholder="Поиск по компаниям"
+                           BackgroundColor="Transparent"
+                           Margin="8,0"
+                           VerticalOptions="Center"
+                           HeightRequest="40"
+                           TextChanged="OnSearchTextChanged" />
+            </Frame>
+
+            <ImageButton x:Name="MapButton"
+                         Source="map_category_icon.png"
+                         WidthRequest="40"
+                         HeightRequest="40"
+                         CornerRadius="10"
+                         BackgroundColor="White"
+                         Aspect="AspectFill"
+                         Padding="0"
+                         Margin="8,0,0,0"
+                         VerticalOptions="Center"
+                         Clicked="OnMapButtonClicked" />
+        </StackLayout>
+
+        <!-- Категории -->
+        <CollectionView x:Name="CategoriesCollection"
+                        Grid.Row="2"
+                        Margin="12,8,12,0"
+                        SelectionMode="None"
+                        VerticalOptions="FillAndExpand"
+                        HorizontalOptions="FillAndExpand"
+                        Opacity="0"
+                        TranslationY="30">
+
+            <CollectionView.ItemsLayout>
+                <!-- Автоматическая адаптация под платформу -->
+                <GridItemsLayout Orientation="Vertical"
+                                 Span="{OnPlatform Android=3, iOS=2}" />
+            </CollectionView.ItemsLayout>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <!-- Каждый элемент сам себя анимирует при Loaded -->
+                    <Frame Padding="10"
+                           CornerRadius="16"
+                           HasShadow="False"
+                           BackgroundColor="White"
+                           Margin="8"
+                           HorizontalOptions="FillAndExpand"
+                           VerticalOptions="FillAndExpand"
+                           Loaded="CategoryFrame_Loaded"
+                           Opacity="0"
+                           TranslationY="20">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Tapped="Category_Tapped"
+                                CommandParameter="{Binding .}" />
+                        </Frame.GestureRecognizers>
+
+                        <VerticalStackLayout Spacing="8"
+                                             HorizontalOptions="Center"
+                                             VerticalOptions="Center">
+                            <Image Source="{Binding Image}"
+                                   WidthRequest="65"
+                                   HeightRequest="65"
+                                   Aspect="AspectFit" />
+                            <Label Text="{Binding Name}"
+                                   FontSize="13"
+                                   HorizontalTextAlignment="Center"
+                                   TextColor="Black"
+                                   LineBreakMode="TailTruncation" />
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Нижняя панель навигации -->
+        <controls:BottomNavBar x:Name="BottomBar"
+                               Grid.Row="3"
+                               Margin="0,4,0,0"
+                               Opacity="0"
+                               TranslationY="30" />
+    </Grid>
+</ContentPage>

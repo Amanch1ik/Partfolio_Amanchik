@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="YessGoFront.Views.MorePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:YessGoFront.Views.Controls"
+    xmlns:services="clr-namespace:YessGoFront.Services"
+    Shell.NavBarIsVisible="False"
+    BackgroundColor="#F4F6F8"
+    FlowDirection="LeftToRight">
+
+    <Grid RowDefinitions="*,Auto">
+
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="16" Spacing="12">
+
+                <!-- Карточка профиля (без стрелки) -->
+                <Frame BackgroundColor="White" CornerRadius="16" HasShadow="True" Padding="14">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" FlowDirection="LeftToRight">
+                        <!-- Аватар -->
+                        <Frame Grid.Column="0"
+                               WidthRequest="44" HeightRequest="44"
+                               CornerRadius="22"
+                               BackgroundColor="#EEF2F7"
+                               Padding="0">
+                            <Image Source="profile" Aspect="AspectFit"/>
+                        </Frame>
+
+                        <!-- Текст -->
+                        <VerticalStackLayout Grid.Column="1"
+                                             Spacing="2"
+                                             VerticalOptions="Center">
+                            <Label
+                                FontSize="14"
+                                FontAttributes="Bold"
+                                TextColor="DarkGreen"
+                                Text="{Binding DisplayName}" />
+                            <Label Text="Профиль"
+                                   TextColor="#6B7280"
+                                   FontSize="12"/>
+                        </VerticalStackLayout>
+                    </Grid>
+                </Frame>
+
+                <!-- Способы входа -->
+                <Frame BackgroundColor="White" CornerRadius="16" HasShadow="True" Padding="14">
+                    <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*" FlowDirection="LeftToRight">
+                        <Label Text="Способы входа" TextColor="#6B7280" FontAttributes="Bold" Grid.ColumnSpan="2"/>
+                        <HorizontalStackLayout Grid.Row="1" Grid.ColumnSpan="2" Spacing="12" Margin="0,8,0,0">
+                            <Image Source="icon_phone" WidthRequest="28" HeightRequest="28"/>
+                            <Image Source="icon_google" WidthRequest="28" HeightRequest="28"/>
+                        </HorizontalStackLayout>
+                    </Grid>
+                </Frame>
+
+                <!-- Меню -->
+                <VerticalStackLayout Spacing="8">
+
+                    <!-- Мой город (иконка слева + текст, без стрелки) -->
+                    <Frame BackgroundColor="White" CornerRadius="12" HasShadow="True" Padding="12">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" FlowDirection="LeftToRight">
+                            <Image Grid.Column="0" Source="icon_location.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                <Label Text="Мой город" TextColor="#6B7280"/>
+                                <Label Text="Бишкек" FontSize="12" TextColor="#6B7280"/>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Frame>
+
+                    <!-- Ввести промокод -->
+                    <Frame BackgroundColor="White" CornerRadius="12" HasShadow="True" Padding="12">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnPromocodeTapped"/>
+                        </Frame.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" FlowDirection="LeftToRight">
+                            <Image Grid.Column="0" Source="icon_promo.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+                            <Label Grid.Column="1" Text="Ввести промокод" TextColor="#6B7280" VerticalOptions="Center"/>
+                        </Grid>
+                    </Frame>
+
+                    
+                    <!-- Реферальная ссылка -->
+                    <Frame BackgroundColor="White" CornerRadius="12" HasShadow="True" Padding="12">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnReferalTapped"/>
+                        </Frame.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" FlowDirection="LeftToRight">
+                            <Image Grid.Column="0" Source="icon_referral.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+                            <Label Grid.Column="1" Text="Реферальная ссылка" TextColor="#6B7280" VerticalOptions="Center"/>
+                        </Grid>
+                    </Frame>
+
+                    <!-- История операции -->
+                    <Frame BackgroundColor="White" CornerRadius="12" HasShadow="True" Padding="12">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnHistoryTapped"/>
+                        </Frame.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" FlowDirection="LeftToRight">
+                            <Image Grid.Column="0" Source="icon_history.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+                            <Label Grid.Column="1" Text="История операции" TextColor="#6B7280" VerticalOptions="Center"/>   
+                        </Grid>
+                    </Frame>
+
+                    <!-- Обратная связь -->
+                    <Frame BackgroundColor="White" CornerRadius="12" HasShadow="True" Padding="12">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnFeedbackTapped"/>
+                        </Frame.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" FlowDirection="LeftToRight">
+                            <Image Grid.Column="0" Source="icon_feedback.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+                            <Label Grid.Column="1" Text="Обратная связь" TextColor="#6B7280" VerticalOptions="Center"/> 
+                        </Grid>
+                    </Frame>
+
+                    <!-- Мои сертификаты -->
+                    <Frame BackgroundColor="White" CornerRadius="12" HasShadow="True" Padding="12">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnCertificateTapped"/>
+                        </Frame.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" FlowDirection="LeftToRight">
+                            <Image Grid.Column="0" Source="icon_certificate.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+                            <Label Grid.Column="1" Text="Сертификаты" TextColor="#6B7280" VerticalOptions="Center"/>
+                        </Grid>
+                    </Frame>
+
+                    <!-- Политика конфиденциальности -->
+                    <Frame BackgroundColor="White" CornerRadius="12" HasShadow="True" Padding="12">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnPolicyTapped"/>
+                        </Frame.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" FlowDirection="LeftToRight">
+                            <Image Grid.Column="0" Source="icon_certificate.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+                            <Label Grid.Column="1" Text="Политика конфиденциальности" TextColor="#6B7280" VerticalOptions="Center"/>
+                        </Grid>
+                    </Frame>
+
+                    <!-- Условия использования -->
+                    <Frame BackgroundColor="White" CornerRadius="12" HasShadow="True" Padding="12">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnConditionsTapped"/>
+                        </Frame.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" FlowDirection="LeftToRight">
+                            <Image Grid.Column="0" Source="icon_certificate.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+                            <Label Grid.Column="1" Text="Условия использования" TextColor="#6B7280" VerticalOptions="Center"/>
+                        </Grid>
+                    </Frame>
+
+                    <!-- Публичная оферта -->
+                    <Frame BackgroundColor="White" CornerRadius="12" HasShadow="True" Padding="12">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnPublicOfferTapped"/>
+                        </Frame.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" FlowDirection="LeftToRight">
+                            <Image Grid.Column="0" Source="icon_certificate.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+                            <Label Grid.Column="1" Text="Публичная оферта" TextColor="#6B7280" VerticalOptions="Center"/>
+                        </Grid>
+                    </Frame>
+
+                    <!-- Политика возврата -->
+                    <Frame BackgroundColor="White" CornerRadius="12" HasShadow="True" Padding="12">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnRefundPolicyTapped"/>
+                        </Frame.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" FlowDirection="LeftToRight">
+                            <Image Grid.Column="0" Source="icon_certificate.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+                            <Label Grid.Column="1" Text="Политика возврата" TextColor="#6B7280" VerticalOptions="Center"/>
+                        </Grid>
+                    </Frame>
+
+                    <!-- Безопасность платежей -->
+                    <Frame BackgroundColor="White" CornerRadius="12" HasShadow="True" Padding="12">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnPaymentSecurityTapped"/>
+                        </Frame.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" FlowDirection="LeftToRight">
+                            <Image Grid.Column="0" Source="icon_certificate.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+                            <Label Grid.Column="1" Text="Безопасность платежей" TextColor="#6B7280" VerticalOptions="Center"/>
+                        </Grid>
+                    </Frame>
+
+                    <!-- Условия доставки -->
+                    <Frame BackgroundColor="White" CornerRadius="12" HasShadow="True" Padding="12">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnDeliveryTermsTapped"/>
+                        </Frame.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" FlowDirection="LeftToRight">
+                            <Image Grid.Column="0" Source="icon_certificate.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+                            <Label Grid.Column="1" Text="Условия доставки" TextColor="#6B7280" VerticalOptions="Center"/>
+                        </Grid>
+                    </Frame>
+
+                    <!-- Контакты -->
+                    <Frame BackgroundColor="White" CornerRadius="12" HasShadow="True" Padding="12">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnContactsTapped"/>
+                        </Frame.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" FlowDirection="LeftToRight">
+                            <Image Grid.Column="0" Source="icon_certificate.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+                            <Label Grid.Column="1" Text="Контакты" TextColor="#6B7280" VerticalOptions="Center"/>
+                        </Grid>
+                    </Frame>
+
+                    <!-- Выйти -->
+                    <Frame BackgroundColor="White" CornerRadius="12" HasShadow="True" Padding="12">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnLogoutTapped"/>
+                        </Frame.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" FlowDirection="LeftToRight">
+                            <Image Grid.Column="0" Source="icon_logout.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+                            <Label Grid.Column="1" Text="Выйти" TextColor="#0F6B53" VerticalOptions="Center"/>
+                        </Grid>
+                    </Frame>
+
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Нижний навбар -->
+        <controls:BottomNavBar x:Name="BottomBar" Grid.Row="1" />
+    </Grid>
+</ContentPage>

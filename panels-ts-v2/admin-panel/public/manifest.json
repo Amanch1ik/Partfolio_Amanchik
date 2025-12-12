@@ -1,0 +1,78 @@
+{
+  "name": "YESS!GO - Admin Panel",
+  "short_name": "YESS Admin",
+  "description": "Административная панель системы лояльности YESS!GO",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#689071",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "ru",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/app-icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Дашборд",
+      "short_name": "Главная",
+      "description": "Перейти к главной панели",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/app-icon.svg",
+          "sizes": "512x512",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Пользователи",
+      "short_name": "Пользователи",
+      "description": "Управление пользователями",
+      "url": "/users",
+      "icons": [
+        {
+          "src": "/app-icon.svg",
+          "sizes": "512x512",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Партнеры",
+      "short_name": "Партнеры",
+      "description": "Управление партнерами",
+      "url": "/partners",
+      "icons": [
+        {
+          "src": "/app-icon.svg",
+          "sizes": "512x512",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Транзакции",
+      "short_name": "Транзакции",
+      "description": "Просмотр транзакций",
+      "url": "/transactions",
+      "icons": [
+        {
+          "src": "/app-icon.svg",
+          "sizes": "512x512",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ],
+  "screenshots": [],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

@@ -1,0 +1,267 @@
+/* Светлая тема для партнер-панели - улучшенная читаемость */
+
+:root,
+[data-theme="light"] {
+  /* Основные цвета */
+  --color-primary: #689071;
+  --color-primary-light: #AEC380;
+  --color-primary-dark: #375534;
+  --color-primary-bg: #F0F7EB;
+  
+  /* Фоны - яркие и чистые */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #F8FBF9;
+  --color-bg-tertiary: #F0F7EB;
+  --color-bg-hover: rgba(104, 144, 113, 0.08);
+  
+  /* Текст - высокий контраст для читаемости */
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #2d4a35;
+  --color-text-tertiary: #5a6b5f;
+  --color-text-inverse: #ffffff;
+  --color-text-muted: #8a9a8f;
+  
+  /* Границы */
+  --color-border: #E3EED4;
+  --color-border-hover: #AEC380;
+  --color-border-light: #F0F7EB;
+  
+  /* Тени - мягкие и элегантные */
+  --shadow-sm: 0 2px 8px rgba(15, 42, 29, 0.06);
+  --shadow-md: 0 4px 16px rgba(15, 42, 29, 0.08);
+  --shadow-lg: 0 8px 24px rgba(15, 42, 29, 0.12);
+  --shadow-xl: 0 12px 32px rgba(15, 42, 29, 0.15);
+  
+  /* Статусы */
+  --color-success: #52c41a;
+  --color-warning: #faad14;
+  --color-error: #ff4d4f;
+  --color-info: #1890ff;
+  
+  /* Sidebar - красивый зеленый градиент */
+  --sidebar-bg: linear-gradient(180deg, #689071 0%, #4a6b52 100%);
+  --sidebar-bg-solid: #689071;
+  --sidebar-text: rgba(255, 255, 255, 0.95);
+  --sidebar-text-active: #ffffff;
+  --sidebar-item-hover: rgba(255, 255, 255, 0.15);
+  --sidebar-item-active: rgba(255, 255, 255, 0.25);
+  
+  /* Header */
+  --header-bg: #ffffff;
+  --header-border: #E3EED4;
+  --header-text: #1a1a1a;
+  
+  /* Cards */
+  --card-bg: #ffffff;
+  --card-bg-gradient: linear-gradient(135deg, #ffffff 0%, #F8FBF9 100%);
+  --card-border: #E3EED4;
+  --card-shadow: 0 2px 12px rgba(15, 42, 29, 0.08);
+  --card-hover-shadow: 0 4px 20px rgba(15, 42, 29, 0.12);
+  
+  /* Inputs */
+  --input-bg: #ffffff;
+  --input-border: #d9d9d9;
+  --input-border-hover: #AEC380;
+  --input-border-focus: #689071;
+  --input-text: #1a1a1a;
+  --input-placeholder: #8a9a8f;
+  
+  /* Charts */
+  --chart-grid: #E3EED4;
+  --chart-tooltip-bg: #ffffff;
+  --chart-text: #1a1a1a;
+}
+
+/* Применение переменных к элементам */
+body {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Улучшенная читаемость текста */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-text-primary);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+p, span, div {
+  color: var(--color-text-primary);
+}
+
+/* Карточки */
+.ant-card {
+  background: var(--card-bg) !important;
+  border-color: var(--card-border) !important;
+  box-shadow: var(--card-shadow) !important;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.ant-card:hover {
+  box-shadow: var(--card-hover-shadow) !important;
+}
+
+.ant-card-head {
+  border-bottom-color: var(--color-border) !important;
+  background: transparent !important;
+}
+
+.ant-card-head-title {
+  color: var(--color-text-primary) !important;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.ant-card-body {
+  color: var(--color-text-primary) !important;
+}
+
+/* Таблицы */
+.ant-table {
+  background: var(--color-bg-primary) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.ant-table-thead > tr > th {
+  background: var(--color-bg-tertiary) !important;
+  color: var(--color-text-primary) !important;
+  font-weight: 600;
+  border-bottom-color: var(--color-border) !important;
+}
+
+.ant-table-tbody > tr > td {
+  border-bottom-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.ant-table-tbody > tr:hover > td {
+  background: var(--color-bg-hover) !important;
+}
+
+/* Модальные окна */
+.ant-modal-content {
+  background: var(--color-bg-primary) !important;
+  border-radius: 12px;
+}
+
+.ant-modal-header {
+  background: var(--color-bg-primary) !important;
+  border-bottom-color: var(--color-border) !important;
+}
+
+.ant-modal-title {
+  color: var(--color-text-primary) !important;
+  font-weight: 600;
+}
+
+.ant-modal-body {
+  color: var(--color-text-primary) !important;
+}
+
+/* Формы */
+.ant-input,
+.ant-input-affix-wrapper,
+.ant-select-selector,
+.ant-picker {
+  background-color: var(--input-bg) !important;
+  border-color: var(--input-border) !important;
+  color: var(--input-text) !important;
+  font-size: 14px;
+}
+
+.ant-input::placeholder,
+.ant-input-affix-wrapper input::placeholder {
+  color: var(--input-placeholder) !important;
+}
+
+.ant-input:hover,
+.ant-input-affix-wrapper:hover,
+.ant-select-selector:hover,
+.ant-picker:hover {
+  border-color: var(--input-border-hover) !important;
+}
+
+.ant-input:focus,
+.ant-input-affix-wrapper:focus,
+.ant-input-affix-wrapper-focused,
+.ant-select-focused .ant-select-selector,
+.ant-picker-focused {
+  border-color: var(--input-border-focus) !important;
+  box-shadow: 0 0 0 2px rgba(104, 144, 113, 0.15) !important;
+}
+
+.ant-form-item-label > label {
+  color: var(--color-text-primary) !important;
+  font-weight: 500;
+}
+
+/* Dropdown и Select */
+.ant-select-dropdown,
+.ant-dropdown-menu {
+  background: var(--color-bg-primary) !important;
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.ant-select-item,
+.ant-dropdown-menu-item {
+  color: var(--color-text-primary) !important;
+}
+
+.ant-select-item:hover,
+.ant-dropdown-menu-item:hover {
+  background: var(--color-bg-hover) !important;
+}
+
+.ant-select-item-option-selected {
+  background: var(--color-primary-bg) !important;
+  color: var(--color-primary) !important;
+  font-weight: 500;
+}
+
+/* Статистика */
+.ant-statistic-title {
+  color: var(--color-text-secondary) !important;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.ant-statistic-content {
+  color: var(--color-text-primary) !important;
+  font-weight: 600;
+}
+
+/* Теги */
+.ant-tag {
+  background: var(--color-bg-tertiary);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+/* Кнопки */
+.ant-btn-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+  border: none;
+  font-weight: 500;
+  box-shadow: var(--shadow-sm);
+}
+
+.ant-btn-primary:hover {
+  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+  box-shadow: var(--shadow-md);
+}
+
+/* Плавные переходы */
+* {
+  transition: background-color 0.2s ease, 
+              border-color 0.2s ease, 
+              box-shadow 0.2s ease,
+              color 0.2s ease;
+}

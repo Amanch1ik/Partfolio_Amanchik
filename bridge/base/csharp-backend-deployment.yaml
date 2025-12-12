@@ -1,0 +1,61 @@
+#! csharp-backend-deployment.yaml
+# Generated code, do not edit
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: csharp-backend
+    namespace: yessbackend-master
+    labels:
+        com.docker.compose.project: yessbackend-master
+        com.docker.compose.service: csharp-backend
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            com.docker.compose.project: yessbackend-master
+            com.docker.compose.service: csharp-backend
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                com.docker.compose.project: yessbackend-master
+                com.docker.compose.service: csharp-backend
+                com.docker.compose.network.yess-network: "true"
+        spec:
+            restartPolicy: unless-stopped
+            containers:
+                - name: yess-backend
+                  image: yessbackend-master-csharp-backend
+                  imagePullPolicy: IfNotPresent
+                  env:
+                    - name: ASPNETCORE_ENVIRONMENT
+                      value: "Production"
+                    - name: ASPNETCORE_URLS
+                      value: "http://+:8000"
+                    - name: ConnectionStrings__DefaultConnection
+                      value: "Host=postgres;Port=5432;Database=yess_db;User Id=yess_user;Password=secure_password"
+                    - name: Jwt__AccessTokenExpireMinutes
+                      value: "60"
+                    - name: Jwt__Audience
+                      value: "yess-loyalty"
+                    - name: Jwt__Issuer
+                      value: "yess-loyalty"
+                    - name: Jwt__RefreshTokenExpireDays
+                      value: "7"
+                    - name: Jwt__SecretKey
+                      value: "GENERATE_LONG_RANDOM_SECRET_KEY_HERE_MINIMUM_32_CHARS"
+                    - name: Redis__ConnectionString
+                      value: "redis:6379"
+                  ports:
+                    - name: csharp-bac-8000
+                      containerPort: 8000
+                    - name: csharp-bac-8443
+                      containerPort: 8443
+                  volumeMounts:
+                    - name: app-uploads
+                      mountPath: /app/uploads
+            volumes:
+                - name: app-uploads
+                  persistentVolumeClaim:
+                    claimName: csharp-backend-yess-uploads

@@ -1,0 +1,239 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="YessGoFront.Views.PartnersListPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:YessGoFront.Converters"
+    Shell.NavBarIsVisible="False">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+            <converters:StringToImageSourceConverter x:Key="ImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+
+    <Grid RowDefinitions="Auto,*" Padding="16,16,16,24">
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#005D45" Offset="0.0" />
+                <GradientStop Color="#00C97B" Offset="1.0" />
+            </LinearGradientBrush>
+        </Grid.Background>
+
+
+        <!-- ===== Шапка ===== -->
+		<Grid Grid.Row="0" RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*"
+              ColumnSpacing="12" Padding="0,0,0,12">
+
+			<!-- Назад -->
+			<Border WidthRequest="36" HeightRequest="36"
+                    StrokeThickness="0"
+                    BackgroundColor="#FFFFFF"
+                    StrokeShape="RoundRectangle8">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnBackTapped" />
+                </Border.GestureRecognizers>
+                <Image Source="back_arrow_icon.png" 
+                       Aspect="AspectFit" 
+                       Margin="8" />
+			</Border>
+
+			<!-- Поиск -->
+			<Frame Grid.Column="1" BackgroundColor="White" CornerRadius="12"
+                   HasShadow="False" Padding="12,10" HeightRequest="44">
+				<Grid ColumnDefinitions="Auto,*">
+					<Image Source="search_icon.png"
+                           WidthRequest="18" HeightRequest="18"
+                           VerticalOptions="Center" />
+					<Entry x:Name="SearchEntry"
+                           Grid.Column="1"
+                           Placeholder="Поиск"
+                           PlaceholderColor="#6B7280"
+                           TextColor="#111827"
+                           FontSize="14"
+                           BackgroundColor="Transparent"
+                           TextChanged="OnSearchTextChanged" />
+				</Grid>
+			</Frame>
+
+			<!-- Категории: горизонтальный ScrollView с BindableLayout -->
+			<ScrollView Grid.Row="1" Orientation="Horizontal" HorizontalScrollBarVisibility="Never" Grid.ColumnSpan="2" Margin="0,8,0,0">
+                <HorizontalStackLayout Padding="0,4" Spacing="8"
+                                       BindableLayout.ItemsSource="{Binding Categories}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Frame Padding="12,8"
+                                   CornerRadius="20"
+                                   HasShadow="False"
+                                   BackgroundColor="White"
+                                   Margin="0">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnCategoryTapped" />
+                                </Frame.GestureRecognizers>
+
+                                <Label x:Name="CategoryLabel"
+                                       Text="{Binding Name}"
+                                       FontSize="14"
+                                       TextColor="#0F6B53">
+                                    <Label.Style>
+                                        <Style TargetType="Label">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsSelected}" TargetType="Label" Value="True">
+                                                    <Setter Property="TextColor" Value="White" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Label.Style>
+                                </Label>
+
+                                <Frame.Triggers>
+                                    <DataTrigger TargetType="Frame" Binding="{Binding IsSelected}" Value="True">
+                                        <Setter Property="BackgroundColor" Value="#0F6B53" />
+                                    </DataTrigger>
+                                </Frame.Triggers>
+                            </Frame>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </HorizontalStackLayout>
+            </ScrollView>
+
+        </Grid>
+
+		<!-- ===== Список партнёров ===== -->
+		<Frame Grid.Row="1" BackgroundColor="White" CornerRadius="16" Padding="0" HasShadow="True">
+			<CollectionView x:Name="PartnersListView"
+                            ItemsSource="{Binding Partners}"
+                            SelectionMode="None">
+				<CollectionView.ItemsLayout>
+					<LinearItemsLayout Orientation="Vertical" ItemSpacing="12"/>
+				</CollectionView.ItemsLayout>
+
+				<CollectionView.ItemTemplate>
+					<DataTemplate>
+						<!-- Стильный кликабельный блок -->
+						<Border StrokeThickness="0"
+                                BackgroundColor="White"
+                                StrokeShape="RoundRectangle 12"
+                                Padding="0"
+                                Margin="12,0">
+							<Border.GestureRecognizers>
+								<TapGestureRecognizer Tapped="OnPartnerTapped" />
+							</Border.GestureRecognizers>
+							
+							<Border.Shadow>
+								<Shadow Brush="#1A000000" 
+                                        Offset="0,2" 
+                                        Radius="8" 
+                                        Opacity="0.1"/>
+							</Border.Shadow>
+
+							<Grid RowDefinitions="Auto,Auto" RowSpacing="0">
+								
+								<!-- Главное изображение партнёра (CoverImageUrl из БД) -->
+								<Grid Grid.Row="0" HeightRequest="200">
+									<Image Source="{Binding CoverImage, Converter={StaticResource ImageSourceConverter}}"
+                                           Aspect="AspectFill"
+                                           BackgroundColor="#F2F2F2">
+									</Image>
+									
+									<!-- Градиентный оверлей снизу для читаемости текста -->
+									<BoxView VerticalOptions="End"
+                                             HeightRequest="80">
+										<BoxView.Background>
+											<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+												<GradientStop Color="Transparent" Offset="0.0" />
+												<GradientStop Color="#CC000000" Offset="1.0" />
+											</LinearGradientBrush>
+										</BoxView.Background>
+									</BoxView>
+
+									<!-- Информация поверх изображения (внизу) -->
+									<Grid VerticalOptions="End"
+                                          Padding="16,12"
+                                          RowDefinitions="Auto,Auto"
+                                          RowSpacing="4">
+										<!-- Название партнёра -->
+										<Label Grid.Row="0"
+                                               Text="{Binding Name}"
+                                               FontSize="20"
+                                               FontAttributes="Bold"
+                                               TextColor="White"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="1">
+											<Label.Shadow>
+												<Shadow Brush="#000000"
+                                                        Opacity="0.8"
+                                                        Radius="3"
+                                                        Offset="0,1"/>
+											</Label.Shadow>
+										</Label>
+
+										<!-- Категория -->
+										<HorizontalStackLayout Grid.Row="1" Spacing="6">
+											<Label Text="●"
+                                                   FontSize="10"
+                                                   TextColor="#FFFFFFCC"
+                                                   VerticalOptions="Center" />
+											<Label Text="{Binding Category}"
+                                                   FontSize="14"
+                                                   TextColor="#FFFFFFCC"
+                                                   VerticalOptions="Center">
+												<Label.Shadow>
+													<Shadow Brush="#000000"
+                                                            Opacity="0.6"
+                                                            Radius="2"
+                                                            Offset="0,1"/>
+												</Label.Shadow>
+											</Label>
+										</HorizontalStackLayout>
+									</Grid>
+
+									<!-- Логотип в правом верхнем углу -->
+									<Frame HorizontalOptions="End"
+                                           VerticalOptions="Start"
+                                           Margin="12"
+                                           WidthRequest="60"
+                                           HeightRequest="60"
+                                           CornerRadius="30"
+                                           Padding="4"
+                                           BackgroundColor="White"
+                                           HasShadow="True">
+										<Image Source="{Binding Logo, Converter={StaticResource ImageSourceConverter}}"
+                                               Aspect="AspectFill" />
+									</Frame>
+
+									<!-- Бейдж кешбэка в левом верхнем углу -->
+									<Frame HorizontalOptions="Start"
+                                           VerticalOptions="Start"
+                                           Margin="12"
+                                           Padding="10,6"
+                                           CornerRadius="16"
+                                           BackgroundColor="#0F6B53"
+                                           HasShadow="True">
+										<Label Text="{Binding CashbackText}"
+                                               FontSize="13"
+                                               FontAttributes="Bold"
+                                               TextColor="White" />
+									</Frame>
+								</Grid>
+
+								<!-- Дополнительная информация (если нужно) -->
+								<Grid Grid.Row="1" 
+                                      Padding="16,8" 
+                                      IsVisible="{Binding HasDescription}">
+									<Label Text="{Binding Description}"
+                                           FontSize="13"
+                                           TextColor="#6B7280"
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="2" />
+								</Grid>
+							</Grid>
+						</Border>
+					</DataTemplate>
+				</CollectionView.ItemTemplate>
+			</CollectionView>
+		</Frame>
+	</Grid>
+</ContentPage>

@@ -1,0 +1,14 @@
+#! kustomization.yaml
+# Generated code, do not edit
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+    - ../../base
+patches:
+    - path: admin-panel-service.yaml
+    - path: csharp-backend-service.yaml
+    - path: csharp-backend-yess_uploads-persistentVolumeClaim.yaml
+    - path: partner-panel-service.yaml
+    - path: postgres-service.yaml
+    - path: postgres-yess_pg_data-persistentVolumeClaim.yaml
+    - path: redis-service.yaml

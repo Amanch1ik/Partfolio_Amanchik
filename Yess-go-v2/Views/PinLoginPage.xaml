@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="YessGoFront.Views.PinLoginPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="PIN-код"
+    BackgroundColor="#007A51"
+    Shell.NavBarIsVisible="False">
+    
+    <Grid RowDefinitions="Auto,*,Auto" Padding="24" RowSpacing="16">
+        <!-- Фон с градиентом -->
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#007A51" Offset="0.0"/>
+                <GradientStop Color="#00C97B" Offset="1.0"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <!-- Карточка -->
+        <Frame Grid.Row="1" Padding="30" CornerRadius="24" HasShadow="True" BackgroundColor="White" VerticalOptions="Center">
+            <VerticalStackLayout Spacing="24">
+                
+                <!-- Заголовок -->
+                <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                    <Label Text="{Binding TitleText}"
+                           FontSize="24"
+                           FontAttributes="Bold"
+                           TextColor="#0B4A3B"
+                           HorizontalOptions="Center" />
+                    <Label Text="{Binding SubtitleText}"
+                           FontSize="14"
+                           TextColor="#666666"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+
+                <!-- Статус токенов -->
+                <Frame BackgroundColor="{Binding TokenStatusColor}"
+                       CornerRadius="8"
+                       Padding="12"
+                       HasShadow="False"
+                       IsVisible="{Binding ShowTokenStatus}">
+                    <Label Text="{Binding TokenStatusMessage}"
+                           TextColor="White"
+                           FontSize="12"
+                           HorizontalTextAlignment="Center"
+                           FontAttributes="Bold"/>
+                </Frame>
+
+                <!-- Индикаторы PIN (4 точки) -->
+                <Grid ColumnDefinitions="*,*,*,*" 
+                      ColumnSpacing="16" 
+                      HorizontalOptions="Center"
+                      Margin="0,20,0,10">
+                    <Frame x:Name="PinIndicator1"
+                           Grid.Column="0"
+                           WidthRequest="16"
+                           HeightRequest="16"
+                           CornerRadius="8"
+                           BackgroundColor="#E0EFE9"
+                           BorderColor="Transparent"
+                           HasShadow="False" />
+                    <Frame x:Name="PinIndicator2"
+                           Grid.Column="1"
+                           WidthRequest="16"
+                           HeightRequest="16"
+                           CornerRadius="8"
+                           BackgroundColor="#E0EFE9"
+                           BorderColor="Transparent"
+                           HasShadow="False" />
+                    <Frame x:Name="PinIndicator3"
+                           Grid.Column="2"
+                           WidthRequest="16"
+                           HeightRequest="16"
+                           CornerRadius="8"
+                           BackgroundColor="#E0EFE9"
+                           BorderColor="Transparent"
+                           HasShadow="False" />
+                    <Frame x:Name="PinIndicator4"
+                           Grid.Column="3"
+                           WidthRequest="16"
+                           HeightRequest="16"
+                           CornerRadius="8"
+                           BackgroundColor="#E0EFE9"
+                           BorderColor="Transparent"
+                           HasShadow="False" />
+                </Grid>
+
+                <!-- Сообщение об ошибке -->
+                <Label Text="{Binding ErrorMessage}" 
+                       IsVisible="{Binding HasError}"
+                       TextColor="#D32F2F" 
+                       FontSize="12"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center"
+                       Margin="0,-10,0,0"/>
+
+                <!-- Скрытое поле для ввода (для фокуса клавиатуры) -->
+                <Entry x:Name="HiddenPinEntry"
+                       IsVisible="False"
+                       Keyboard="Numeric"
+                       MaxLength="4"
+                       Text="{Binding PinCode}"
+                       TextChanged="OnPinCodeChanged" />
+
+                <!-- Цифровая клавиатура -->
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto" 
+                      RowSpacing="12"
+                      ColumnSpacing="12"
+                      Margin="0,20,0,0">
+                    
+                    <!-- Ряд 1: 1, 2, 3 -->
+                    <Grid Grid.Row="0" ColumnDefinitions="*,*,*" ColumnSpacing="12">
+                        <Button Grid.Column="0" 
+                                Text="1" 
+                                FontSize="24"
+                                FontAttributes="Bold"
+                                CornerRadius="16"
+                                BackgroundColor="#E0EFE9"
+                                TextColor="#0B4A3B"
+                                HeightRequest="60"
+                                Command="{Binding NumberCommand}"
+                                CommandParameter="1" />
+                        <Button Grid.Column="1" 
+                                Text="2" 
+                                FontSize="24"
+                                FontAttributes="Bold"
+                                CornerRadius="16"
+                                BackgroundColor="#E0EFE9"
+                                TextColor="#0B4A3B"
+                                HeightRequest="60"
+                                Command="{Binding NumberCommand}"
+                                CommandParameter="2" />
+                        <Button Grid.Column="2" 
+                                Text="3" 
+                                FontSize="24"
+                                FontAttributes="Bold"
+                                CornerRadius="16"
+                                BackgroundColor="#E0EFE9"
+                                TextColor="#0B4A3B"
+                                HeightRequest="60"
+                                Command="{Binding NumberCommand}"
+                                CommandParameter="3" />
+                    </Grid>
+
+                    <!-- Ряд 2: 4, 5, 6 -->
+                    <Grid Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="12">
+                        <Button Grid.Column="0" 
+                                Text="4" 
+                                FontSize="24"
+                                FontAttributes="Bold"
+                                CornerRadius="16"
+                                BackgroundColor="#E0EFE9"
+                                TextColor="#0B4A3B"
+                                HeightRequest="60"
+                                Command="{Binding NumberCommand}"
+                                CommandParameter="4" />
+                        <Button Grid.Column="1" 
+                                Text="5" 
+                                FontSize="24"
+                                FontAttributes="Bold"
+                                CornerRadius="16"
+                                BackgroundColor="#E0EFE9"
+                                TextColor="#0B4A3B"
+                                HeightRequest="60"
+                                Command="{Binding NumberCommand}"
+                                CommandParameter="5" />
+                        <Button Grid.Column="2" 
+                                Text="6" 
+                                FontSize="24"
+                                FontAttributes="Bold"
+                                CornerRadius="16"
+                                BackgroundColor="#E0EFE9"
+                                TextColor="#0B4A3B"
+                                HeightRequest="60"
+                                Command="{Binding NumberCommand}"
+                                CommandParameter="6" />
+                    </Grid>
+
+                    <!-- Ряд 3: 7, 8, 9 -->
+                    <Grid Grid.Row="2" ColumnDefinitions="*,*,*" ColumnSpacing="12">
+                        <Button Grid.Column="0" 
+                                Text="7" 
+                                FontSize="24"
+                                FontAttributes="Bold"
+                                CornerRadius="16"
+                                BackgroundColor="#E0EFE9"
+                                TextColor="#0B4A3B"
+                                HeightRequest="60"
+                                Command="{Binding NumberCommand}"
+                                CommandParameter="7" />
+                        <Button Grid.Column="1" 
+                                Text="8" 
+                                FontSize="24"
+                                FontAttributes="Bold"
+                                CornerRadius="16"
+                                BackgroundColor="#E0EFE9"
+                                TextColor="#0B4A3B"
+                                HeightRequest="60"
+                                Command="{Binding NumberCommand}"
+                                CommandParameter="8" />
+                        <Button Grid.Column="2" 
+                                Text="9" 
+                                FontSize="24"
+                                FontAttributes="Bold"
+                                CornerRadius="16"
+                                BackgroundColor="#E0EFE9"
+                                TextColor="#0B4A3B"
+                                HeightRequest="60"
+                                Command="{Binding NumberCommand}"
+                                CommandParameter="9" />
+                    </Grid>
+
+                    <!-- Ряд 4: Пусто, 0, Удалить -->
+                    <Grid Grid.Row="3" ColumnDefinitions="*,*,*" ColumnSpacing="12">
+                        <BoxView Grid.Column="0" 
+                                 BackgroundColor="Transparent" />
+                        <Button Grid.Column="1" 
+                                Text="0" 
+                                FontSize="24"
+                                FontAttributes="Bold"
+                                CornerRadius="16"
+                                BackgroundColor="#E0EFE9"
+                                TextColor="#0B4A3B"
+                                HeightRequest="60"
+                                Command="{Binding NumberCommand}"
+                                CommandParameter="0" />
+                        <Button Grid.Column="2" 
+                                Text="⌫" 
+                                FontSize="20"
+                                FontAttributes="Bold"
+                                CornerRadius="16"
+                                BackgroundColor="#E0EFE9"
+                                TextColor="#0B4A3B"
+                                HeightRequest="60"
+                                Command="{Binding DeleteCommand}"
+                                IsEnabled="{Binding CanDelete}" />
+                    </Grid>
+                </Grid>
+
+                <!-- Индикатор загрузки -->
+                <ActivityIndicator IsRunning="{Binding IsBusy}" 
+                                   IsVisible="{Binding IsBusy}"
+                                   Color="#0B4A3B"
+                                   VerticalOptions="Center"
+                                   HorizontalOptions="Center"
+                                   Margin="0,10,0,0" />
+
+                <!-- Кнопка "Забыли PIN?" (только в режиме проверки) -->
+                <Button Text="Забыли PIN?"
+                        IsVisible="{Binding IsVerificationMode}"
+                        TextColor="#0B4A3B"
+                        BackgroundColor="Transparent"
+                        FontSize="14"
+                        Margin="0,16,0,0"
+                        Clicked="OnForgotPinClicked" />
+            </VerticalStackLayout>
+        </Frame>
+    </Grid>
+</ContentPage>

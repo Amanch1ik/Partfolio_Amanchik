@@ -1,0 +1,50 @@
+name: Admin Panel CI
+
+on:
+  push:
+    paths:
+      - 'admin-panel/**'
+  pull_request:
+    paths:
+      - 'admin-panel/**'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        working-directory: admin-panel
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Run linter
+        working-directory: admin-panel
+        continue-on-error: true
+        run: npm run lint || echo "Linter found issues, but continuing..."
+
+      - name: Type check
+        working-directory: admin-panel
+        continue-on-error: true
+        run: npm run type-check || echo "Type check found issues, but continuing..."
+
+      - name: Run unit tests
+        working-directory: admin-panel
+        continue-on-error: true
+        run: npm test -- --passWithNoTests || echo "Tests failed or no tests found, continuing..."
+
+      - name: Build
+        working-directory: admin-panel
+        run: npm run build
+

@@ -1,0 +1,21 @@
+# Build results
+bin/
+obj/
+
+# VS tooling
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+
+# Logs
+*.log
+
+# MAUI/Platform specifics
+Platforms/Android/*.apks
+Platforms/Android/app/
+
+# IDEs
+.idea/
+.vscode/
+.env

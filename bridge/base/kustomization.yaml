@@ -1,0 +1,24 @@
+#! kustomization.yaml
+# Generated code, do not edit
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+    - 0-yessbackend-master-namespace.yaml
+    - admin-panel-deployment.yaml
+    - admin-panel-expose.yaml
+    - admin-panel-service.yaml
+    - csharp-backend-deployment.yaml
+    - csharp-backend-expose.yaml
+    - csharp-backend-service.yaml
+    - csharp-backend-yess_uploads-persistentVolumeClaim.yaml
+    - partner-panel-deployment.yaml
+    - partner-panel-expose.yaml
+    - partner-panel-service.yaml
+    - postgres-deployment.yaml
+    - postgres-expose.yaml
+    - postgres-service.yaml
+    - postgres-yess_pg_data-persistentVolumeClaim.yaml
+    - redis-deployment.yaml
+    - redis-expose.yaml
+    - redis-service.yaml
+    - yess-network-network-policy.yaml

@@ -1,0 +1,185 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: yess-postgres-prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-yess_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secure_password}
+      POSTGRES_DB: ${POSTGRES_DB:-yess_db}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - yess_pg_data_prod:/var/lib/postgresql/data
+    networks:
+      - yess-network-prod
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-yess_user}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  redis:
+    image: redis:7-alpine
+    container_name: yess-redis-prod
+    restart: always
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-secure_redis_password}
+    volumes:
+      - yess_redis_data_prod:/data
+    networks:
+      - yess-network-prod
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  csharp-backend:
+    build:
+      context: ../YessBackend-master
+      dockerfile: Dockerfile
+    container_name: yess-backend-prod
+    restart: always
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8000
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB:-yess_db};User Id=${POSTGRES_USER:-yess_user};Password=${POSTGRES_PASSWORD:-secure_password}
+      - Redis__ConnectionString=redis:6379,password=${REDIS_PASSWORD:-secure_redis_password}
+      - Jwt__SecretKey=${JWT_SECRET_KEY:-GENERATE_LONG_RANDOM_SECRET_KEY_HERE_MINIMUM_32_CHARS}
+      - Jwt__Issuer=yess-loyalty
+      - Jwt__Audience=yess-loyalty
+      - Jwt__AccessTokenExpireMinutes=60
+      - Jwt__RefreshTokenExpireDays=7
+    networks:
+      - yess-network-prod
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - yess_uploads_prod:/app/uploads
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  admin-panel:
+    build:
+      context: ./admin-panel
+      dockerfile: Dockerfile
+    container_name: yess-admin-panel-prod
+    restart: always
+    ports:
+      - "${ADMIN_PANEL_PORT:-8083}:80"
+    depends_on:
+      csharp-backend:
+        condition: service_healthy
+    networks:
+      - yess-network-prod
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    environment:
+      - NODE_ENV=production
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  partner-panel:
+    build:
+      context: ./partner-panel
+      dockerfile: Dockerfile
+    container_name: yess-partner-panel-prod
+    restart: always
+    ports:
+      - "${PARTNER_PANEL_PORT:-8081}:80"
+    depends_on:
+      csharp-backend:
+        condition: service_healthy
+    networks:
+      - yess-network-prod
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    environment:
+      - NODE_ENV=production
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Optional: Nginx reverse proxy for production
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: yess-nginx-prod
+    restart: always
+    ports:
+      - "${NGINX_HTTP_PORT:-80}:80"
+      - "${NGINX_HTTPS_PORT:-443}:443"
+    volumes:
+      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - admin-panel
+      - partner-panel
+      - csharp-backend
+    networks:
+      - yess-network-prod
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  yess_pg_data_prod:
+    driver: local
+  yess_redis_data_prod:
+    driver: local
+  yess_uploads_prod:
+    driver: local
+
+networks:
+  yess-network-prod:
+    driver: bridge
+

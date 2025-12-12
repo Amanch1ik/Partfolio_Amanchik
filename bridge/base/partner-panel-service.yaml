@@ -1,0 +1,21 @@
+#! partner-panel-service.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: Service
+metadata:
+    name: partner-panel-published
+    namespace: yessbackend-master
+    labels:
+        com.docker.compose.project: yessbackend-master
+        com.docker.compose.service: partner-panel
+spec:
+    selector:
+        com.docker.compose.project: yessbackend-master
+        com.docker.compose.service: partner-panel
+    ports:
+        - name: partner-pa-8081
+          port: 8081
+          protocol: TCP
+          targetPort: partner-pane-80
+
+# check if there is at least one published port

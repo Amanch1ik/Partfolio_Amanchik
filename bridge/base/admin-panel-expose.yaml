@@ -1,0 +1,18 @@
+#! admin-panel-expose.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: Service
+metadata:
+    name: admin-panel
+    namespace: yessbackend-master
+    labels:
+        com.docker.compose.project: yessbackend-master
+        com.docker.compose.service: admin-panel
+spec:
+    selector:
+        com.docker.compose.project: yessbackend-master
+        com.docker.compose.service: admin-panel
+    ports:
+        - name: admin-panel-80
+          port: 80
+          targetPort: admin-panel-80

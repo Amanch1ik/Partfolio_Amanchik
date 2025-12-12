@@ -1,0 +1,18 @@
+#! csharp-backend-yess_uploads-persistentVolumeClaim.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: csharp-backend-yess-uploads
+    namespace: yessbackend-master
+    labels:
+        com.docker.compose.service: csharp-backend
+        com.docker.compose.volume: yess_uploads
+spec:
+    accessModes:
+        # TODO would need to check which services use this volume
+        - ReadWriteOnce
+    volumeMode: Filesystem
+    resources:
+        requests:
+            storage: 100Mi

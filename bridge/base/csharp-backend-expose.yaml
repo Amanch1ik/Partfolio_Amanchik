@@ -1,0 +1,21 @@
+#! csharp-backend-expose.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: Service
+metadata:
+    name: csharp-backend
+    namespace: yessbackend-master
+    labels:
+        com.docker.compose.project: yessbackend-master
+        com.docker.compose.service: csharp-backend
+spec:
+    selector:
+        com.docker.compose.project: yessbackend-master
+        com.docker.compose.service: csharp-backend
+    ports:
+        - name: csharp-bac-8000
+          port: 8000
+          targetPort: csharp-bac-8000
+        - name: csharp-bac-8443
+          port: 8443
+          targetPort: csharp-bac-8443

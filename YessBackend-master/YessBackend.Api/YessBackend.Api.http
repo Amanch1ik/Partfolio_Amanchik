@@ -1,0 +1,6 @@
+@YessBackend.Api_HostAddress = http://localhost:5148
+
+GET {{YessBackend.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

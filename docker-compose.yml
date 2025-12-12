@@ -1,0 +1,90 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    container_name: yess-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: yess_user
+      POSTGRES_PASSWORD: dev_password
+      POSTGRES_DB: yess_db
+    ports:
+      - "5433:5432"  # Изменен порт, чтобы не конфликтовать с локальным PostgreSQL
+    volumes:
+      - yess_pg_data:/var/lib/postgresql/data
+    networks:
+      - yess-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yess_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: yess-redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"  # Изменен порт, чтобы не конфликтовать с локальным Redis
+    networks:
+      - yess-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Python FastAPI Backend
+  backend:
+    build: 
+      context: ./yess-backend
+      dockerfile: Dockerfile.dev
+    container_name: yess-backend
+    restart: unless-stopped
+    ports:
+      - "8001:8000"  # Изменен внешний порт на 8001, чтобы не конфликтовать с локальным Backend
+    volumes:
+      - ./yess-backend:/app
+      - /app/venv  # Исключаем venv из volume
+    environment:
+      - DATABASE_URL=postgresql://yess_user:dev_password@postgres:5432/yess_db
+      - POSTGRES_HOST=postgres
+      - POSTGRES_USER=yess_user
+      - POSTGRES_PASSWORD=dev_password
+      - POSTGRES_DB=yess_db
+      - ENVIRONMENT=development
+      - DEVELOPMENT_MODE=true
+      - DEBUG=true
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=dev-secret-key-change-in-production
+      - JWT_SECRET_KEY=dev-jwt-secret-key-change-in-production
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - yess-network
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # PgAdmin (опционально, для управления БД)
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: yess-pgadmin
+    restart: unless-stopped
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@yessloyalty.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - yess-network
+
+volumes:
+  yess_pg_data:
+    driver: local
+
+networks:
+  yess-network:
+    driver: bridge

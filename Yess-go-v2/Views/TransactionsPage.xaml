@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="YessGoFront.Views.TransactionsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewmodels="clr-namespace:YessGoFront.ViewModels"
+    xmlns:models="clr-namespace:YessGoFront.Models"
+    xmlns:converters="clr-namespace:YessGoFront.Converters"
+    x:DataType="viewmodels:TransactionsViewModel"
+    Shell.NavBarIsVisible="False"
+    BackgroundColor="#F4F6F8">
+
+    <ContentPage.Resources>
+        <converters:TransactionTypeToColorConverter x:Key="TransactionTypeToColorConverter" />
+        <DataTemplate x:Key="TransactionItemTemplate" x:DataType="models:PurchaseDto">
+            <Grid Padding="12" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+                <Frame Grid.RowSpan="2"
+                       WidthRequest="40"
+                       HeightRequest="40"
+                       CornerRadius="20"
+                       Padding="0"
+                       BackgroundColor="{Binding Type, Converter={StaticResource TransactionTypeToColorConverter}}">
+                    <Label Text="₸"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           TextColor="White"
+                           FontAttributes="Bold"/>
+                </Frame>
+
+                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                    <HorizontalStackLayout Spacing="6">
+                        <Label Text="{Binding Amount, StringFormat='{0:0.##}'}"
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               TextColor="#111827"/>
+                        <Label Text="Yess!Coin"
+                               FontSize="12"
+                               TextColor="#6B7280"/>
+                    </HorizontalStackLayout>
+
+                    <Label Text="{Binding DisplayName}"
+                           FontSize="13"
+                           TextColor="#4B5563"
+                           LineBreakMode="TailTruncation"
+                           MaxLines="1"/>
+
+                    <HorizontalStackLayout Spacing="8">
+                        <Label Text="{Binding TypeLabel}"
+                               FontSize="11"
+                               TextColor="#6B7280"/>
+                        <Label Text="·"
+                               FontSize="11"
+                               TextColor="#9CA3AF"/>
+                        <Label Text="{Binding StatusLabel}"
+                               FontSize="11"
+                               TextColor="#6B7280"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+                <Label Grid.Column="1"
+                       Grid.Row="1"
+                       Text="{Binding CreatedAt, StringFormat='{0:dd.MM.yyyy HH:mm}'}"
+                       FontSize="11"
+                       TextColor="#9CA3AF"
+                       HorizontalOptions="End"/>
+            </Grid>
+        </DataTemplate>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- Header -->
+        <Grid Grid.Row="0" RowDefinitions="Auto,Auto" Padding="16,44,16,8" BackgroundColor="#0F6B53">
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" VerticalOptions="Center">
+                <Border WidthRequest="36" HeightRequest="36"
+        StrokeThickness="0"
+        BackgroundColor="#FFFFFF"
+        StrokeShape="RoundRectangle8">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnBackTapped" />
+                    </Border.GestureRecognizers>
+                    <Image Source="back_arrow_icon.png" 
+           Aspect="AspectFit" 
+           Margin="8" />
+                </Border>
+
+                <Label Grid.Column="1"
+                       Text="История"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       TextColor="White"
+                       FontAttributes="Bold"
+                       FontSize="18"/>
+            </Grid>
+
+            <!-- Filters -->
+            <Grid Grid.Row="1" Margin="0,12,0,0" ColumnDefinitions="*,*,*" ColumnSpacing="6">
+                <Button x:Name="AllFilterButton"
+                        Text="Все"
+                        CornerRadius="8"
+                        Clicked="OnAllFilterClicked"/>
+                <Button x:Name="IncomeFilterButton"
+                        Grid.Column="1" 
+                        Text="Доходы"
+                        CornerRadius="8"
+                        Clicked="OnIncomeFilterClicked"/>
+                <Button x:Name="ExpenseFilterButton"
+                        Grid.Column="2" 
+                        Text="Расходы"
+                        CornerRadius="8"
+                        Clicked="OnExpenseFilterClicked"/>
+            </Grid>
+        </Grid>
+
+        <!-- Content -->
+        <RefreshView Grid.Row="1" IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshCommand}">
+            <CollectionView ItemsSource="{Binding Groups}"
+                            RemainingItemsThreshold="5"
+                            RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}">
+                <CollectionView.GroupHeaderTemplate>
+                    <DataTemplate x:DataType="viewmodels:TransactionGroup">
+                        <Grid BackgroundColor="#E5E7EB" Padding="12,6">
+                            <Label Text="{Binding DateTitle}"
+                                   FontAttributes="Bold"
+                                   FontSize="13"
+                                   TextColor="#374151"/>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.GroupHeaderTemplate>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="viewmodels:TransactionGroup">
+                        <CollectionView ItemsSource="{Binding Items}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:PurchaseDto">
+                                    <Frame Margin="12,6" Padding="0" CornerRadius="14" HasShadow="False" BackgroundColor="White">
+                                        <Grid>
+                                            <Grid.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="OnTransactionTapped" CommandParameter="{Binding Id}"/>
+                                            </Grid.GestureRecognizers>
+                                            <Grid Padding="12" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+                                                <Frame Grid.RowSpan="2"
+                                                       WidthRequest="40"
+                                                       HeightRequest="40"
+                                                       CornerRadius="20"
+                                                       Padding="0"
+                                                       BackgroundColor="{Binding Type, Converter={StaticResource TransactionTypeToColorConverter}}">
+                                                    <Label Text="₸"
+                                                           HorizontalOptions="Center"
+                                                           VerticalOptions="Center"
+                                                           TextColor="White"
+                                                           FontAttributes="Bold"/>
+                                                </Frame>
+
+                                                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                                    <HorizontalStackLayout Spacing="6">
+                                                        <Label Text="{Binding Amount, StringFormat='{0:0.##}'}"
+                                                               FontSize="16"
+                                                               FontAttributes="Bold"
+                                                               TextColor="#111827"/>
+                                                        <Label Text="Yess!Coin"
+                                                               FontSize="12"
+                                                               TextColor="#6B7280"/>
+                                                    </HorizontalStackLayout>
+
+                                                    <Label Text="{Binding DisplayName}"
+                                                           FontSize="13"
+                                                           TextColor="#4B5563"
+                                                           LineBreakMode="TailTruncation"
+                                                           MaxLines="1"/>
+
+                                                    <HorizontalStackLayout Spacing="8">
+                                                        <Label Text="{Binding TypeLabel}"
+                                                               FontSize="11"
+                                                               TextColor="#6B7280"/>
+                                                        <Label Text="·"
+                                                               FontSize="11"
+                                                               TextColor="#9CA3AF"/>
+                                                        <Label Text="{Binding StatusLabel}"
+                                                               FontSize="11"
+                                                               TextColor="#6B7280"/>
+                                                    </HorizontalStackLayout>
+                                                </VerticalStackLayout>
+
+                                                <Label Grid.Column="1"
+                                                       Grid.Row="1"
+                                                       Text="{Binding CreatedAt, StringFormat='{0:dd.MM.yyyy HH:mm}'}"
+                                                       FontSize="11"
+                                                       TextColor="#9CA3AF"
+                                                       HorizontalOptions="End"/>
+                                            </Grid>
+                                        </Grid>
+                                    </Frame>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

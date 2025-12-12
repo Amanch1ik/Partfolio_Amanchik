@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="YessGoFront.Views.WalletPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Фон с градиентом -->
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#005D45" Offset="0.0"/>
+                <GradientStop Color="#00C97B" Offset="1.0"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <!-- Верхняя панель: Назад -->
+        <Grid Grid.Row="0" Padding="12,44,12,8" ColumnDefinitions="Auto,*,Auto">
+            <Button Grid.Column="0"
+                    Text="←"
+                    WidthRequest="40" 
+                    HeightRequest="40"
+                    CornerRadius="20"
+                    BackgroundColor="#FFFFFF22"
+                    TextColor="White"
+                    IsEnabled="True"
+                    InputTransparent="False"
+                    Clicked="OnBackClicked"/>
+            <Label Grid.Column="1"
+                   Text="Пополнение"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   TextColor="White"
+                   FontAttributes="Bold"
+                   FontSize="18"/>
+        </Grid>
+
+        <!-- Основной контент -->
+        <ScrollView Grid.Row="1" Padding="16,12,16,12">
+            <VerticalStackLayout Spacing="14">
+
+                <!-- Горизонтальная лента -->
+                <ScrollView Orientation="Horizontal"
+                            HorizontalScrollBarVisibility="Never"
+                            Margin="0,0,0,4">
+                    <HorizontalStackLayout Spacing="12" Padding="4,0">
+
+                        <!-- Баланс -->
+                        <Frame BackgroundColor="#FFFFFF"
+                               CornerRadius="16"
+                               HasShadow="False"
+                               Padding="16"
+                               WidthRequest="160"
+                               HeightRequest="112">
+                            <VerticalStackLayout Spacing="6" VerticalOptions="Center">
+                                <Label Text="{Binding Balance, StringFormat='{0:0.##}'}"
+                                       FontSize="28"
+                                       FontAttributes="Bold"
+                                       TextColor="#0F6B53"
+                                       HorizontalTextAlignment="Center"/>
+                                <Frame BackgroundColor="#E6F5EF"
+                                       CornerRadius="10"
+                                       Padding="10,4"
+                                       HasShadow="False"
+                                       HorizontalOptions="Center">
+                                    <Label Text="Yess!Coin"
+                                           TextColor="#0F6B53"
+                                           FontAttributes="Bold"
+                                           FontSize="12"
+                                           HorizontalTextAlignment="Center"/>
+                                </Frame>
+                            </VerticalStackLayout>
+                        </Frame>
+
+                        <!-- Карточка “Бронза” -->
+                        <Frame BackgroundColor="#FFFFFF"
+                               CornerRadius="16"
+                               HasShadow="False"
+                               Padding="12"
+                               WidthRequest="140"
+                               HeightRequest="112">
+                            <VerticalStackLayout HorizontalOptions="Center"
+                                                 VerticalOptions="Center"
+                                                 Spacing="6">
+                                <Image Source="icon_certificate.png" HeightRequest="38"/>
+                                <Label Text="Бронза"
+                                       FontAttributes="Bold"
+                                       TextColor="#0F6B53"
+                                       HorizontalTextAlignment="Center"/>
+                                <Label Text="Уровни"
+                                       FontSize="12"
+                                       TextColor="#6B7280"
+                                       HorizontalTextAlignment="Center"/>
+                            </VerticalStackLayout>
+                        </Frame>
+
+                        <!-- Что такое йесскоины -->
+                        <Frame BackgroundColor="#FFFFFF"
+                               CornerRadius="16"
+                               HasShadow="False"
+                               Padding="14"
+                               WidthRequest="180"
+                               HeightRequest="112">
+                            <VerticalStackLayout Spacing="8" VerticalOptions="Center">
+                                <Label Text="Что такое йесскоины"
+                                       TextColor="#0F6B53"
+                                       FontAttributes="Bold"
+                                       FontSize="14"/>
+                                <Button Text="Посмотреть"
+                                        BackgroundColor="#0F6B53"
+                                        TextColor="White"
+                                        CornerRadius="12"
+                                        Padding="12,6"
+                                        FontAttributes="Bold"
+                                        Clicked="OnAboutCoinsClicked"/>
+                            </VerticalStackLayout>
+                        </Frame>
+
+                        <!-- Адреса партнёров -->
+                        <Frame BackgroundColor="#FFFFFF"
+                               CornerRadius="16"
+                               HasShadow="False"
+                               Padding="14"
+                               WidthRequest="160"
+                               HeightRequest="112">
+                            <VerticalStackLayout Spacing="8" VerticalOptions="Center">
+                                <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
+                                    <Image Source="icon_location.png" WidthRequest="20" HeightRequest="20"/>
+                                    <Label Text="Адреса наших партнёров"
+                                           TextColor="#0F6B53"
+                                           FontAttributes="Bold"
+                                           FontSize="13"/>
+                                </HorizontalStackLayout>
+                                <Frame BackgroundColor="#E6F5EF"
+                                       CornerRadius="12"
+                                       HasShadow="False"
+                                       Padding="10,4"
+                                       HorizontalOptions="Center">
+                                    <Label Text="1 Адрес"
+                                           TextColor="#0F6B53"
+                                           FontAttributes="Bold"
+                                           FontSize="12"
+                                           HorizontalTextAlignment="Center"/>
+                                </Frame>
+                            </VerticalStackLayout>
+                        </Frame>
+
+                    </HorizontalStackLayout>
+                </ScrollView>
+
+                <!-- Выбор суммы -->
+                <Frame BackgroundColor="#FFFFFF" CornerRadius="16" HasShadow="False" Padding="14">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Выберите сумму пополнения:"
+                               TextColor="#0F6B53"
+                               FontAttributes="Bold"
+                               FontSize="14"/>
+
+                        <RadioButton x:Name="rb1000" Content="1000 KGS" GroupName="topup" Value="1000"/>
+                        <RadioButton x:Name="rb800"  Content="800 KGS"  GroupName="topup" Value="800"/>
+                        <RadioButton x:Name="rb600"  Content="600 KGS"  GroupName="topup" Value="600"/>
+                        <RadioButton x:Name="rb500"  Content="500 KGS"  GroupName="topup" Value="500"/>
+                        <RadioButton x:Name="rb300"  Content="300 KGS"  GroupName="topup" Value="300"/>
+                        <RadioButton x:Name="rb100"  Content="100 KGS"  GroupName="topup" Value="100" IsChecked="True"/>
+
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                            <RadioButton x:Name="rbOther" Content="Другая сумма" GroupName="topup" CheckedChanged="OnOtherCheckedChanged"/>
+                            <Entry x:Name="entryOther"
+                                   Grid.Column="1"
+                                   Placeholder="Введите сумму, KGS"
+                                   Keyboard="Numeric"
+                                   IsEnabled="False"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Frame>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Кнопка пополнения -->
+        <Grid Grid.Row="2" Padding="16,8,16,18">
+            <Button Text="Пополнить"
+                    HeightRequest="52"
+                    CornerRadius="26"
+                    FontAttributes="Bold"
+                    BackgroundColor="#0B4A3B"
+                    TextColor="White"
+                    Clicked="OnTopUpClicked"/>
+        </Grid>
+    </Grid>
+</ContentPage>

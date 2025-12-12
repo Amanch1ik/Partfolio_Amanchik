@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="YessLoyaltyApp.Views.NotificationsPage"
+             Title="Уведомления"
+             BackgroundColor="#F4F4F4">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <!-- Градиентный фон -->
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#007A51" Offset="0.0"/>
+                <GradientStop Color="#00945E" Offset="1.0"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <!-- Заголовок -->
+        <Grid Grid.Row="0" Padding="16,32,16,16" BackgroundColor="Transparent">
+            <Label Text="Уведомления" 
+                   FontSize="24" 
+                   FontAttributes="Bold" 
+                   TextColor="White" 
+                   HorizontalOptions="Start"/>
+        </Grid>
+
+        <!-- Список уведомлений -->
+        <RefreshView Grid.Row="1" 
+                     Command="{Binding RefreshNotificationsCommand}"
+                     IsRefreshing="{Binding IsLoading}">
+            <CollectionView ItemsSource="{Binding Notifications}"
+                            EmptyView="Нет уведомлений"
+                            SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <SwipeView>
+                            <!-- Контент уведомления -->
+                            <Grid Padding="16,8" BackgroundColor="White">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer 
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type local:NotificationsViewModel}}, Path=MarkNotificationAsReadCommand}"
+                                        CommandParameter="{Binding .}"/>
+                                </Grid.GestureRecognizers>
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                    <Label Text="{Binding Title}" 
+                                           FontAttributes="Bold" 
+                                           FontSize="16"
+                                           TextColor="{Binding IsRead, Converter={StaticResource ReadStatusColorConverter}}"/>
+                                    
+                                    <Label Text="{Binding Body}" 
+                                           FontSize="14" 
+                                           TextColor="Gray"
+                                           MaxLines="2"
+                                           LineBreakMode="TailTruncation"/>
+                                    
+                                    <Label Text="{Binding CreatedAt, StringFormat='{0:dd MMM HH:mm}'}" 
+                                           FontSize="12" 
+                                           TextColor="LightGray"/>
+                                </VerticalStackLayout>
+
+                                <!-- Индикатор типа уведомления -->
+                                <Border Grid.Column="1" 
+                                        BackgroundColor="{Binding Type, Converter={StaticResource NotificationTypeColorConverter}}"
+                                        WidthRequest="12" 
+                                        HeightRequest="12" 
+                                        CornerRadius="6"
+                                        VerticalOptions="Center"/>
+                            </Grid>
+
+                            <!-- Swipe Actions -->
+                            <SwipeView.RightItems>
+                                <SwipeItems>
+                                    <SwipeItem Text="Прочитано" 
+                                               BackgroundColor="Green"
+                                               Command="{Binding Source={RelativeSource AncestorType={x:Type local:NotificationsViewModel}}, Path=MarkNotificationAsReadCommand}"
+                                               CommandParameter="{Binding .}"/>
+                                    <SwipeItem Text="Удалить" 
+                                               BackgroundColor="Red"/>
+                                </SwipeItems>
+                            </SwipeView.RightItems>
+                        </SwipeView>
+                </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+                <!-- Индикатор загрузки -->
+                <CollectionView.Footer>
+                    <Grid>
+                        <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                                           Color="#007A51" 
+                                           IsVisible="{Binding IsLoading}"/>
+                        
+                        <Button Text="Загрузить ещё" 
+                                Command="{Binding LoadMoreNotificationsCommand}"
+                                IsVisible="{Binding HasMoreNotifications}"
+                                BackgroundColor="#007A51"
+                                TextColor="White"
+                                Margin="16"/>
+                    </Grid>
+                </CollectionView.Footer>
+            </CollectionView>
+        </RefreshView>
+
+        <!-- Нижняя навигация -->
+        <Grid Grid.Row="2" BackgroundColor="White" Padding="16,8">
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="32">
+                <Button Text="Главная" 
+                        ImageSource="home_icon.png" 
+                        Style="{StaticResource BottomNavButtonStyle}"/>
+                <Button Text="Партнеры" 
+                        ImageSource="partners_icon.png" 
+                        Style="{StaticResource BottomNavButtonStyle}"/>
+                <Button Text="QR" 
+                        ImageSource="qr_icon.png" 
+                        Style="{StaticResource BottomNavButtonStyle}"/>
+                <Button Text="Уведомления" 
+                        ImageSource="notifications_icon.png" 
+                        Style="{StaticResource ActiveBottomNavButtonStyle}"/>
+                <Button Text="Ещё" 
+                        ImageSource="more_icon.png" 
+                        Style="{StaticResource BottomNavButtonStyle}"/>
+            </HorizontalStackLayout>
+        </Grid>
+    </Grid>
+
+    <!-- Ресурсы страницы -->
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <!-- Конвертер цвета в зависимости от статуса прочтения -->
+            <local:ReadStatusColorConverter x:Key="ReadStatusColorConverter"/>
+            
+            <!-- Конвертер цвета в зависимости от типа уведомления -->
+            <local:NotificationTypeColorConverter x:Key="NotificationTypeColorConverter"/>
+
+            <!-- Стили для кнопок нижней навигации -->
+            <Style x:Key="BottomNavButtonStyle" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="Transparent"/>
+                <Setter Property="TextColor" Value="Gray"/>
+                <Setter Property="VerticalOptions" Value="Center"/>
+                <Setter Property="HorizontalOptions" Value="Center"/>
+            </Style>
+
+            <Style x:Key="ActiveBottomNavButtonStyle" TargetType="Button" BasedOn="{StaticResource BottomNavButtonStyle}">
+                <Setter Property="TextColor" Value="#007A51"/>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+</ContentPage>

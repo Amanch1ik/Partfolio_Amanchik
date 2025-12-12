@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="YessGoFront.Views.QrPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
+    BackgroundColor="#F2F2F2">
+
+    <Grid RowDefinitions="Auto,*,Auto,Auto" Padding="0">
+
+        <!-- Верхняя панель -->
+        <Grid Padding="16,40,16,0" BackgroundColor="#007F5F">
+            <ImageButton Source="back_icon.png"
+                         WidthRequest="28"
+                         HeightRequest="28"
+                         BackgroundColor="Transparent"
+                         Clicked="OnBackClicked"/>
+        </Grid>
+
+        <!-- Камера + рамка -->
+        <Grid Grid.Row="1">
+            <zxing:CameraBarcodeReaderView
+                x:Name="BarCodeReader"
+                BarcodesDetected="BarCodeReader_BarcodesDetected"
+                HorizontalOptions="FillAndExpand"
+                VerticalOptions="FillAndExpand"/>
+
+            <!-- Оверлей -->
+            <Grid>
+                <BoxView Color="#80000000"/>
+                <Grid Margin="70">
+                    <Border
+                        Stroke="#007F5F"
+                        StrokeThickness="4"
+                        BackgroundColor="Transparent"
+                        StrokeShape="RoundRectangle 32"/>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <!-- Подпись -->
+        <StackLayout Grid.Row="2"
+                     Margin="0,20,0,10"
+                     HorizontalOptions="Center">
+            <Label Text="Сканируйте QR код"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   TextColor="#333"
+                   HorizontalOptions="Center" />
+            <Label Text="Отсканируйте чек, чтобы получить бонусные баллы"
+                   FontSize="13"
+                   TextColor="#666"
+                   HorizontalOptions="Center" />
+        </StackLayout>
+
+        <!-- Нижняя панель -->
+        <VerticalStackLayout Grid.Row="3"
+                             Padding="16,8"
+                             Spacing="16"
+                             VerticalOptions="End"
+                             BackgroundColor="#F2F2F2">
+
+            <!-- Ползунок яркости -->
+            <Slider x:Name="BrightnessSlider"
+                    Minimum="0"
+                    Maximum="1"
+                    Value="0.5"
+                    VerticalOptions="Center"
+                    Margin="16,0,16,0"/>
+
+            <!-- Кнопки -->
+            <HorizontalStackLayout Spacing="16"
+                                   HorizontalOptions="Center">
+                <Button Text="Мой QR"
+                        ImageSource="qr_my_icon.png"
+                        CornerRadius="12"
+                        BackgroundColor="#E9E9E9"
+                        TextColor="Black"
+                        Padding="12,8"
+                        WidthRequest="130"
+                        Clicked="OnMyQrClicked"/>
+                <Button Text="Из Галереи"
+                        ImageSource="gallery_icon.png"
+                        CornerRadius="12"
+                        BackgroundColor="#E9E9E9"
+                        TextColor="Black"
+                        Padding="12,8"
+                        WidthRequest="130"/>
+                <ImageButton x:Name="FlashButton"
+                             Source="flash_icon.png"
+                             WidthRequest="32"
+                             HeightRequest="32"
+                             BackgroundColor="Transparent"
+                             Clicked="OnFlashClicked"
+                             VerticalOptions="Center"
+                             Margin="8,0,0,0"/>
+            </HorizontalStackLayout>
+
+            <!-- Кнопка выхода -->
+            <Button Text="Назад"
+                CornerRadius="12"
+                BackgroundColor="#D9534F"
+                TextColor="White"
+                Padding="12,8"
+                HorizontalOptions="Center"
+                WidthRequest="280"
+                Clicked="OnExitClicked"/>
+
+        </VerticalStackLayout>
+
+        <!-- Окно отображения QR -->
+        <Grid x:Name="QrOverlay"
+      IsVisible="False"
+      BackgroundColor="#80000000"
+      Grid.RowSpan="4"
+      VerticalOptions="FillAndExpand"
+      HorizontalOptions="FillAndExpand">
+
+            <Frame HasShadow="True"
+           CornerRadius="20"
+           BackgroundColor="White"
+           Padding="20"
+           WidthRequest="300"
+           HeightRequest="400"
+           VerticalOptions="Center"
+           HorizontalOptions="Center">
+
+                <VerticalStackLayout Spacing="20"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center">
+                    <Image x:Name="QrImage"
+                   WidthRequest="220"
+                   HeightRequest="220"
+                   Aspect="AspectFit"/>
+                    <Button Text="Закрыть"
+                    BackgroundColor="#007F5F"
+                    TextColor="White"
+                    CornerRadius="12"
+                    Clicked="OnCloseQrClicked"/>
+                </VerticalStackLayout>
+
+            </Frame>
+        </Grid>
+
+
+    </Grid>
+</ContentPage>

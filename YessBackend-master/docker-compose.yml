@@ -1,0 +1,60 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: yess-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: yess_user
+      POSTGRES_PASSWORD: secure_password
+      POSTGRES_DB: yess_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - yess_pg_data:/var/lib/postgresql/data
+    networks:
+      - yess-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: yess-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - yess-network
+
+  csharp-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: csharp-backend
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "8000:8000"
+      - "8443:8443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - EnableSwagger=true
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=yess_db;Username=yess_user;Password=secure_password
+      - Redis__ConnectionString=redis:6379
+      - Jwt__SecretKey=your_secret_key_here_change_in_production
+      - Jwt__Issuer=YessBackend
+      - Jwt__Audience=YessUsers
+      - Jwt__AccessTokenExpireMinutes=30
+      - Jwt__RefreshTokenExpireMinutes=10080
+      - Cors__Origins=["http://localhost:3000","http://localhost:3001","http://localhost:3002","http://127.0.0.1:3000","http://127.0.0.1:3001","http://127.0.0.1:3002"]
+    networks:
+      - yess-network
+
+volumes:
+  yess_pg_data:
+
+networks:
+  yess-network:
+    driver: bridge
+

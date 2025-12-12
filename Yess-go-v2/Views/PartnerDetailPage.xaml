@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="YessGoFront.Views.PartnerDetailPage"
+    BackgroundColor="#F9F9F9"
+    Title="О партнёре">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="0">
+            <!-- Обложка партнёра -->
+            <Grid HeightRequest="200" BackgroundColor="#0F6B53">
+                <Image x:Name="PartnerCoverImage"
+                       Aspect="AspectFill"
+                       Opacity="0.3"
+                       HorizontalOptions="Fill"
+                       VerticalOptions="Fill"/>
+                
+                <!-- Кнопка "Назад" -->
+                <Grid Padding="16,12">
+                    <Button x:Name="BackButton"
+                            Text="← Назад"
+                            BackgroundColor="#40000000"
+                            TextColor="White"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            HorizontalOptions="Start"
+                            VerticalOptions="Start"
+                            Padding="12,8"
+                            CornerRadius="20"
+                            Clicked="OnBackClicked"/>
+                </Grid>
+                
+                <VerticalStackLayout VerticalOptions="End" Padding="20,16">
+                    <Label x:Name="PartnerName"
+                           FontSize="28"
+                           FontAttributes="Bold"
+                           TextColor="White"
+                           HorizontalOptions="Start"/>
+                    <Label x:Name="PartnerCategory"
+                           FontSize="14"
+                           TextColor="White"
+                           Opacity="0.9"
+                           Margin="0,4,0,0"
+                           HorizontalOptions="Start"/>
+                </VerticalStackLayout>
+            </Grid>
+
+            <!-- Основной контент -->
+            <VerticalStackLayout Spacing="20" Padding="20">
+                <!-- Логотип (поверх обложки) -->
+                <Frame x:Name="LogoFrame"
+                       WidthRequest="120"
+                       HeightRequest="120"
+                       CornerRadius="60"
+                       HasShadow="True"
+                       BackgroundColor="White"
+                       Padding="4"
+                       HorizontalOptions="Center"
+                       Margin="0,-60,0,0">
+                    <Image x:Name="PartnerLogo"
+                           Aspect="AspectFill"
+                           HorizontalOptions="Fill"
+                           VerticalOptions="Fill"/>
+                </Frame>
+
+                <!-- Описание -->
+                <Label x:Name="PartnerDescription"
+                       FontSize="15"
+                       TextColor="#333"
+                       LineBreakMode="WordWrap"
+                       Margin="0,20,0,0"
+                       IsVisible="False"/>
+
+                <!-- Информация о кэшбэке и скидках -->
+                <Border BackgroundColor="#E0EFE9"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 12"
+                        Padding="16">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="💰 Кэшбэк и скидки"
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               TextColor="#0F6B53"/>
+                        <HorizontalStackLayout Spacing="16">
+                            <VerticalStackLayout Spacing="4">
+                                <Label x:Name="CashbackLabel"
+                                       FontSize="20"
+                                       FontAttributes="Bold"
+                                       TextColor="#0F6B53"
+                                       Text="5%"/>
+                                <Label Text="Кэшбэк"
+                                       FontSize="12"
+                                       TextColor="#666"/>
+                            </VerticalStackLayout>
+                            <BoxView WidthRequest="1" 
+                                     BackgroundColor="#CCC"
+                                     VerticalOptions="Fill"/>
+                            <VerticalStackLayout Spacing="4">
+                                <Label x:Name="DiscountLabel"
+                                       FontSize="20"
+                                       FontAttributes="Bold"
+                                       TextColor="#0F6B53"
+                                       Text="10%"/>
+                                <Label Text="Макс. скидка"
+                                       FontSize="12"
+                                       TextColor="#666"/>
+                            </VerticalStackLayout>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Контакты -->
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="📞 Контакты"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="#333"/>
+                    
+                    <Border BackgroundColor="White"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 12"
+                            Padding="16">
+                        <VerticalStackLayout Spacing="12">
+                            <HorizontalStackLayout Spacing="12">
+                                <Label Text="📱"
+                                       FontSize="20"
+                                       VerticalOptions="Center"/>
+                                <Label x:Name="PartnerPhone"
+                                       FontSize="15"
+                                       TextColor="#333"
+                                       VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                            
+                            <BoxView HeightRequest="1" BackgroundColor="#E0E0E0"/>
+                            
+                            <HorizontalStackLayout Spacing="12">
+                                <Label Text="🌐"
+                                       FontSize="20"
+                                       VerticalOptions="Center"/>
+                                <Label x:Name="PartnerWebsite"
+                                       FontSize="15"
+                                       TextColor="#0F6B53"
+                                       VerticalOptions="Center">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnWebsiteTapped"/>
+                                    </Label.GestureRecognizers>
+                                </Label>
+                            </HorizontalStackLayout>
+                            
+                            <BoxView x:Name="AddressSeparator" HeightRequest="1" BackgroundColor="#E0E0E0"/>
+                            
+                            <HorizontalStackLayout x:Name="AddressContainer" Spacing="12">
+                                <Label Text="📍"
+                                       FontSize="20"
+                                       VerticalOptions="Center"/>
+                                <Label x:Name="PartnerAddress"
+                                       FontSize="15"
+                                       TextColor="#333"
+                                       LineBreakMode="WordWrap"
+                                       VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- Кнопки действий -->
+                <VerticalStackLayout Spacing="12" Margin="0,8,0,0">
+                    <Button Text="🛍️ Просмотреть продукты"
+                            HeightRequest="52"
+                            BackgroundColor="#FF9800"
+                            TextColor="White"
+                            CornerRadius="12"
+                            FontAttributes="Bold"
+                            Clicked="OnViewProductsClicked"/>
+
+                    <Button Text="📍 Посмотреть на карте"
+                            HeightRequest="52"
+                            BackgroundColor="#0F6B53"
+                            TextColor="White"
+                            CornerRadius="12"
+                            Clicked="OnMapClicked"/>
+
+                    <Button Text="📞 Позвонить"
+                            HeightRequest="52"
+                            BackgroundColor="White"
+                            TextColor="#0F6B53"
+                            BorderColor="#0F6B53"
+                            BorderWidth="1"
+                            CornerRadius="12"
+                            Clicked="OnCallClicked"/>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

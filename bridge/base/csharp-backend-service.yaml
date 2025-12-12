@@ -1,0 +1,21 @@
+#! csharp-backend-service.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: Service
+metadata:
+    name: csharp-backend-published
+    namespace: yessbackend-master
+    labels:
+        com.docker.compose.project: yessbackend-master
+        com.docker.compose.service: csharp-backend
+spec:
+    selector:
+        com.docker.compose.project: yessbackend-master
+        com.docker.compose.service: csharp-backend
+    ports:
+        - name: csharp-bac-8000
+          port: 8000
+          protocol: TCP
+          targetPort: csharp-bac-8000
+
+# check if there is at least one published port

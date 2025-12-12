@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="YessGoFront.Views.ReferalPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:YessGoFront.Views.Controls"
+    Shell.NavBarIsVisible="False"
+    BackgroundColor="#F4F6F8">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        
+        <!-- Верхняя панель -->
+        <Grid Padding="16,44,16,8" BackgroundColor="#0F6B53">
+            <Grid ColumnDefinitions="Auto,*,Auto" VerticalOptions="Center">
+                <Border WidthRequest="36" HeightRequest="36"
+                        StrokeThickness="0"
+                        BackgroundColor="#FFFFFF"
+                        StrokeShape="RoundRectangle8">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnBackTapped" />
+                    </Border.GestureRecognizers>
+                    <Image Source="back_arrow_icon.png" 
+                        Aspect="AspectFit" 
+                        Margin="8" />
+                </Border>
+
+                <Label Grid.Column="1"
+                       Text="Реферальная ссылка"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       TextColor="White"
+                       FontAttributes="Bold"
+                       FontSize="18"/>
+            </Grid>
+        </Grid>
+
+        <!-- Контент -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="16" Spacing="20">
+                
+                <!-- Информационная карточка -->
+                <Frame BackgroundColor="White" CornerRadius="16" HasShadow="True" Padding="20">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Пригласите друзей"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="#0F6B53"
+                               HorizontalOptions="Center"/>
+                        
+                        <Label Text="Поделитесь своей реферальной ссылкой и получайте бонусы за каждого приглашенного друга!"
+                               FontSize="14"
+                               TextColor="#6B7280"
+                               HorizontalOptions="Center"
+                               HorizontalTextAlignment="Center"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Статистика приглашенных -->
+                <Frame BackgroundColor="White" CornerRadius="16" HasShadow="True" Padding="20">
+                    <VerticalStackLayout Spacing="16">
+                        <Label Text="Ваша статистика"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="#0F6B53"
+                               HorizontalOptions="Center"/>
+                        
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="12">
+                            <!-- Всего приглашено -->
+                            <Frame Grid.Row="0" Grid.Column="0"
+                                   BackgroundColor="#F0F9F7"
+                                   CornerRadius="12"
+                                   Padding="16"
+                                   HasShadow="False">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label x:Name="TotalReferredLabel"
+                                           Text="0"
+                                           FontSize="28"
+                                           FontAttributes="Bold"
+                                           TextColor="#0F6B53"
+                                           HorizontalOptions="Center"/>
+                                    <Label Text="Всего приглашено"
+                                           FontSize="12"
+                                           TextColor="#6B7280"
+                                           HorizontalOptions="Center"/>
+                                </VerticalStackLayout>
+                            </Frame>
+                            
+                            <!-- Активных -->
+                            <Frame Grid.Row="0" Grid.Column="1"
+                                   BackgroundColor="#E8F5E9"
+                                   CornerRadius="12"
+                                   Padding="16"
+                                   HasShadow="False">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label x:Name="ActiveReferredLabel"
+                                           Text="0"
+                                           FontSize="28"
+                                           FontAttributes="Bold"
+                                           TextColor="#2E7D32"
+                                           HorizontalOptions="Center"/>
+                                    <Label Text="Активных"
+                                           FontSize="12"
+                                           TextColor="#6B7280"
+                                           HorizontalOptions="Center"/>
+                                </VerticalStackLayout>
+                            </Frame>
+                            
+                            <!-- Прогресс-бар -->
+                            <Grid Grid.Row="1" Grid.ColumnSpan="2" RowDefinitions="Auto,Auto" RowSpacing="8">
+                                <Label Grid.Row="0"
+                                       Text="Прогресс приглашений"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       TextColor="#0F6B53"/>
+                                
+                                <Border Grid.Row="1"
+                                        StrokeThickness="0"
+                                        BackgroundColor="#E5E7EB"
+                                        StrokeShape="RoundRectangle 8"
+                                        HeightRequest="24">
+                                    <Border x:Name="ProgressBar"
+                                            StrokeThickness="0"
+                                            BackgroundColor="#0F6B53"
+                                            StrokeShape="RoundRectangle 8"
+                                            HorizontalOptions="Start"
+                                            WidthRequest="0"/>
+                                </Border>
+                                
+                                <Label Grid.Row="1"
+                                       x:Name="ProgressLabel"
+                                       Text="0 / 10"
+                                       FontSize="12"
+                                       TextColor="White"
+                                       VerticalOptions="Center"
+                                       HorizontalOptions="Center"
+                                       Margin="0"/>
+                            </Grid>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Реферальный код -->
+                <Frame BackgroundColor="White" CornerRadius="16" HasShadow="True" Padding="20">
+                    <VerticalStackLayout Spacing="16">
+                        <Label Text="Ваш реферальный код"
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               HorizontalOptions="Center"/>
+                        
+                        <Border Stroke="#0F6B53"
+                                StrokeThickness="2"
+                                StrokeShape="RoundRectangle 12"
+                                BackgroundColor="#F0F9F7"
+                                Padding="20,16">
+                            <Label x:Name="ReferralCodeLabel"
+                                   Text="Загрузка..."
+                                   FontSize="24"
+                                   FontAttributes="Bold"
+                                   TextColor="#0F6B53"
+                                   HorizontalOptions="Center"
+                                   HorizontalTextAlignment="Center"/>
+                        </Border>
+                        
+                        <Button Text="Скопировать код"
+                                BackgroundColor="#0F6B53"
+                                TextColor="White"
+                                CornerRadius="12"
+                                Padding="16,12"
+                                Clicked="OnCopyCodeClicked"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Реферальная ссылка -->
+                <Frame BackgroundColor="White" CornerRadius="16" HasShadow="True" Padding="20">
+                    <VerticalStackLayout Spacing="16">
+                        <Label Text="Ваша реферальная ссылка"
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               HorizontalOptions="Center"/>
+                        
+                        <Border Stroke="#0F6B53"
+                                StrokeThickness="2"
+                                StrokeShape="RoundRectangle 12"
+                                BackgroundColor="#F0F9F7"
+                                Padding="16,12">
+                            <Label x:Name="ReferralLinkLabel"
+                                   Text="Загрузка..."
+                                   FontSize="14"
+                                   TextColor="#0F6B53"
+                                   HorizontalOptions="Center"
+                                   HorizontalTextAlignment="Center"
+                                   LineBreakMode="TailTruncation"/>
+                        </Border>
+                        
+                        <Button Text="Скопировать ссылку"
+                                BackgroundColor="#0F6B53"
+                                TextColor="White"
+                                CornerRadius="12"
+                                Padding="16,12"
+                                Clicked="OnCopyLinkClicked"/>
+                        
+                        <Button Text="Поделиться"
+                                BackgroundColor="#E9E9E9"
+                                TextColor="Black"
+                                CornerRadius="12"
+                                Padding="16,12"
+                                Clicked="OnShareClicked"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Правила -->
+                <Frame BackgroundColor="#FFF9E6" CornerRadius="16" HasShadow="True" Padding="16">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Как это работает?"
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               TextColor="#0F6B53"/>
+                        
+                        <Label Text="• Поделитесь ссылкой с друзьями"
+                               FontSize="14"
+                               TextColor="#6B7280"/>
+                        <Label Text="• Друг регистрируется по вашей ссылке"
+                               FontSize="14"
+                               TextColor="#6B7280"/>
+                        <Label Text="• Вы получаете бонусные баллы"
+                               FontSize="14"
+                               TextColor="#6B7280"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Нижний навбар -->
+        <controls:BottomNavBar x:Name="BottomBar" Grid.Row="2" />
+    </Grid>
+</ContentPage>
+

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Border xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+        x:Class="YessGoFront.Components.PhoneEntry"
+        BackgroundColor="#E0EFE9"
+        Stroke="Transparent"
+        StrokeShape="RoundRectangle 16"
+        HeightRequest="52">
+
+    <Grid Padding="12,0" ColumnDefinitions="Auto,Auto,*,Auto">
+
+        <!-- Флаг Кыргызстана -->
+        <Border Grid.Column="0"
+                WidthRequest="32"
+                HeightRequest="24"
+                Stroke="#E0E0E0"
+                StrokeThickness="1"
+                VerticalOptions="Center">
+            <Label Text="🇰🇬"
+                   FontSize="20"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"/>
+        </Border>
+
+        <!-- Префикс +996 -->
+        <Label Grid.Column="1"
+               Text="+996"
+               FontSize="16"
+               TextColor="#0B4A3B"
+               FontAttributes="Bold"
+               VerticalOptions="Center"
+               Margin="8,0"/>
+
+        <!-- Поле ввода номера -->
+        <Entry x:Name="PhoneNumberEntryBinding"
+               Grid.Column="2"
+               Placeholder="555 12 34 56"
+               Keyboard="Telephone"
+               BackgroundColor="Transparent"
+               TextChanged="OnPhoneNumberChanged"
+               MaxLength="12" />
+
+        <!-- Индикатор валидности -->
+        <Label x:Name="ValidationIndicator"
+               Grid.Column="3"
+               Text="✓"
+               FontSize="16"
+               TextColor="#4CAF50"
+               IsVisible="False"
+               VerticalOptions="Center"
+               Margin="8,0,0,0"/>
+    </Grid>
+
+</Border>

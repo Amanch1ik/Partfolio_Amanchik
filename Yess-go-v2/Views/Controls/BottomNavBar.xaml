@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="YessGoFront.Views.Controls.BottomNavBar"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <Grid
+        Padding="0"
+        BackgroundColor="Transparent"
+        VerticalOptions="End"
+        HorizontalOptions="FillAndExpand"
+        HeightRequest="120">
+
+        <!-- 🔹 Скруглённая панель -->
+        <Border
+            x:Name="NavBarBackground"
+            BackgroundColor="#F4F4F4"
+            StrokeShape="RoundRectangle 28,28,28,28"
+            Margin="20,0,20,-18"
+            Padding="0"
+            VerticalOptions="End"
+            HorizontalOptions="FillAndExpand"
+            HeightRequest="82"
+            ZIndex="0">
+            <Border.Shadow>
+                <Shadow Brush="#33000000" Radius="8" Opacity="0.4" />
+            </Border.Shadow>
+        </Border>
+
+        <!-- 🔸 Контент -->
+        <Grid
+            ColumnDefinitions="*,*,*,*,*"
+            VerticalOptions="End"
+            HorizontalOptions="FillAndExpand"
+            Padding="16,0,16,0"
+            Margin="0,0,0,0"
+            ZIndex="2">
+
+            <!-- Главная -->
+            <VerticalStackLayout
+                Grid.Column="0"
+                HorizontalOptions="Center"
+                Spacing="3"
+                TranslationY="-2">
+                <Image x:Name="HomeIcon"
+                       Source="nav_home.png"
+                       WidthRequest="32"
+                       HeightRequest="32" />
+                <Label x:Name="HomeText"
+                       Text="Главная"
+                       FontSize="11"
+                       TextColor="#9E9E9E"
+                       HorizontalTextAlignment="Center" />
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnHomeTapped" />
+                </VerticalStackLayout.GestureRecognizers>
+            </VerticalStackLayout>
+
+            <!-- Партнёры -->
+            <VerticalStackLayout
+                Grid.Column="1"
+                HorizontalOptions="Center"
+                Spacing="3"
+                TranslationY="-2">
+                <Image x:Name="PartnerIcon"
+                       Source="nav_partners.png"
+                       WidthRequest="32"
+                       HeightRequest="32" />
+                <Label x:Name="PartnerText"
+                       Text="Партнёры"
+                       FontSize="11"
+                       TextColor="#9E9E9E"
+                       HorizontalTextAlignment="Center" />
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnPartnerTapped" />
+                </VerticalStackLayout.GestureRecognizers>
+            </VerticalStackLayout>
+
+            <!-- Центральная QR-кнопка -->
+            <Border
+                Grid.Column="2"
+                x:Name="QrButton"
+                BackgroundColor="#146B4D"
+                StrokeShape="RoundRectangle 34,34,34,34"
+                HeightRequest="70"
+                WidthRequest="70"
+                TranslationY="-12"
+                ZIndex="10"
+                VerticalOptions="Center"
+                HorizontalOptions="Center">
+                <Border.Shadow>
+                    <Shadow Brush="#55000000" Radius="10" Opacity="0.6" />
+                </Border.Shadow>
+                <Image x:Name="QrIcon"
+                       Source="nav_qr.png"
+                       WidthRequest="36"
+                       HeightRequest="36"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnQrTapped" />
+                </Border.GestureRecognizers>
+            </Border>
+
+            <!-- Уведомления -->
+            <VerticalStackLayout
+                Grid.Column="3"
+                HorizontalOptions="Center"
+                Spacing="3"
+                TranslationY="-2">
+                <Image x:Name="BellIcon"
+                       Source="nav_notification.png"
+                       WidthRequest="32"
+                       HeightRequest="32" />
+                <Label x:Name="BellText"
+                       Text="Уведомления"
+                       FontSize="11"
+                       TextColor="#9E9E9E"
+                       HorizontalTextAlignment="Center" />
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnNotificationsTapped" />
+                </VerticalStackLayout.GestureRecognizers>
+            </VerticalStackLayout>
+
+            <!-- Ещё -->
+            <VerticalStackLayout
+                Grid.Column="4"
+                HorizontalOptions="Center"
+                Spacing="3"
+                TranslationY="-2">
+                <Image x:Name="MoreIcon"
+                       Source="nav_more.png"
+                       WidthRequest="32"
+                       HeightRequest="32" />
+                <Label x:Name="MoreText"
+                       Text="Ещё"
+                       FontSize="11"
+                       TextColor="#9E9E9E"
+                       HorizontalTextAlignment="Center" />
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnMoreTapped" />
+                </VerticalStackLayout.GestureRecognizers>
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
+</ContentView>

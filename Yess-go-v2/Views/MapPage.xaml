@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:YessGoFront.Views.Controls"
+    x:Class="YessGoFront.Views.MapPage"
+    BackgroundColor="#005D45"
+    Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*,Auto,Auto,Auto">
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#005D45" Offset="0.0"/>
+                <GradientStop Color="#00C97B" Offset="1.0"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <!-- Кнопка "Назад" и заголовок -->
+        <Grid Grid.Row="0" 
+              Margin="16,40,16,0"
+              ColumnDefinitions="Auto,*,Auto"
+              ColumnSpacing="12"
+              VerticalOptions="Start">
+            <Border Grid.Column="0"
+                    WidthRequest="36"
+                    HeightRequest="36"
+                    StrokeThickness="0"
+                    BackgroundColor="White"
+                    StrokeShape="RoundRectangle 8,8,8,8"
+                    VerticalOptions="Center">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnBackTapped" />
+                </Border.GestureRecognizers>
+                <Image Source="back_arrow_icon.png"
+                       Aspect="AspectFit"
+                       Margin="8" />
+            </Border>
+            
+            <Label Grid.Column="1"
+                   Text="Карта партнёров Yess!Go"
+                   FontSize="20"
+                   TextColor="White"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   VerticalTextAlignment="Center"
+                   HorizontalTextAlignment="Center"/>
+            
+            <!-- Пустая колонка для симметрии -->
+            <Frame Grid.Column="2"
+                   WidthRequest="36"
+                   HeightRequest="36"
+                   BackgroundColor="Transparent"
+                   HasShadow="False"/>
+        </Grid>
+
+        <!-- Карта OpenStreetMap в рамке -->
+        <Frame Grid.Row="1"
+               Margin="16,16,16,0"
+               Padding="0"
+               CornerRadius="12"
+               HasShadow="True"
+               BackgroundColor="White"
+               BorderColor="Transparent">
+            <Grid x:Name="MapContainer">
+                <!-- MapView будет создан программно -->
+                
+                <!-- Индикатор загрузки -->
+                <ActivityIndicator x:Name="LoadingIndicator"
+                                   IsRunning="False"
+                                   IsVisible="False"
+                                   Color="#0F6B53"
+                                   WidthRequest="40"
+                                   HeightRequest="40"
+                                   VerticalOptions="Center"
+                                   HorizontalOptions="Center"/>
+                
+                <!-- Кнопка "Моё местоположение" -->
+                <Frame x:Name="MyLocationButton"
+                       Margin="0,0,16,16"
+                       WidthRequest="48"
+                       HeightRequest="48"
+                       CornerRadius="24"
+                       BackgroundColor="White"
+                       HasShadow="True"
+                       HorizontalOptions="End"
+                       VerticalOptions="End"
+                       Padding="0">
+                    <Image Source="icon_location.png"
+                           WidthRequest="24"
+                           HeightRequest="24"
+                           Aspect="AspectFit"
+                           VerticalOptions="Center"
+                           HorizontalOptions="Center">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnMyLocationTapped" />
+                        </Image.GestureRecognizers>
+                    </Image>
+                </Frame>
+            </Grid>
+        </Frame>
+
+        <!-- Поисковая строка (слегка перекрывает карту) -->
+        <Frame Grid.Row="2"
+               Margin="16,-20,16,0"
+               BackgroundColor="White"
+               CornerRadius="12"
+               Padding="0"
+               HasShadow="True"
+               HeightRequest="48"
+               VerticalOptions="Start">
+            <Grid ColumnDefinitions="Auto,*" Padding="12,0" ColumnSpacing="8">
+                <!-- Иконка поиска -->
+                <Label Text="🔍"
+                       FontSize="18"
+                       VerticalOptions="Center"
+                       Margin="4,0"
+                       TextColor="#9CA3AF"/>
+                
+                <!-- Поле поиска -->
+                <Entry x:Name="SearchEntry"
+                       Grid.Column="1"
+                       Placeholder="Поиск партнёров"
+                       PlaceholderColor="#9CA3AF"
+                       TextColor="#111827"
+                       FontSize="16"
+                       BackgroundColor="Transparent"
+                       VerticalOptions="Center"
+                       TextChanged="OnSearchTextChanged"
+                       Completed="OnSearchCompleted"/>
+                
+                <!-- Кнопка очистки поиска -->
+                <Button x:Name="ClearSearchButton"
+                        Grid.Column="1"
+                        Text="✕"
+                        FontSize="14"
+                        TextColor="#9CA3AF"
+                        BackgroundColor="Transparent"
+                        WidthRequest="30"
+                        HeightRequest="30"
+                        CornerRadius="15"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center"
+                        Margin="0,0,8,0"
+                        IsVisible="False"
+                        Clicked="OnClearSearchClicked"/>
+            </Grid>
+        </Frame>
+
+        <!-- Категории фильтров -->
+        <Grid Grid.Row="3" 
+              BackgroundColor="Transparent"
+              Padding="16,12,16,16"
+              Margin="0,-8,0,0">
+            <ScrollView Orientation="Horizontal"
+                        HorizontalScrollBarVisibility="Never">
+                <HorizontalStackLayout x:Name="CategoriesContainer"
+                                       Spacing="12"
+                                       Padding="0">
+                    <!-- Кнопки категорий будут добавлены программно -->
+                </HorizontalStackLayout>
+            </ScrollView>
+        </Grid>
+
+        <!-- Нижняя навигационная панель -->
+        <controls:BottomNavBar x:Name="BottomBar"
+                               Grid.Row="4"
+                               Margin="0,4,0,0"/>
+    </Grid>
+</ContentPage>

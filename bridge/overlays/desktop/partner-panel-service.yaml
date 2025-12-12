@@ -1,0 +1,11 @@
+#! partner-panel-service.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: Service
+metadata:
+    name: partner-panel-published
+    namespace: yessbackend-master
+spec:
+    type: LoadBalancer
+
+# check if there is at least one published port

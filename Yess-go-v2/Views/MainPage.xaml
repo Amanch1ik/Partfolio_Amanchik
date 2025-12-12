@@ -1,0 +1,659 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="YessGoFront.Views.MainPage"
+    x:Name="MainPageElement"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewmodels="clr-namespace:YessGoFront.ViewModels"
+    xmlns:models="clr-namespace:YessGoFront.Models"
+    xmlns:controls="clr-namespace:YessGoFront.Views.Controls"
+    xmlns:services="clr-namespace:YessGoFront.Services"
+    xmlns:converters="clr-namespace:YessGoFront.Converters"
+    xmlns:helpers="clr-namespace:YessGoFront.Helpers"
+    x:DataType="viewmodels:MainPageViewModel"
+    Shell.NavBarIsVisible="False"
+    BackgroundColor="#F4F6F8">
+
+    <!-- ViewModel будет создан в code-behind с DI -->
+    
+    <ContentPage.Resources>
+        <converters:StringToImageSourceConverter x:Key="ImageSourceConverter"/>
+        <converters:ProgressToWidthMultiConverter x:Key="ProgressToWidthMultiConverter"/>
+        <converters:StoryProgressWidthConverter x:Key="StoryProgressWidthConverter"/>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="*,Auto">
+
+        <!-- ===== ПРОКРУЧИВАЕМЫЙ КОНТЕНТ ===== -->
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Spacing="0">
+
+                <!-- ===== ШАПКА ===== -->
+                <Border StrokeThickness="0"
+                        BackgroundColor="#0F6B53"
+                        StrokeShape="RoundRectangle 0,0,10,10"
+                        Padding="{OnPlatform Android='16,36,16,14', iOS='16,48,16,14'}">
+                    <VerticalStackLayout Spacing="16">
+
+                        <!-- Профиль -->
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" VerticalOptions="Center">
+                            <Frame Grid.Column="0"
+                                   WidthRequest="56" HeightRequest="56"
+                                   CornerRadius="28" Padding="0"
+                                   BackgroundColor="#FFFFFF33">
+                                <Image Source="profile.png" Aspect="AspectFill"/>
+                            </Frame>
+
+                            <VerticalStackLayout Grid.Column="1"
+                     Spacing="2"
+                     VerticalOptions="Center">
+                                <Label FontSize="20"
+           FontAttributes="Bold"
+           TextColor="White"
+           Text="{Binding DisplayName}" />
+                                <Label FontSize="12"
+           TextColor="#FFFFFFCC"
+           Text="{Binding Phone}" />
+                            </VerticalStackLayout>
+
+                        </Grid>
+
+                        <!-- Кошелёк -->
+                        <Frame WidthRequest="360"
+                               HeightRequest="130"
+                               HorizontalOptions="Center"
+                               Padding="14"
+                               CornerRadius="18"
+                               HasShadow="True"
+                               BackgroundColor="White">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnWalletTapped"/>
+                            </Frame.GestureRecognizers>
+
+                            <Grid RowDefinitions="Auto,*" ColumnDefinitions="*,Auto">
+                                <Label Text="Ваш Баланс"
+                                       Grid.Row="0" Grid.Column="0"
+                                       TextColor="#DAA520"
+                                       FontSize="13"/>
+                                <Button Text="История"
+                                        Grid.Row="0" Grid.Column="1"
+                                        BackgroundColor="White"
+                                        TextColor="#7A7A7A"
+                                        Padding="10,4"
+                                        CornerRadius="10"
+                                        FontSize="13"
+                                        Clicked="OnHistoryClicked"/>
+                                <Grid Grid.Row="1" Grid.ColumnSpan="2"
+                                      ColumnDefinitions="*,Auto"
+                                      VerticalOptions="End"
+                                      Padding="0,0,0,2">
+                                    <HorizontalStackLayout Grid.Column="0" Spacing="8" VerticalOptions="End">
+                                        <Label Text="{Binding Balance}"
+                                               FontSize="30"
+                                               FontAttributes="Bold"
+                                               TextColor="#0F6B53"/>
+                                        <Frame BackgroundColor="#EEF2F7" CornerRadius="10" Padding="8,2">
+                                            <Label Text="Yess!Coin"
+                                                   TextColor="#0F6B53"
+                                                   FontAttributes="Bold"
+                                                   FontSize="13"/>
+                                        </Frame>
+                                    </HorizontalStackLayout>
+                                    <Image Grid.Column="1"
+                                           Source="coin.png"
+                                           WidthRequest="40" HeightRequest="40"
+                                           HorizontalOptions="End"
+                                           VerticalOptions="End"
+                                           Margin="0,0,0,2"/>
+                                </Grid>
+                            </Grid>
+                        </Frame>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
+                <VerticalStackLayout Spacing="16" Padding="16,12,16,20">
+
+                    <!-- Быстрый доступ -->
+                    <Label Text="Быстрый доступ"
+                           FontAttributes="Bold"
+                           FontSize="16"
+                           TextColor="#333"
+                           Margin="0,0,0,4"/>
+
+                    <CollectionView ItemsSource="{Binding Stories}"
+                                    ItemsLayout="HorizontalList"
+                                    SelectionMode="None"
+                                    HeightRequest="100"
+                                    HorizontalScrollBarVisibility="Never">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:StoryModel">
+                                <VerticalStackLayout Padding="4" Spacing="4" WidthRequest="80">
+                                    <Border WidthRequest="64" HeightRequest="64"
+                                            BackgroundColor="White"
+                                            Stroke="#DAA520" StrokeThickness="2"
+                                            HorizontalOptions="Center" VerticalOptions="Center">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="32"/>
+                                        </Border.StrokeShape>
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                Command="{Binding BindingContext.OpenStoryAsyncCommand, Source={x:Reference MainPageElement}}"
+                                                CommandParameter="{Binding .}" />
+                                        </Border.GestureRecognizers>
+                                        <Image Source="{Binding Icon}" Aspect="AspectFill"/>
+                                    </Border>
+                                    <Label Text="{Binding Title}"
+                                           FontSize="12"
+                                           HorizontalTextAlignment="Center"
+                                           TextColor="#333"
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="1"/>
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+
+
+                    <CollectionView x:Name="BannersCollection"
+                            ItemsSource="{Binding Banners}"
+                            ItemsLayout="HorizontalList"
+                            SelectionMode="None"
+                            HorizontalScrollBarVisibility="Never"
+                            Margin="0,0,0,4"
+                            VerticalOptions="Start"
+                            HeightRequest="90">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:BannerModel">
+                                <Grid WidthRequest="160"
+                                      HeightRequest="90"
+                                      Margin="0,0,12,0">
+                                    <Border StrokeThickness="0"
+                                           StrokeShape="RoundRectangle 16"
+                                           Padding="0"
+                                           BackgroundColor="#E0E0E0">
+                                        <Grid>
+                                            <!-- Placeholder (серый фон с индикатором) -->
+                                            <Grid x:Name="BannerPlaceholder"
+                                                  BackgroundColor="#E0E0E0"
+                                                  HorizontalOptions="Fill"
+                                                  VerticalOptions="Fill">
+                                                <ActivityIndicator IsRunning="True"
+                                                                 Color="#007A51"
+                                                                 VerticalOptions="Center"
+                                                                 HorizontalOptions="Center"/>
+                                            </Grid>
+                                            
+                                            <!-- Изображение (поверх placeholder) -->
+                                            <Image Source="{Binding Image, Converter={StaticResource ImageSourceConverter}}" 
+                                                   Aspect="AspectFill"
+                                                   HorizontalOptions="Fill"
+                                                   VerticalOptions="Fill"
+                                                   BackgroundColor="#F0F0F0">
+                                                <Image.Behaviors>
+                                                    <helpers:ImageLoadingBehavior />
+                                                </Image.Behaviors>
+                                            </Image>
+                                            <!-- Fallback текст, если изображение не загрузилось -->
+                                            <Label Text="📷"
+                                                   FontSize="40"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center"
+                                                   TextColor="#999"
+                                                   IsVisible="False"
+                                                   x:Name="BannerFallback"/>
+                                        </Grid>
+                                    </Border>
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding BindingContext.OpenBannerAsyncCommand, Source={x:Reference MainPageElement}}"
+                                                              CommandParameter="{Binding .}"/>
+                                    </Grid.GestureRecognizers>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+
+                    <!-- 🔹 Лента категорий -->
+                    <ScrollView Orientation="Horizontal"
+            HorizontalScrollBarVisibility="Never"
+            Margin="0"
+            HeightRequest="160">
+                        <HorizontalStackLayout Spacing="12"
+                           Padding="12,0,12,0">
+
+                            <!-- Категория 1 -->
+                            <VerticalStackLayout Spacing="6"
+                             WidthRequest="120"
+                             HorizontalOptions="Center">
+                                <Frame WidthRequest="120"
+                   HeightRequest="120"
+                   CornerRadius="12"
+                   Padding="0"
+                   HasShadow="True"
+                   IsClippedToBounds="True"
+                   BackgroundColor="White">
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnCategoryTapped" CommandParameter="beauty" />
+                                    </Frame.GestureRecognizers>
+                                    <Image Source="cat_beauty.png"
+                       Aspect="AspectFill"
+                       HorizontalOptions="Fill"
+                       VerticalOptions="Fill"/>
+                                </Frame>
+                                <Label Text="Салоны красоты"
+                   FontSize="13"
+                   FontAttributes="Bold"
+                   TextColor="#333"
+                   HorizontalTextAlignment="Center"/>
+                            </VerticalStackLayout>
+
+                            <!-- Категория 2 -->
+                            <VerticalStackLayout Spacing="6"
+                             WidthRequest="120"
+                             HorizontalOptions="Center">
+                                <Frame WidthRequest="120"
+                   HeightRequest="120"
+                   CornerRadius="12"
+                   Padding="0"
+                   HasShadow="True"
+                   IsClippedToBounds="True"
+                   BackgroundColor="White">
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnCategoryTapped" CommandParameter="pharmacy" />
+                                    </Frame.GestureRecognizers>
+                                    <Image Source="cat_beauty.png"
+                       Aspect="AspectFill"
+                       HorizontalOptions="Fill"
+                       VerticalOptions="Fill"/>
+                                </Frame>
+                                <Label Text="Аптеки"
+                   FontSize="13"
+                   FontAttributes="Bold"
+                   TextColor="#333"
+                   HorizontalTextAlignment="Center"/>
+                            </VerticalStackLayout>
+
+                            <!-- Категория 3 -->
+                            <VerticalStackLayout Spacing="6"
+                             WidthRequest="120"
+                             HorizontalOptions="Center">
+                                <Frame WidthRequest="120"
+                   HeightRequest="120"
+                   CornerRadius="12"
+                   Padding="0"
+                   HasShadow="True"
+                   IsClippedToBounds="True"
+                   BackgroundColor="White">
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnCategoryTapped" CommandParameter="groceries" />
+                                    </Frame.GestureRecognizers>
+                                    <Image Source="cat_food.png"
+                       Aspect="AspectFill"
+                       HorizontalOptions="Fill"
+                       VerticalOptions="Fill"/>
+                                </Frame>
+                                <Label Text="Магазины"
+                   FontSize="13"
+                   FontAttributes="Bold"
+                   TextColor="#333"
+                   HorizontalTextAlignment="Center"/>
+                            </VerticalStackLayout>
+
+                            <!-- Кнопка “Ещё...” -->
+                            <VerticalStackLayout Spacing="6"
+                             WidthRequest="120"
+                             HorizontalOptions="Center">
+                                <Frame WidthRequest="120"
+                   HeightRequest="120"
+                   CornerRadius="12"
+                   Padding="0"
+                   HasShadow="True"
+                   BackgroundColor="#F3F3F3"
+                   HorizontalOptions="Center">
+                                    <Grid>
+                                        <Label Text="+"
+                           FontSize="48"
+                           FontAttributes="Bold"
+                           TextColor="#0F6B53"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+                                        <Grid.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnMoreTapped" />
+                                        </Grid.GestureRecognizers>
+                                    </Grid>
+                                </Frame>
+                                <Label Text="Ещё..."
+                   FontSize="13"
+                   FontAttributes="Bold"
+                   TextColor="#555"
+                   HorizontalTextAlignment="Center"/>
+                            </VerticalStackLayout>
+
+                        </HorizontalStackLayout>
+                    </ScrollView>
+
+
+
+
+
+
+                    <!-- ===== Наши партнёры ===== -->
+                    <Label Text="Наши партнёры"
+                           FontAttributes="Bold"
+                           FontSize="16"
+                           TextColor="#555"
+                           Margin="0,2,0,0"/>
+
+                    <!-- 🔹 Исправленный блок с ScrollView для бесшовной прокрутки -->
+                    <VerticalStackLayout Spacing="0" Padding="0" Margin="0">
+
+                        <!-- Ряд 1 -->
+                        <ScrollView x:Name="Row1"
+                                    Orientation="Horizontal"
+                                    HeightRequest="98"
+                                    HorizontalScrollBarVisibility="Never"
+                                    VerticalScrollBarVisibility="Never"
+                                    VerticalOptions="Start">
+                            <HorizontalStackLayout x:Name="Row1Panel"
+                                                   Spacing="20"
+                                                   Padding="24,0"
+                                                   BindableLayout.ItemsSource="{Binding PartnersRow1}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="models:PartnerLogoModel">
+                                        <Grid WidthRequest="84" HeightRequest="84">
+                                            <Border Padding="0"
+                                                    BackgroundColor="White"
+                                                    Stroke="#0F6B53"
+                                                    StrokeThickness="1">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="42"/>
+                                                </Border.StrokeShape>
+                                                <Grid>
+                                                    <!-- Placeholder -->
+                                                    <Grid x:Name="PartnerPlaceholder"
+                                                          BackgroundColor="#E0E0E0"
+                                                          HorizontalOptions="Fill"
+                                                          VerticalOptions="Fill">
+                                                        <ActivityIndicator IsRunning="True"
+                                                                           Color="#0F6B53"
+                                                                           VerticalOptions="Center"
+                                                                           HorizontalOptions="Center"
+                                                                           WidthRequest="20"
+                                                                           HeightRequest="20"/>
+                                                    </Grid>
+                                                    <!-- Изображение -->
+                                                    <Image Source="{Binding Logo, Converter={StaticResource ImageSourceConverter}}"
+                                                           Aspect="AspectFill"
+                                                           HorizontalOptions="Fill"
+                                                           VerticalOptions="Fill">
+                                                        <Image.Behaviors>
+                                                            <helpers:ImageLoadingBehavior />
+                                                        </Image.Behaviors>
+                                                    </Image>
+                                                </Grid>
+                                            </Border>
+                                            <Grid.GestureRecognizers>
+                                                <TapGestureRecognizer
+                                                    Command="{Binding BindingContext.OpenPartnerAsyncCommand, Source={x:Reference MainPageElement}}"
+                                                    CommandParameter="{Binding .}" />
+                                            </Grid.GestureRecognizers>
+                                        </Grid>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </HorizontalStackLayout>
+                        </ScrollView>
+
+                        <!-- Ряд 2 -->
+                        <ScrollView x:Name="Row2"
+                                    Orientation="Horizontal"
+                                    HeightRequest="98"
+                                    HorizontalScrollBarVisibility="Never"
+                                    VerticalScrollBarVisibility="Never"
+                                    VerticalOptions="Start">
+                            <HorizontalStackLayout x:Name="Row2Panel"
+                                                   Spacing="20"
+                                                   Padding="24,0"
+                                                   BindableLayout.ItemsSource="{Binding PartnersRow2}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="models:PartnerLogoModel">
+                                        <Grid WidthRequest="84" HeightRequest="84">
+                                            <Border Padding="0"
+                                                    BackgroundColor="White"
+                                                    Stroke="#0F6B53"
+                                                    StrokeThickness="1">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="42"/>
+                                                </Border.StrokeShape>
+                                                <Grid>
+                                                    <!-- Placeholder -->
+                                                    <Grid x:Name="PartnerPlaceholder"
+                                                          BackgroundColor="#E0E0E0"
+                                                          HorizontalOptions="Fill"
+                                                          VerticalOptions="Fill">
+                                                        <ActivityIndicator IsRunning="True"
+                                                                           Color="#0F6B53"
+                                                                           VerticalOptions="Center"
+                                                                           HorizontalOptions="Center"
+                                                                           WidthRequest="20"
+                                                                           HeightRequest="20"/>
+                                                    </Grid>
+                                                    <!-- Изображение -->
+                                                    <Image Source="{Binding Logo, Converter={StaticResource ImageSourceConverter}}"
+                                                           Aspect="AspectFill"
+                                                           HorizontalOptions="Fill"
+                                                           VerticalOptions="Fill">
+                                                        <Image.Behaviors>
+                                                            <helpers:ImageLoadingBehavior />
+                                                        </Image.Behaviors>
+                                                    </Image>
+                                                </Grid>
+                                            </Border>
+                                            <Grid.GestureRecognizers>
+                                                <TapGestureRecognizer
+                                                    Command="{Binding BindingContext.OpenPartnerAsyncCommand, Source={x:Reference MainPageElement}}"
+                                                    CommandParameter="{Binding .}" />
+                                            </Grid.GestureRecognizers>
+                                        </Grid>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </HorizontalStackLayout>
+                        </ScrollView>
+
+                        <!-- Ряд 3 -->
+                        <ScrollView x:Name="Row3"
+                                    Orientation="Horizontal"
+                                    HeightRequest="98"
+                                    HorizontalScrollBarVisibility="Never"
+                                    VerticalScrollBarVisibility="Never"
+                                    VerticalOptions="Start">
+                            <HorizontalStackLayout x:Name="Row3Panel"
+                                                   Spacing="20"
+                                                   Padding="24,0"
+                                                   BindableLayout.ItemsSource="{Binding PartnersRow3}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="models:PartnerLogoModel">
+                                        <Grid WidthRequest="84" HeightRequest="84">
+                                            <Border Padding="0"
+                                                    BackgroundColor="White"
+                                                    Stroke="#0F6B53"
+                                                    StrokeThickness="1">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="42"/>
+                                                </Border.StrokeShape>
+                                                <Grid>
+                                                    <!-- Placeholder -->
+                                                    <Grid x:Name="PartnerPlaceholder"
+                                                          BackgroundColor="#E0E0E0"
+                                                          HorizontalOptions="Fill"
+                                                          VerticalOptions="Fill">
+                                                        <ActivityIndicator IsRunning="True"
+                                                                           Color="#0F6B53"
+                                                                           VerticalOptions="Center"
+                                                                           HorizontalOptions="Center"
+                                                                           WidthRequest="20"
+                                                                           HeightRequest="20"/>
+                                                    </Grid>
+                                                    <!-- Изображение -->
+                                                    <Image Source="{Binding Logo, Converter={StaticResource ImageSourceConverter}}"
+                                                           Aspect="AspectFill"
+                                                           HorizontalOptions="Fill"
+                                                           VerticalOptions="Fill">
+                                                        <Image.Behaviors>
+                                                            <helpers:ImageLoadingBehavior />
+                                                        </Image.Behaviors>
+                                                    </Image>
+                                                </Grid>
+                                            </Border>
+                                            <Grid.GestureRecognizers>
+                                                <TapGestureRecognizer
+                                                    Command="{Binding BindingContext.OpenPartnerAsyncCommand, Source={x:Reference MainPageElement}}"
+                                                    CommandParameter="{Binding .}" />
+                                            </Grid.GestureRecognizers>
+                                        </Grid>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </HorizontalStackLayout>
+                        </ScrollView>
+
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- ===== НИЖНИЙ НАВБАР ===== -->
+        <controls:BottomNavBar x:Name="BottomBar" Grid.Row="1" />
+
+        <!-- ====== OVERLAY: Story (full-screen) ====== -->
+        <Grid Grid.RowSpan="2"
+              IsVisible="{Binding IsStoryOpen}"
+              BackgroundColor="#000000CC"
+              InputTransparent="False"
+              ZIndex="9999">
+            
+            <!-- Сцена сторис (фон) -->
+            <Grid>
+                <Image x:Name="StoryImageA" Aspect="AspectFill" Opacity="1"/>
+                <Image x:Name="StoryImageB" Aspect="AspectFill" Opacity="0"/>
+                <Image Source="{Binding CurrentPageImage}"
+                       Aspect="AspectFill"
+                       HorizontalOptions="Fill"
+                       VerticalOptions="Fill"
+                       InputTransparent="True"/>
+            </Grid>
+
+            <!-- Прогресс (таймлайн) - поверх картинки -->
+            <Grid Padding="12,8" Margin="0" 
+                  VerticalOptions="Start"
+                  x:Name="ProgressTimelineContainer">
+                <HorizontalStackLayout Spacing="4"
+                                      BindableLayout.ItemsSource="{Binding PageProgressList}"
+                                      x:Name="ProgressStackLayout">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="x:Double">
+                            <Grid HeightRequest="3" 
+                                  HorizontalOptions="FillAndExpand"
+                                  Margin="0">
+                                <!-- Фон прогресс-бара с округленными углами -->
+                                <Border HeightRequest="3"
+                                        BackgroundColor="#FFFFFF55"
+                                        StrokeThickness="0"
+                                        HorizontalOptions="FillAndExpand">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="1.5"/>
+                                    </Border.StrokeShape>
+                                </Border>
+                                <!-- Прогресс с округленными углами -->
+                                <Border HeightRequest="3"
+                                        BackgroundColor="White"
+                                        StrokeThickness="0"
+                                        HorizontalOptions="Start">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="1.5"/>
+                                    </Border.StrokeShape>
+                                    <Border.WidthRequest>
+                                        <MultiBinding>
+                                            <MultiBinding.Converter>
+                                                <converters:StoryProgressWidthConverter/>
+                                            </MultiBinding.Converter>
+                                            <Binding Path="."/>
+                                            <Binding Path="BindingContext.CurrentStoryPageCount" Source="{x:Reference MainPageElement}"/>
+                                            <Binding Path="BindingContext.ProgressTimelineContainerWidth" Source="{x:Reference MainPageElement}"/>
+                                        </MultiBinding>
+                                    </Border.WidthRequest>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </HorizontalStackLayout>
+            </Grid>
+
+            <!-- Аватарка и название - поверх картинки -->
+            <HorizontalStackLayout Spacing="12"
+                                   Padding="16,48,16,0"
+                                   HorizontalOptions="Start"
+                                   VerticalOptions="Start"
+                                   InputTransparent="True">
+
+                <Border WidthRequest="56" HeightRequest="56"
+                        Stroke="White" StrokeThickness="2"
+                        BackgroundColor="Transparent"
+                        HorizontalOptions="Start"
+                        VerticalOptions="Center">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="28" />
+                    </Border.StrokeShape>
+                    <Image Source="{Binding CurrentStory.Icon, Converter={StaticResource ImageSourceConverter}}"
+                           Aspect="AspectFill" />
+                </Border>
+
+                <Label Text="{Binding CurrentStory.Title}"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       VerticalOptions="Center">
+                    <Label.Shadow>
+                        <Shadow Brush="#000000"
+                                Opacity="0.8"
+                                Radius="5"
+                                Offset="1,1"/>
+                    </Label.Shadow>
+                </Label>
+            </HorizontalStackLayout>
+
+            <!-- Навигация сторис -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding PrevPageCommand}"/>
+                    </Grid.GestureRecognizers>
+                </Grid>
+                <Grid Grid.Column="1">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NextPageCommand}"/>
+                    </Grid.GestureRecognizers>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <!-- ====== OVERLAY: Banner (full-screen) ====== -->
+        <Grid Grid.RowSpan="2"
+              IsVisible="{Binding IsBannerOpen}"
+              BackgroundColor="#000000CC"
+              ZIndex="10000">
+            <Image Source="{Binding CurrentBanner.Image}"
+                   Aspect="AspectFill"
+                   HorizontalOptions="Fill"
+                   VerticalOptions="Fill"/>
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding CloseBannerCommand}"/>
+            </Grid.GestureRecognizers>
+        </Grid>
+
+    </Grid>
+</ContentPage>

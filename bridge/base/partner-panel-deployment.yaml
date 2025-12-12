@@ -1,0 +1,43 @@
+#! partner-panel-deployment.yaml
+# Generated code, do not edit
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: partner-panel
+    namespace: yessbackend-master
+    labels:
+        com.docker.compose.project: yessbackend-master
+        com.docker.compose.service: partner-panel
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            com.docker.compose.project: yessbackend-master
+            com.docker.compose.service: partner-panel
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                com.docker.compose.project: yessbackend-master
+                com.docker.compose.service: partner-panel
+                com.docker.compose.network.yess-network: "true"
+        spec:
+            restartPolicy: unless-stopped
+            containers:
+                - name: yess-partner-panel
+                  image: yessbackend-master-partner-panel
+                  imagePullPolicy: IfNotPresent
+                  env:
+                    - name: NODE_ENV
+                      value: "production"
+                  livenessProbe:
+                    exec:
+                        command: ['wget --quiet --tries=1 --spider http://localhost/health']
+                    periodSeconds: 30
+                    initialDelaySeconds: 40
+                    timeoutSeconds: 10
+                    failureThreshold: 3
+                  ports:
+                    - name: partner-pane-80
+                      containerPort: 80

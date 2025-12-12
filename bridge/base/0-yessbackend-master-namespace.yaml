@@ -1,0 +1,8 @@
+#! 0-yessbackend-master-namespace.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: Namespace
+metadata:
+    name: yessbackend-master
+    labels:
+        com.docker.compose.project: yessbackend-master
