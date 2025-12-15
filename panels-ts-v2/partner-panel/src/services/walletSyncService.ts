@@ -29,10 +29,7 @@ class WalletSyncService {
    */
   async getBalance(userId: number): Promise<WalletBalance | null> {
     try {
-      // TODO: Добавить endpoint в partnerApi
-      // В production используем относительный путь
-      const IS_PROD = import.meta.env.PROD;
-      const apiBase = IS_PROD ? '' : (import.meta.env.VITE_API_URL || 'http://localhost:8000');
+      const apiBase = (import.meta.env.VITE_API_URL || 'https://api.yessgo.org').replace(/\/$/, '');
       const response = await fetch(`${apiBase}/api/v1/wallet/balance?user_id=${userId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('partner_token')}`,
@@ -61,9 +58,7 @@ class WalletSyncService {
     this.isSyncing = true;
 
     try {
-      // В production используем относительный путь
-      const IS_PROD = import.meta.env.PROD;
-      const apiBase = IS_PROD ? '' : (import.meta.env.VITE_API_URL || 'http://localhost:8000');
+      const apiBase = (import.meta.env.VITE_API_URL || 'https://api.yessgo.org').replace(/\/$/, '');
       const response = await fetch(`${apiBase}/api/v1/wallet/sync`, {
         method: 'POST',
         headers: {

@@ -1,18 +1,3 @@
-<<<<<<< HEAD
-# .NET
-bin/
-obj/
-*.user
-*.suo
-*.cache
-*.dll
-*.pdb
-project.lock.json
-project.fragment.lock.json
-artifacts/
-*.exe
-*.log
-=======
 # Python
 __pycache__/
 *.py[cod]
@@ -39,7 +24,6 @@ venv/
 env/
 ENV/
 .venv
->>>>>>> fbeca546db7463a04490b22dcaacce1d07a7fa06
 
 # Node
 node_modules/
@@ -47,19 +31,12 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
-<<<<<<< HEAD
+.npm
 .eslintcache
 .parcel-cache
 dist/
 build/
 .vite/
-
-# IDE
-.vs/
-=======
-.npm
-.eslintcache
-.parcel-cache
 
 # Environment variables
 .env
@@ -67,40 +44,17 @@ build/
 .env.development.local
 .env.test.local
 .env.production.local
+.env.*.local
 
 # IDE
->>>>>>> fbeca546db7463a04490b22dcaacce1d07a7fa06
 .vscode/
 .idea/
+.vs/
 *.swp
 *.swo
 *~
-<<<<<<< HEAD
 *.sln.iml
 
-# Environment
-.env
-.env.local
-.env.*.local
-appsettings.Development.json
-appsettings.Production.json
-
-# Logs
-*.log
-logs/
-=======
-.DS_Store
-
-# Build outputs
-dist/
-build/
-*.log
->>>>>>> fbeca546db7463a04490b22dcaacce1d07a7fa06
-*.pid
-*.seed
-*.pid.lock
-
-<<<<<<< HEAD
 # OS
 Thumbs.db
 .DS_Store
@@ -111,64 +65,40 @@ Thumbs.db
 *.sqlite
 *.sqlite3
 
-# Uploads
-uploads/
-temp/
+# Logs
+logs/
+*.log
+*.pid
+*.seed
+*.pid.lock
 
-# Secrets
-*.pem
-*.key
-*.crt
-secrets/
-
-# Docker
-.dockerignore
-
-=======
->>>>>>> fbeca546db7463a04490b22dcaacce1d07a7fa06
 # Testing
 coverage/
 .nyc_output/
 .pytest_cache/
 .coverage
 htmlcov/
-<<<<<<< HEAD
 test-results/
-
-# Temporary
-*.tmp
-*.temp
-*.old
-
-# Python (legacy)
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-venv/
-env/
-.venv/
-=======
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
-# Logs
-logs/
-*.log
-
-# OS
-Thumbs.db
-.DS_Store
 
 # Temporary files
 *.tmp
 *.temp
-*.bak
-*.swp
+*.old
+*.backup
+
+# Uploads
+uploads/
+temp/
+
+# Secrets
+secrets/
+*.pem
+*.key
+*.crt
+appsettings.Development.json
+appsettings.Production.json
+local_settings.py
+local_config.json
 
 # Docker
 .dockerignore
@@ -176,7 +106,7 @@ Thumbs.db
 # Kubernetes
 *.kubeconfig
 
-# Mobile (C# / .NET)
+# Mobile (C# / .NET / MAUI)
 bin/
 obj/
 *.user
@@ -185,41 +115,11 @@ obj/
 *.dll
 *.exe
 *.pdb
-*.cache
 project.lock.json
 project.fragment.lock.json
 artifacts/
->>>>>>> fbeca546db7463a04490b22dcaacce1d07a7fa06
-
-# MAUI
 *.appx
 *.appxbundle
 *.ipa
 *.apk
 *.aab
-
-<<<<<<< HEAD
-=======
-# Uploads
-uploads/
-*.jpg
-*.jpeg
-*.png
-*.gif
-*.pdf
-!screenshots/
-
-# Secrets
-secrets/
-*.pem
-*.key
-*.crt
-
-# Backup files
-*.backup
-*.old
-
-# Local configuration
-local_settings.py
-local_config.json
->>>>>>> fbeca546db7463a04490b22dcaacce1d07a7fa06

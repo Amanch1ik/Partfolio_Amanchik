@@ -268,21 +268,11 @@ export const wsService = new WebSocketService();
 // В development используем относительный путь через Vite proxy
 // В production используем полный URL
 const getWebSocketUrl = (): string => {
-  if (import.meta.env.DEV) {
-    // В development используем полный URL до бэкенда
-    return 'ws://localhost:8000/api/v1/ws';
-  }
-  // В production используем относительный путь
-  const IS_PROD = import.meta.env.PROD;
-  if (IS_PROD) {
-    // В production используем протокол текущей страницы
-    const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = typeof window !== 'undefined' ? window.location.host : 'localhost';
-    return `${protocol}//${host}/ws`;
-  }
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-  const wsUrl = API_BASE_URL.replace('http://', 'ws://').replace('https://', 'wss://');
-  return `${wsUrl}/api/v1/ws`;
+  // Используем тот же базовый API host, что и для HTTP: api.yessgo.org (или VITE_API_URL)
+  const apiBase = (import.meta.env.VITE_API_URL as string | undefined) || 'https://api.yessgo.org';
+  const normalized = apiBase.replace(/\/$/, '');
+  const wsBase = normalized.replace(/^http:\/\//, 'ws://').replace(/^https:\/\//, 'wss://');
+  return `${wsBase}/api/v1/ws`;
 };
 
 export const connectWebSocket = (baseUrl?: string): void => {

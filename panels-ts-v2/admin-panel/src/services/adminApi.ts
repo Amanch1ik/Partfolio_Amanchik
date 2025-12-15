@@ -12,16 +12,17 @@ import { createMetricsInterceptor, errorLogger } from '@shared/monitoring';
 import { getUserFriendlyMessage, logError, shouldRedirectToLogin } from '@shared/utils/errorHandler';
 import { createRetryInterceptor, isRetryableError } from '@shared/utils/retryUtils';
 
-// В development можем явно задать полный URL через VITE_API_URL (например, внешний стенд),
-// В production всегда используем относительный путь и прокси (nginx).
+// В development/production можем явно задать полный URL через VITE_API_URL
+// По умолчанию используем продовый публичный API https://api.yessgo.org
 const IS_DEV = import.meta.env.DEV;
 const IS_PROD = import.meta.env.PROD;
-const ENV_API_BASE = import.meta.env.VITE_API_URL || '';
+const ENV_API_BASE = import.meta.env.VITE_API_URL || 'https://api.yessgo.org';
 
-// В production всегда используем относительный путь, игнорируя VITE_API_URL
-const API_PATH = IS_PROD
-  ? '/api/v1'
-  : (IS_DEV && ENV_API_BASE ? `${ENV_API_BASE.replace(/\/$/, '')}/api/v1` : '/api/v1');
+// Единая база для всех окружений:
+//  - если задан VITE_API_URL — используем его
+//  - иначе — дефолтный публичный API https://api.yessgo.org
+const NORMALIZED_API_BASE = ENV_API_BASE.replace(/\/$/, '');
+const API_PATH = `${NORMALIZED_API_BASE}/api/v1`;
 
 // Создаем экземпляр axios
 const apiClient: AxiosInstance = axios.create({
@@ -228,9 +229,9 @@ const adminApi = {
         if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
           throw new Error('Превышено время ожидания. Проверьте подключение к интернету.');
         } else if (error.code === 'ERR_NETWORK' || error.message?.includes('Network Error') || error.message?.includes('Failed to fetch')) {
-          throw new Error(`Не удалось подключиться к серверу. Убедитесь, что бэкенд запущен на порту 8001`);
+          throw new Error('Не удалось подключиться к серверу api.yessgo.org. Проверьте доступность Backend API.');
         } else {
-          throw new Error(`Не удалось подключиться к серверу. Проверьте, что бэкенд запущен на порту 8001`);
+          throw new Error('Не удалось подключиться к серверу api.yessgo.org. Проверьте доступность Backend API.');
         }
       }
       throw error; // Возвращаем ошибку для обработки в LoginPage

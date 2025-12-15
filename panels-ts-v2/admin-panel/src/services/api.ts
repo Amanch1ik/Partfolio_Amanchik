@@ -154,11 +154,8 @@ const api = {
   adminApi,
   // Прямой доступ к axios для кастомных запросов
   post: (url: string, data?: any, config?: any) => {
-    const IS_DEV = import.meta.env.DEV;
-    const ENV_API_BASE = import.meta.env.VITE_API_URL || '';
-    const API_PATH = IS_DEV && ENV_API_BASE
-      ? `${ENV_API_BASE.replace(/\/$/, '')}/api/v1`
-      : '/api/v1';
+    const ENV_API_BASE = import.meta.env.VITE_API_URL || 'https://api.yessgo.org';
+    const API_PATH = `${ENV_API_BASE.replace(/\/$/, '')}/api/v1`;
     const token = localStorage.getItem('admin_token');
     return axios.post(`${API_PATH}${url}`, data, {
       ...config,
@@ -170,11 +167,8 @@ const api = {
     });
   },
   put: (url: string, data?: any, config?: any) => {
-    const IS_DEV = import.meta.env.DEV;
-    const ENV_API_BASE = import.meta.env.VITE_API_URL || '';
-    const API_PATH = IS_DEV && ENV_API_BASE
-      ? `${ENV_API_BASE.replace(/\/$/, '')}/api/v1`
-      : '/api/v1';
+    const ENV_API_BASE = import.meta.env.VITE_API_URL || 'https://api.yessgo.org';
+    const API_PATH = `${ENV_API_BASE.replace(/\/$/, '')}/api/v1`;
     const token = localStorage.getItem('admin_token');
     return axios.put(`${API_PATH}${url}`, data, {
       ...config,

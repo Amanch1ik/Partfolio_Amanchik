@@ -1,11 +1,9 @@
 import axios from 'axios';
 
-// В development используем относительный путь через Vite proxy
-const IS_DEV = import.meta.env.DEV;
-const ENV_API_BASE = import.meta.env.VITE_API_URL || '';
-const API_PATH = IS_DEV && ENV_API_BASE
-  ? `${ENV_API_BASE.replace(/\/$/, '')}/api/v1`
-  : '/api/v1';
+// Базовый URL API: по умолчанию используем публичный backend api.yessgo.org,
+// при необходимости можно переопределить через VITE_API_URL
+const ENV_API_BASE = import.meta.env.VITE_API_URL || 'https://api.yessgo.org';
+const API_PATH = `${ENV_API_BASE.replace(/\/$/, '')}/api/v1`;
 
 // Создаем экземпляр axios с настройками
 const apiClient = axios.create({

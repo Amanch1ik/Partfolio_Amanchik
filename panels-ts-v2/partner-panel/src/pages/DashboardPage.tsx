@@ -41,7 +41,7 @@ export const DashboardPage = () => {
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       wsUrl = `${protocol}//${window.location.host}/ws`;
     } else {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://api.yessgo.org';
       wsUrl = apiUrl.replace(/^http/, 'ws') + '/ws';
     }
     

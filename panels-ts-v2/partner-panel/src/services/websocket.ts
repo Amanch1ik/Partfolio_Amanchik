@@ -257,7 +257,7 @@ class WebSocketService {
 export const wsService = new WebSocketService();
 
 // Хелпер для подключения с токеном из localStorage
-export const connectWebSocket = (baseUrl: string = 'ws://localhost:8000/ws'): void => {
+export const connectWebSocket = (baseUrl?: string): void => {
   // Проверяем, доступен ли WebSocket (только в браузере)
   if (typeof WebSocket === 'undefined') {
     return;
@@ -283,7 +283,12 @@ export const connectWebSocket = (baseUrl: string = 'ws://localhost:8000/ws'): vo
     }
   }
 
+  const apiBase = (import.meta.env.VITE_API_URL as string | undefined) || 'https://api.yessgo.org';
+  const normalized = apiBase.replace(/\/$/, '');
+  const wsBase = normalized.replace(/^http:\/\//, 'ws://').replace(/^https:\/\//, 'wss://');
+  const finalUrl = baseUrl || `${wsBase}/api/v1/ws`;
+
   const token = localStorage.getItem('partner_token');
-  wsService.connect(baseUrl, token || undefined);
+  wsService.connect(finalUrl, token || undefined);
 };
 

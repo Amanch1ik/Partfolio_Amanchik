@@ -4,16 +4,10 @@ import { createMetricsInterceptor, errorLogger } from '@shared/monitoring';
 import { getUserFriendlyMessage, logError, shouldRedirectToLogin } from '@shared/utils/errorHandler';
 import { createRetryInterceptor, isRetryableError } from '@shared/utils/retryUtils';
 
-// В dev можно явно указать удалённый backend через VITE_API_URL.
-// В production всегда используем относительный путь и прокси (nginx).
-const IS_DEV = import.meta.env.DEV;
-const IS_PROD = import.meta.env.PROD;
-const ENV_API_BASE = import.meta.env.VITE_API_URL || '';
-
-// В production всегда используем относительный путь, игнорируя VITE_API_URL
-const API_BASE_URL = IS_PROD 
-  ? '' 
-  : (IS_DEV && ENV_API_BASE ? ENV_API_BASE.replace(/\/$/, '') : '');
+// Базовый URL backend API.
+// По умолчанию используем публичный api.yessgo.org, можно переопределить через VITE_API_URL.
+const ENV_API_BASE = import.meta.env.VITE_API_URL || 'https://api.yessgo.org';
+const API_BASE_URL = ENV_API_BASE.replace(/\/$/, '');
 
 // Создаем экземпляр axios
 const apiClient: AxiosInstance = axios.create({
