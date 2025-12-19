@@ -200,8 +200,14 @@ export const PartnersPage = () => {
 
   const handleSave = async (values: any) => {
     try {
+      // При редактировании удаляем пустой пароль из данных
       if (editingPartner) {
-        await partnersApi.update(editingPartner.id, values);
+        const updateData = { ...values };
+        // Если пароль пустой, не отправляем его на сервер
+        if (!updateData.password || updateData.password.trim() === '') {
+          delete updateData.password;
+        }
+        await partnersApi.update(editingPartner.id, updateData);
         message.success(t('partners.updated', 'Партнер обновлен'));
       } else {
         await partnersApi.create(values);
@@ -680,6 +686,20 @@ export const PartnersPage = () => {
                 >
                   <Input 
                     placeholder={t('partners.namePlaceholder', 'Введите название партнера')}
+                    size="large"
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  label={t('partners.password', 'Пароль')}
+                  name="password"
+                  rules={[
+                    { min: 6, message: t('partners.passwordMinLength', 'Пароль должен содержать минимум 6 символов') }
+                  ]}
+                  help={editingPartner ? t('partners.passwordHelp', 'Оставьте пустым, чтобы не изменять пароль') : undefined}
+                >
+                  <Input.Password 
+                    placeholder={t('partners.passwordPlaceholder', 'Введите пароль')}
                     size="large"
                   />
                 </Form.Item>
