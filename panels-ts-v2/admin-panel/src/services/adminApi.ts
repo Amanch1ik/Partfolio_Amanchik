@@ -1,5 +1,4 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
-// Типы для _retryCount определены в src/types/axios.d.ts и подхватываются автоматически
 import type {
   DashboardStats,
   User,
@@ -9,19 +8,10 @@ import type {
   AdminUser,
 } from '@/types';
 import { createMetricsInterceptor, errorLogger } from '@shared/monitoring';
-import { getUserFriendlyMessage, logError, shouldRedirectToLogin } from '@shared/utils/errorHandler';
 import { createRetryInterceptor, isRetryableError } from '@shared/utils/retryUtils';
 
-// В development можем явно задать полный URL через VITE_API_URL (например, внешний стенд),
-// В production всегда используем относительный путь и прокси (nginx).
-const IS_DEV = import.meta.env.DEV;
-const IS_PROD = import.meta.env.PROD;
-const ENV_API_BASE = import.meta.env.VITE_API_URL || '';
-
-// В production всегда используем относительный путь, игнорируя VITE_API_URL
-const API_PATH = IS_PROD
-  ? '/api/v1'
-  : (IS_DEV && ENV_API_BASE ? `${ENV_API_BASE.replace(/\/$/, '')}/api/v1` : '/api/v1');
+// Конфигурация API
+const API_PATH = '/api/v1'; // Всегда используем относительный путь для проксирования
 
 // Создаем экземпляр axios
 const apiClient: AxiosInstance = axios.create({
@@ -29,13 +19,11 @@ const apiClient: AxiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 30000, // 30 секунд таймаут по умолчанию для всех запросов
+  timeout: 30000,
 });
 
-// Создаем интерцептор метрик для отслеживания API запросов
+// Перехватчики для метрик и повторных попыток
 const metricsInterceptor = createMetricsInterceptor();
-
-// Создаем retry interceptor для автоматических повторов
 const retryInterceptor = createRetryInterceptor({
   maxRetries: 3,
   retryDelay: 1000,
@@ -43,132 +31,72 @@ const retryInterceptor = createRetryInterceptor({
   maxRetryDelay: 30000,
 });
 
-// Интерцептор для добавления токена и метрик
+// Интерцептор запросов: добавление токена авторизации
 apiClient.interceptors.request.use(
   (config) => {
+    // Не добавляем токен для запросов входа и регистрации
+    if (config.url?.includes('/admin/auth/login') || config.url?.includes('/admin/auth/register')) {
+      return config;
+    }
+
     const token = localStorage.getItem('admin_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      if (import.meta.env.DEV) {
+        console.log(`📡 [API Request] ${config.method?.toUpperCase()} ${config.url} with token: ${token.substring(0, 10)}...`);
+      }
     }
-    // Инициализируем счетчик попыток
     if (!config._retryCount) {
       config._retryCount = 0;
     }
-    // Добавляем отслеживание метрик
     return metricsInterceptor.request(config);
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Интерцептор для обработки ошибок и метрик
+// Интерцептор ответов: обработка ошибок и метрик
 apiClient.interceptors.response.use(
   (response) => {
-    // Записываем метрики успешного ответа
     metricsInterceptor.response(response);
-    // Сбрасываем счетчик попыток при успехе
     if (response.config) {
       response.config._retryCount = 0;
     }
     return response;
   },
   async (error: AxiosError) => {
-    // Пытаемся повторить запрос через retry interceptor
+    // Повторные попытки при сетевых ошибках
     if (isRetryableError(error) && error.config) {
       try {
         const retryResult = await retryInterceptor.onRejected(error);
-        if (retryResult) {
-          return retryResult;
-        }
+        if (retryResult) return retryResult;
       } catch (retryError) {
-        // Если retry не помог, продолжаем обычную обработку ошибки
+        // Игнорируем ошибку ретрая и идем к основной обработке
       }
     }
-    // Расширенная обработка ошибок
+
     if (error.response) {
       const status = error.response.status;
       const data = error.response.data as any;
       
-      // Логируем ошибку в систему мониторинга (кроме 429 - это нормальная ситуация)
-      if (status !== 429) {
-        errorLogger.logApiError(
-          error.config?.url || '',
-          status,
-          error
-        );
-      }
+      // Логируем ошибки
+      errorLogger.logApiError(error.config?.url || '', status, error);
       
-      switch (status) {
-        case 401:
-          // Токен истек или невалиден
-          localStorage.removeItem('admin_token');
-          if (window.location.pathname !== '/login') {
-            window.location.href = '/login';
-          }
-          console.error('Ошибка авторизации:', data?.detail || 'Unauthorized');
-          break;
-        case 403:
-          console.error('Доступ запрещен:', data?.detail || 'Forbidden');
-          break;
-        case 404:
-          console.error('Ресурс не найден:', data?.detail || 'Not Found');
-          break;
-        case 422:
-          console.error('Ошибка валидации:', data?.detail || 'Validation Error');
-          break;
-        case 429:
-          // Rate limit - слишком много запросов
-          console.warn('Превышен лимит запросов. Подождите немного.');
-          // Не логируем как ошибку, это нормальная ситуация
-          break;
-        case 500: {
-          const errorMsg = data?.detail || data?.message || 'Internal Server Error';
-          // Логируем только один раз, чтобы не засорять консоль
-          if (!(error.config as any)?._500Logged) {
-            console.error('⚠️ Ошибка сервера (500):', errorMsg);
-            console.warn('💡 Backend возвращает ошибки 500. Проверьте логи сервера.');
-            (error.config as any)._500Logged = true;
-          }
-          break;
+      if (status === 401) {
+        console.warn('🔓 adminApi: 401 Unauthorized received for', error.config?.url);
+        if (error.response?.data) {
+          console.warn('🔓 adminApi: 401 details:', error.response.data);
         }
-        case 503:
-          console.error('Сервис недоступен:', data?.detail || 'Service Unavailable');
-          break;
-        default:
-          console.error('Ошибка API:', data?.detail || error.message);
+        // Убрали localStorage.removeItem('admin_token'), чтобы избежать race condition
+        // Токен будет очищен в useAuth.logout() или при явном логауте
       }
-    } else if (error.request) {
-      // Запрос отправлен, но ответа нет - логируем как сетевую ошибку
-      errorLogger.logError({
-        message: `Network Error: No response from server - ${error.config?.url || 'unknown'}`,
-        source: 'api',
-        additionalData: {
-          url: error.config?.url,
-          method: error.config?.method,
-        },
-      });
-      
-      console.error('Нет ответа от сервера. Проверьте подключение к бэкенду.');
-    } else {
-      // Ошибка при настройке запроса
-      errorLogger.logError({
-        message: `Request Error: ${error.message}`,
-        source: 'api',
-        additionalData: {
-          url: error.config?.url,
-          method: error.config?.method,
-        },
-      });
-      console.error('Ошибка запроса:', error.message);
     }
     
-    // Записываем метрики ошибки
-    return metricsInterceptor.error(error);
+    metricsInterceptor.error(error);
+    return Promise.reject(error);
   }
 );
 
-// Типы для ответов API
+// Интерфейсы ответов
 interface ApiResponse<T> {
   data: T;
   message?: string;
@@ -179,84 +107,63 @@ interface PaginatedResponse<T> {
   total: number;
   page: number;
   page_size: number;
-  // Для некоторых страниц используется total_pages
   total_pages?: number;
 }
 
-// Простейшее in-memory хранилище для dev-настроек,
-// пока соответствующие endpoints на бэкенде не реализованы.
-// Это позволяет странице настроек работать без 404 и падений.
-const devSettingsStore: {
-  categories: { id: number; name: string }[];
-  limits: Record<string, any>;
-  apiKeys: { id: number; name: string; key: string; created_at: string }[];
-} = {
-  categories: [],
-  limits: {},
-  apiKeys: [],
-};
-
-let devCategoryId = 1;
-let devApiKeyId = 1;
-
-// Admin API методы
+// Методы Admin API
 const adminApi = {
   // Аутентификация
   async login(username: string, password: string) {
+    console.log('📡 adminApi.login: Запрос на', `${API_PATH}/admin/auth/login`);
+    const payload = {
+      Username: username,
+      Password: password,
+    };
+    console.log('📦 adminApi.login: Payload:', { Username: username, Password: '***' });
+    
     try {
-      console.log('📡 adminApi.login: Отправляем запрос на', `${API_PATH}/admin/auth/login`);
-      // Используем правильный admin endpoint
-      const response = await axios.post(`${API_PATH}/admin/auth/login`, {
-        username: username,
-        password: password,
-      }, {
-        headers: { 'Content-Type': 'application/json' },
-        timeout: 10000,
+      const response = await apiClient.post('/admin/auth/login', payload, {
+        timeout: 15000,
       });
 
-      if (response.data && response.data.access_token) {
-        console.log('💾 adminApi.login: Сохраняем токен в localStorage');
-        localStorage.setItem('admin_token', response.data.access_token);
+      // Бэкенд возвращает PascalCase: AccessToken
+      const token = response.data?.AccessToken || response.data?.access_token;
+
+      if (token) {
+        localStorage.setItem('admin_token', token);
+        // Бэкенд может возвращать данные в PascalCase или camelCase
+        const adminData = response.data.Admin || response.data.admin || response.data.User || response.data.user;
+        
         return {
-          access_token: response.data.access_token,
-          admin: response.data.admin || response.data.user || {
-            id: response.data.admin?.id?.toString() || response.data.user_id?.toString() || '1',
-            email: username,
-            role: 'admin' as const,
+          access_token: token,
+          admin: {
+            id: (adminData?.Id || adminData?.id || response.data.user_id || '1').toString(),
+            email: adminData?.Email || adminData?.email || username,
+            role: (adminData?.Role || adminData?.role || 'admin').toLowerCase() as any,
           },
         };
       }
       throw new Error('Invalid response from server');
     } catch (error: any) {
-      console.error('❌ adminApi.login: Ошибка при входе:', error);
-      
-      // Обрабатываем ошибки подключения
-      if (!error.response && error.request) {
-        if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
-          throw new Error('Превышено время ожидания. Проверьте подключение к интернету.');
-        } else if (error.code === 'ERR_NETWORK' || error.message?.includes('Network Error') || error.message?.includes('Failed to fetch')) {
-          throw new Error('Не удалось подключиться к серверу. Убедитесь, что бэкенд запущен на порту 8000');
-        } else {
-          throw new Error('Не удалось подключиться к серверу. Проверьте, что бэкенд запущен на порту 8000');
-        }
-      }
-      
-      // Обрабатываем HTTP ошибки
-      if (error.response) {
-        const status = error.response.status;
-        const detail = error.response.data?.detail || error.response.data?.message || 'Ошибка сервера';
-        
-        if (status === 401) {
-          throw new Error('Неверное имя пользователя или пароль');
-        } else if (status === 500) {
-          throw new Error(`Ошибка сервера: ${detail}. Проверьте логи Backend.`);
-        } else {
-          throw new Error(detail || `Ошибка ${status}`);
-        }
-      }
-      
+      console.error('❌ adminApi.login: Error response:', error.response?.data);
       throw error;
     }
+  },
+
+  async register(data: any) {
+    console.log('📡 adminApi.register: Запрос на', `${API_PATH}/admin/auth/register`);
+    // Преобразуем ключи в PascalCase для бэкенда
+    const payload = {
+      Username: data.username,
+      Email: data.email,
+      Password: data.password,
+      Role: data.role || 'admin'
+    };
+    console.log('📦 adminApi.register: Payload:', payload);
+    const response = await apiClient.post('/admin/auth/register', payload, {
+      timeout: 15000,
+    });
+    return response.data;
   },
 
   logout() {
@@ -264,167 +171,38 @@ const adminApi = {
   },
 
   async getCurrentAdmin(): Promise<ApiResponse<AdminUser>> {
+    console.log('📡 adminApi.getCurrentAdmin: Запрос на /admin/me');
     const response = await apiClient.get('/admin/me');
     return response.data;
   },
 
   async getCurrentUser(): Promise<ApiResponse<any>> {
-    try {
-      const response = await apiClient.get('/auth/me');
-      // Безопасная обработка ответа
-      if (!response || !response.data) {
-        throw new Error('Invalid response format');
-      }
-      return response.data;
-    } catch (error: any) {
-      // При ошибке 401 или 403 возвращаем пустой ответ вместо падения
-      if (error.response?.status === 401 || error.response?.status === 403) {
-        throw error; // Пробрасываем для обработки в интерцепторе
-      }
-      // Для других ошибок возвращаем безопасный ответ
-      // Не логируем ошибки 500 здесь - они уже обработаны в интерцепторе
-      if (error.response?.status !== 500) {
-        console.error('Error getting current user:', error);
-      }
-      throw error;
-    }
+    const response = await apiClient.get('/auth/me');
+    return response.data;
   },
 
-  // Dashboard
+  // Дашборд
   async getDashboardStats(): Promise<ApiResponse<DashboardStats>> {
-    try {
-      const response = await apiClient.get('/admin/dashboard/stats');
-      // Безопасная обработка ответа
-      if (!response || !response.data) {
-        console.warn('⚠️ getDashboardStats: Пустой ответ от API');
-        return {
-          data: {
-            total_users: 0,
-            active_users: 0,
-            total_partners: 0,
-            active_partners: 0,
-            total_transactions: 0,
-            total_revenue: 0,
-            transactions_today: 0,
-            revenue_today: 0,
-            users_growth: 0,
-            revenue_growth: 0,
-          } as DashboardStats,
-        };
-      }
-      // Проверяем структуру данных перед возвратом
-      const statsData = response.data?.data || response.data;
-      return {
-        data: {
-          total_users: statsData?.total_users ?? 0,
-          active_users: statsData?.active_users ?? 0,
-          total_partners: statsData?.total_partners ?? 0,
-          active_partners: statsData?.active_partners ?? statsData?.total_partners ?? 0,
-          total_transactions: statsData?.total_transactions ?? 0,
-          total_revenue: statsData?.total_revenue ?? 0,
-          transactions_today: statsData?.transactions_today ?? 0,
-          revenue_today: statsData?.revenue_today ?? 0,
-          users_growth: statsData?.users_growth ?? 0,
-          revenue_growth: statsData?.revenue_growth ?? 0,
-        } as DashboardStats,
-      };
-    } catch (error: any) {
-      // Не логируем ошибки 500 - они уже обработаны в интерцепторе
-      if (error.response?.status !== 500) {
-        console.error('❌ getDashboardStats: Ошибка получения статистики:', error);
-      }
-      // Возвращаем безопасные значения по умолчанию вместо падения
-      return {
-        data: {
-          total_users: 0,
-          active_users: 0,
-          total_partners: 0,
-          active_partners: 0,
-          total_transactions: 0,
-          total_revenue: 0,
-          transactions_today: 0,
-          revenue_today: 0,
-          users_growth: 0,
-          revenue_growth: 0,
-        } as DashboardStats,
-      };
-    }
+    const response = await apiClient.get('/admin/dashboard/stats');
+    return response.data;
   },
 
-  // Users
+  // Пользователи
   async getUsers(page = 1, page_size = 20, search?: string): Promise<ApiResponse<PaginatedResponse<User>>> {
-    try {
-      const params: any = { page, page_size };
-      if (search && search.trim()) {
-        params.search = search.trim();
-      }
-      const response = await apiClient.get('/admin/users', { 
-        params,
-        timeout: 20000, // 20 секунд для получения списка пользователей
-      });
-      // Безопасная обработка ответа
-      if (!response || !response.data) {
-        return {
-          data: {
-            items: [],
-            total: 0,
-            page,
-            page_size,
-          },
-        };
-      }
-      return response.data;
-    } catch (error: any) {
-      console.error('Error fetching users:', error);
-      // Возвращаем безопасный ответ вместо падения
-      return {
-        data: {
-          items: [],
-          total: 0,
-          page,
-          page_size,
-        },
-      };
-    }
+    const params: any = { page, page_size };
+    if (search?.trim()) params.search = search.trim();
+    const response = await apiClient.get('/admin/users', { params });
+    return response.data;
   },
 
   async getUserById(id: number): Promise<ApiResponse<User>> {
-    try {
-      if (!id || typeof id !== 'number') {
-        throw new Error('Invalid user ID');
-      }
-      const response = await apiClient.get(`/admin/users/${id}`, {
-        timeout: 15000,
-      });
-      if (!response || !response.data) {
-        throw new Error('Invalid response format');
-      }
-      return response.data;
-    } catch (error: any) {
-      console.error(`Error fetching user ${id}:`, error);
-      throw error;
-    }
+    const response = await apiClient.get(`/admin/users/${id}`);
+    return response.data;
   },
 
   async updateUser(id: number, data: Partial<User>): Promise<ApiResponse<User>> {
-    try {
-      if (!id || typeof id !== 'number') {
-        throw new Error('Invalid user ID');
-      }
-      if (!data || typeof data !== 'object') {
-        throw new Error('Invalid user data');
-      }
-      const response = await apiClient.put(`/admin/users/${id}`, data, {
-        timeout: 15000,
-      });
-      if (!response || !response.data) {
-        throw new Error('Invalid response format');
-      }
-      return response.data;
-    } catch (error: any) {
-      console.error(`Error updating user ${id}:`, error);
-      throw error;
-    }
+    const response = await apiClient.put(`/admin/users/${id}`, data);
+    return response.data;
   },
 
   async deleteUser(id: number): Promise<void> {
@@ -439,50 +217,18 @@ const adminApi = {
     await apiClient.post(`/admin/users/${id}/deactivate`);
   },
 
-  // Partners
+  // Партнеры
   async getPartners(page = 1, page_size = 20, search?: string, status?: string): Promise<ApiResponse<PaginatedResponse<Partner>>> {
-    try {
-      const params: any = { page, page_size };
-      if (search && search.trim()) {
-        params.search = search.trim();
-      }
-      if (status) {
-        params.status = status;
-      }
-      const response = await apiClient.get('/admin/partners', { params });
-      return response.data;
-    } catch (error: any) {
-      console.error('Error fetching partners:', error);
-      return {
-        data: {
-          items: [],
-          total: 0,
-          page,
-          page_size,
-        },
-      };
-    }
+    const params: any = { page, page_size };
+    if (search?.trim()) params.search = search.trim();
+    if (status) params.status = status;
+    const response = await apiClient.get('/admin/partners', { params });
+    return response.data;
   },
 
   async getPartnerById(id: number): Promise<ApiResponse<Partner>> {
     const response = await apiClient.get(`/admin/partners/${id}`);
     return response.data;
-  },
-
-  // Partner Locations (Admin)
-  async getPartnerLocations(): Promise<ApiResponse<any[]>> {
-    // Backend endpoint для локаций партнёров пока нестабилен,
-    // поэтому в панели просто возвращаем пустой список, чтобы не спамить ошибками.
-    return { data: [] };
-  },
-
-  async createPartnerLocation(partnerId: number, data: { address: string; latitude: number; longitude: number; phone_number?: string; is_active?: boolean }): Promise<ApiResponse<any>> {
-    const response = await apiClient.post(`/admin/partners/${partnerId}/locations`, data);
-    return response.data;
-  },
-
-  async deletePartnerLocation(locationId: number): Promise<void> {
-    await apiClient.delete(`/admin/partners/locations/${locationId}`);
   },
 
   async createPartner(data: Partial<Partner>): Promise<ApiResponse<Partner>> {
@@ -507,33 +253,34 @@ const adminApi = {
     await apiClient.post(`/admin/partners/${id}/reject`, { reason });
   },
 
-  // Promotions
+  // Товары партнеров
+  async getPartnerProducts(partnerId: number, page = 1, page_size = 20): Promise<ApiResponse<PaginatedResponse<any>>> {
+    const response = await apiClient.get(`/admin/partners/${partnerId}/products`, {
+      params: { page, page_size },
+    });
+    return response.data;
+  },
+
+  async createPartnerProduct(partnerId: number, data: any): Promise<ApiResponse<any>> {
+    const response = await apiClient.post(`/admin/partners/${partnerId}/products`, data);
+    return response.data;
+  },
+
+  async updatePartnerProduct(partnerId: number, productId: number, data: any): Promise<ApiResponse<any>> {
+    const response = await apiClient.put(`/admin/partners/${partnerId}/products/${productId}`, data);
+    return response.data;
+  },
+
+  async deletePartnerProduct(partnerId: number, productId: number): Promise<void> {
+    await apiClient.delete(`/admin/partners/${partnerId}/products/${productId}`);
+  },
+
+  // Акции и баннеры
   async getPromotions(page = 1, page_size = 20): Promise<ApiResponse<PaginatedResponse<Promotion>>> {
-    try {
-      const response = await apiClient.get('/admin/promotions', {
-        params: { page, page_size },
-      });
-      // Backend сейчас возвращает объект формата { items, total, page, page_size }
-      const payload = response.data as any;
-      const normalized: PaginatedResponse<Promotion> = {
-        items: Array.isArray(payload?.items) ? payload.items : [],
-        total: payload?.total ?? 0,
-        page: payload?.page ?? page,
-        page_size: payload?.page_size ?? page_size,
-        total_pages: payload?.total_pages,
-      };
-      return { data: normalized };
-    } catch {
-      // В случае ошибки возвращаем пустой список, чтобы React Query не получал undefined
-      return {
-        data: {
-          items: [],
-          total: 0,
-          page,
-          page_size,
-        },
-      };
-    }
+    const response = await apiClient.get('/admin/promotions', {
+      params: { page, page_size },
+    });
+    return response.data;
   },
 
   async getPromotionById(id: number): Promise<ApiResponse<Promotion>> {
@@ -555,48 +302,12 @@ const adminApi = {
     await apiClient.delete(`/admin/promotions/${id}`);
   },
 
-  // Transactions
+  // Транзакции
   async getTransactions(page = 1, page_size = 20): Promise<ApiResponse<PaginatedResponse<Transaction>>> {
-    try {
-      const response = await apiClient.get('/admin/transactions', {
-        params: { page, page_size },
-        timeout: 15000, // 15 секунд таймаут
-      });
-      // Безопасная обработка ответа
-      if (!response || !response.data) {
-        return {
-          data: {
-            items: [],
-            total: 0,
-            page,
-            page_size,
-          },
-        };
-      }
-      const payload = response.data as any;
-      const normalized: PaginatedResponse<Transaction> = {
-        items: Array.isArray(payload?.items) ? payload.items : [],
-        total: payload?.total ?? 0,
-        page: payload?.page ?? page,
-        page_size: payload?.page_size ?? page_size,
-        total_pages: payload?.total_pages,
-      };
-      return { data: normalized };
-    } catch (error: any) {
-      // Не логируем ошибки 500 - они уже обработаны в интерцепторе
-      if (error.response?.status !== 500) {
-        console.error('Error fetching transactions:', error);
-      }
-      // Возвращаем безопасный ответ вместо падения
-      return {
-        data: {
-          items: [],
-          total: 0,
-          page,
-          page_size,
-        },
-      };
-    }
+    const response = await apiClient.get('/admin/transactions', {
+      params: { page, page_size },
+    });
+    return response.data;
   },
 
   async getTransactionById(id: number): Promise<ApiResponse<Transaction>> {
@@ -604,24 +315,12 @@ const adminApi = {
     return response.data;
   },
 
-  // Notifications
+  // Уведомления
   async getNotifications(page = 1, page_size = 20): Promise<ApiResponse<PaginatedResponse<any>>> {
-    try {
-      const response = await apiClient.get('/admin/notifications', {
-        params: { page, page_size },
-      });
-      return response.data;
-    } catch {
-      // Возвращаем пустые чтобы страница использовала демо-данные
-      return {
-        data: {
-          items: [],
-          total: 0,
-          page,
-          page_size,
-        },
-      };
-    }
+    const response = await apiClient.get('/admin/notifications', {
+      params: { page, page_size },
+    });
+    return response.data;
   },
 
   async sendNotification(data: {
@@ -634,16 +333,7 @@ const adminApi = {
     return response.data;
   },
 
-  async updateNotification(id: number, data: Partial<any>): Promise<ApiResponse<any>> {
-    const response = await apiClient.put(`/admin/notifications/${id}`, data);
-    return response.data;
-  },
-
-  async deleteNotification(id: number): Promise<void> {
-    await apiClient.delete(`/admin/notifications/${id}`);
-  },
-
-  // Referrals
+  // Рефералы
   async getReferrals(): Promise<ApiResponse<any[]>> {
     const response = await apiClient.get('/admin/referrals');
     return response.data;
@@ -654,139 +344,47 @@ const adminApi = {
     return response.data;
   },
 
-  // Audit - backend эндпоинты пока не реализованы,
-  // поэтому возвращаем пустые данные без сетевых запросов.
-  async getAuditLogs(page = 1, page_size = 20): Promise<ApiResponse<PaginatedResponse<any>>> {
-    return {
-      data: {
-        items: [],
-        total: 0,
-        page,
-        page_size,
-      },
-    };
-  },
-
-  async getAuditSessions(): Promise<ApiResponse<any[]>> {
-    return { data: [] };
-  },
-
-  // Settings
+  // Настройки и Справочники
   async getSettings(): Promise<ApiResponse<any>> {
-    // Возвращаем in-memory настройки, чтобы не обращаться к несуществующему endpoint
-    return {
-      data: {
-        limits: devSettingsStore.limits,
-        categories: devSettingsStore.categories,
-        api_keys: devSettingsStore.apiKeys,
-      },
-    };
+    const response = await apiClient.get('/admin/settings');
+    return response.data;
   },
 
   async updateSettings(data: Partial<any>): Promise<ApiResponse<any>> {
-    devSettingsStore.limits = {
-      ...devSettingsStore.limits,
-      ...(data.limits || {}),
-    };
-    return { data: devSettingsStore.limits };
+    const response = await apiClient.put('/admin/settings', data);
+    return response.data;
   },
 
   async getCategories(): Promise<ApiResponse<any[]>> {
-    // Пока нет реального backend-API для категорий, работаем в памяти
-    return { data: devSettingsStore.categories };
+    const response = await apiClient.get('/admin/categories');
+    return response.data;
   },
 
   async createCategory(data: { name: string }): Promise<ApiResponse<any>> {
-    const category = { id: devCategoryId++, name: data.name };
-    devSettingsStore.categories.push(category);
-    return { data: category };
-  },
-
-  async updateCategory(id: number, data: { name: string }): Promise<ApiResponse<any>> {
-    const idx = devSettingsStore.categories.findIndex((c) => c.id === id);
-    if (idx !== -1) {
-      devSettingsStore.categories[idx] = { ...devSettingsStore.categories[idx], ...data };
-      return { data: devSettingsStore.categories[idx] };
-    }
-    return { data: null };
-  },
-
-  async deleteCategory(id: number): Promise<void> {
-    const idx = devSettingsStore.categories.findIndex((c) => c.id === id);
-    if (idx !== -1) {
-      devSettingsStore.categories.splice(idx, 1);
-    }
+    const response = await apiClient.post('/admin/categories', data);
+    return response.data;
   },
 
   async getCities(): Promise<ApiResponse<any[]>> {
-    // Используем реальные города из backend-эндпоинта /admin/cities
     const response = await apiClient.get('/admin/cities');
-    const payload = response.data as any;
-    // Приводим к массиву городов для удобства в UI
-    const items = Array.isArray(payload?.items) ? payload.items : [];
-    return { data: items };
+    return response.data;
   },
 
-  async createCity(data: { name: string; country?: string }): Promise<ApiResponse<any>> {
-    // Проксируем создание в реальный endpoint /admin/cities
-    const response = await apiClient.post('/admin/cities', { name: data.name });
-    return { data: response.data };
-  },
-
-  async updateCity(id: number, data: { name: string }): Promise<ApiResponse<any>> {
-    // На бэкенде пока нет обновления города, поэтому просто возвращаем существующие данные как есть
-    console.warn('updateCity не реализован на backend, операция пропущена');
-    return { data: { id, ...data } };
+  async createCity(data: { name: string }): Promise<ApiResponse<any>> {
+    const response = await apiClient.post('/admin/cities', data);
+    return response.data;
   },
 
   async deleteCity(id: number): Promise<void> {
     await apiClient.delete(`/admin/cities/${id}`);
   },
 
-  async getLimits(): Promise<ApiResponse<any>> {
-    // Лимиты пока храним только в памяти
-    return { data: devSettingsStore.limits };
-  },
-
-  async updateLimits(data: Record<string, any>): Promise<ApiResponse<any>> {
-    devSettingsStore.limits = {
-      ...devSettingsStore.limits,
-      ...data,
-    };
-    return { data: devSettingsStore.limits };
-  },
-
-  async getApiKeys(): Promise<ApiResponse<any[]>> {
-    return { data: devSettingsStore.apiKeys };
-  },
-
-  async createApiKey(data: { name: string }): Promise<ApiResponse<any>> {
-    const key = `dev_${Math.random().toString(36).slice(2, 10)}_${Date.now().toString(36)}`;
-    const apiKey = {
-      id: devApiKeyId++,
-      name: data.name,
-      key,
-      created_at: new Date().toISOString(),
-    };
-    devSettingsStore.apiKeys.push(apiKey);
-    return { data: apiKey };
-  },
-
-  async revokeApiKey(id: number): Promise<void> {
-    const idx = devSettingsStore.apiKeys.findIndex((k) => k.id === id);
-    if (idx !== -1) {
-      devSettingsStore.apiKeys.splice(idx, 1);
-    }
-  },
-
-  // File Upload
+  // Загрузка файлов
   async uploadPartnerLogo(partnerId: number, file: File): Promise<ApiResponse<{ logo_url: string }>> {
     const formData = new FormData();
     formData.append('file', file);
     const response = await apiClient.post(`/upload/partner/logo/${partnerId}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
   },
@@ -795,9 +393,7 @@ const adminApi = {
     const formData = new FormData();
     formData.append('file', file);
     const response = await apiClient.post(`/upload/partner/cover/${partnerId}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
   },
@@ -805,4 +401,3 @@ const adminApi = {
 
 export default adminApi;
 export type { ApiResponse, PaginatedResponse };
-

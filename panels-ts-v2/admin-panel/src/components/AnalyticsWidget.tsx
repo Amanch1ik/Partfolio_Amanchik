@@ -18,7 +18,7 @@ export const AnalyticsWidget = ({
   trend, 
   trendLabel, 
   icon,
-  color = '#689071'
+  color = '#07B981'
 }: AnalyticsWidgetProps) => {
   const isPositive = trend !== undefined && trend >= 0;
   
@@ -28,21 +28,21 @@ export const AnalyticsWidget = ({
       className="hover-lift-green scale-in"
       style={{
         borderRadius: 16,
-        background: 'linear-gradient(135deg, #ffffff 0%, #F0F7EB 100%)',
-        border: '1px solid #E3EED4',
+        background: 'linear-gradient(135deg, #ffffff 0%, #F0FDF9 100%)',
+        border: '1px solid #E8F8F3',
         boxShadow: '0 2px 12px rgba(15, 42, 29, 0.08)',
         transition: 'all 0.3s',
       }}
     >
       <Statistic
-        title={<span style={{ color: '#689071', fontWeight: 500 }}>{icon} {title}</span>}
+        title={<span style={{ color: '#07B981', fontWeight: 500 }}>{icon} {title}</span>}
         value={value}
         suffix={suffix}
-        valueStyle={{ color: '#0F2A1D', fontWeight: 700, fontSize: 28 }}
+        valueStyle={{ color: '#03533A', fontWeight: 700, fontSize: 28 }}
         prefix={icon}
       />
       {trend !== undefined && (
-        <div style={{ fontSize: 12, color: isPositive ? '#689071' : '#ff4d4f', marginTop: 8, fontWeight: 500 }}>
+        <div style={{ fontSize: 12, color: isPositive ? '#07B981' : '#ff4d4f', marginTop: 8, fontWeight: 500 }}>
           {isPositive ? <ArrowUpOutlined /> : <ArrowDownOutlined />} {Math.abs(trend)}% {trendLabel || 'vs прошлый период'}
         </div>
       )}

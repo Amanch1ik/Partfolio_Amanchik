@@ -66,7 +66,7 @@ export const SearchResults = ({ query, visible, onClose }: SearchResultsProps) =
               type: 'user',
               title: u.name || u.email || u.phone || `User #${u.id}`,
               subtitle: u.email || u.phone,
-              icon: <Avatar icon={<UserOutlined />} style={{ backgroundColor: '#689071' }} />,
+              icon: <Avatar icon={<UserOutlined />} style={{ backgroundColor: '#07B981' }} />,
               path: '/users',
             });
           });
@@ -117,7 +117,7 @@ export const SearchResults = ({ query, visible, onClose }: SearchResultsProps) =
         background: '#ffffff',
         borderRadius: 12,
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
-        border: '1px solid #E3EED4',
+        border: '1px solid #E8F8F3',
         overflow: 'hidden',
       }}
     >
@@ -142,7 +142,7 @@ export const SearchResults = ({ query, visible, onClose }: SearchResultsProps) =
                 transition: 'background 0.2s',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#F0F7EB';
+                e.currentTarget.style.background = '#F0FDF9';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent';

@@ -36,8 +36,8 @@ export const ErrorDisplay = ({
               icon={<ReloadOutlined />}
               onClick={onRetry}
               style={{
-                backgroundColor: '#689071',
-                borderColor: '#689071',
+                backgroundColor: '#07B981',
+                borderColor: '#07B981',
               }}
             >
               Попробовать снова

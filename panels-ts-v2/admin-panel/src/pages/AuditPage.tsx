@@ -33,7 +33,7 @@ export const AuditPage = () => {
       key: 'created_at',
       width: 180,
       render: (date: string) => (
-        <span style={{ color: '#0F2A1D' }}>
+        <span style={{ color: '#03533A' }}>
           {date ? new Date(date).toLocaleString('ru-RU') : '-'}
         </span>
       ),
@@ -44,8 +44,8 @@ export const AuditPage = () => {
       width: 200,
       render: (_: any, record: any) => (
         <Space>
-          <Avatar icon={<UserOutlined />} style={{ backgroundColor: '#689071' }} />
-          <span style={{ color: '#0F2A1D' }}>
+          <Avatar icon={<UserOutlined />} style={{ backgroundColor: '#07B981' }} />
+          <span style={{ color: '#03533A' }}>
             {record.user?.name || record.user?.email || `User #${record.user_id}` || 'Admin'}
           </span>
         </Space>
@@ -56,21 +56,21 @@ export const AuditPage = () => {
       dataIndex: 'action',
       key: 'action',
       width: 250,
-      render: (action: string) => <span style={{ color: '#0F2A1D' }}>{action || '-'}</span>,
+      render: (action: string) => <span style={{ color: '#03533A' }}>{action || '-'}</span>,
     },
     {
       title: 'IP',
       dataIndex: 'ip_address',
       key: 'ip_address',
       width: 120,
-      render: (ip: string) => <span style={{ color: '#0F2A1D' }}>{ip || '-'}</span>,
+      render: (ip: string) => <span style={{ color: '#03533A' }}>{ip || '-'}</span>,
     },
     {
       title: t('audit.resource', 'Ресурс'),
       key: 'resource',
       width: 150,
       render: (_: any, record: any) => (
-        <span style={{ color: '#0F2A1D' }}>
+        <span style={{ color: '#03533A' }}>
           {record.resource_type || '-'} {record.resource_id ? `#${record.resource_id}` : ''}
         </span>
       ),
@@ -84,7 +84,7 @@ export const AuditPage = () => {
       key: 'user_agent',
       width: 200,
       render: (userAgent: string) => (
-        <span style={{ color: '#0F2A1D' }}>
+        <span style={{ color: '#03533A' }}>
           {userAgent ? userAgent.split(' ')[0] : '-'}
         </span>
       ),
@@ -94,14 +94,14 @@ export const AuditPage = () => {
       dataIndex: 'ip_address',
       key: 'ip_address',
       width: 120,
-      render: (ip: string) => <span style={{ color: '#0F2A1D' }}>{ip || '-'}</span>,
+      render: (ip: string) => <span style={{ color: '#03533A' }}>{ip || '-'}</span>,
     },
     {
       title: t('audit.location', 'Местоположение'),
       dataIndex: 'location',
       key: 'location',
       width: 150,
-      render: (location: string) => <span style={{ color: '#0F2A1D' }}>{location || '-'}</span>,
+      render: (location: string) => <span style={{ color: '#03533A' }}>{location || '-'}</span>,
     },
     {
       title: t('audit.active', 'Активна'),
@@ -109,7 +109,7 @@ export const AuditPage = () => {
       key: 'last_activity',
       width: 150,
       render: (lastActivity: string) => (
-        <span style={{ color: '#689071' }}>
+        <span style={{ color: '#07B981' }}>
           {lastActivity ? new Date(lastActivity).toLocaleString('ru-RU') : '-'}
         </span>
       ),

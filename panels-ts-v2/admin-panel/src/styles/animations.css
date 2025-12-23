@@ -115,19 +115,19 @@
 
 @keyframes pulseGlow {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(82, 196, 26, 0.4);
+    box-shadow: 0 0 0 0 rgba(7, 185, 129, 0.4);
   }
   50% {
-    box-shadow: 0 0 0 8px rgba(82, 196, 26, 0);
+    box-shadow: 0 0 0 8px rgba(7, 185, 129, 0);
   }
 }
 
 @keyframes glow {
   0%, 100% {
-    box-shadow: 0 0 5px rgba(82, 196, 26, 0.3);
+    box-shadow: 0 0 5px rgba(7, 185, 129, 0.3);
   }
   50% {
-    box-shadow: 0 0 20px rgba(82, 196, 26, 0.6);
+    box-shadow: 0 0 20px rgba(7, 185, 129, 0.6);
   }
 }
 
@@ -233,12 +233,12 @@
 
 .hover-lift:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(15, 42, 29, 0.2);
+  box-shadow: 0 8px 24px rgba(3, 83, 58, 0.2);
 }
 
 .hover-lift-green:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(82, 196, 26, 0.3);
+  box-shadow: 0 8px 24px rgba(7, 185, 129, 0.3);
 }
 
 .hover-scale {
@@ -254,7 +254,7 @@
 }
 
 .hover-glow:hover {
-  box-shadow: 0 0 20px rgba(82, 196, 26, 0.4);
+  box-shadow: 0 0 20px rgba(7, 185, 129, 0.4);
 }
 
 /* Градиентные эффекты */
@@ -270,7 +270,7 @@
   inset: 0;
   border-radius: 12px;
   padding: 2px;
-  background: linear-gradient(135deg, #689071 0%, #AEC380 100%);
+  background: linear-gradient(135deg, #03533A 0%, #07B981 100%);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -281,11 +281,11 @@
 .loading-shimmer {
   background: linear-gradient(
     90deg,
-    #E3EED4 0%,
-    #AEC380 25%,
-    #689071 50%,
-    #AEC380 75%,
-    #E3EED4 100%
+    #E8F8F3 0%,
+    #07B981 25%,
+    #03533A 50%,
+    #07B981 75%,
+    #E8F8F3 100%
   );
   background-size: 1000px 100%;
   animation: shimmerGreen 2s infinite;
@@ -306,23 +306,6 @@
   animation: wave 2s ease-in-out infinite;
 }
 
-/* Задержки для последовательной анимации */
-.animate-delay-100 {
-  animation-delay: 0.1s;
-}
-
-.animate-delay-200 {
-  animation-delay: 0.2s;
-}
-
-.animate-delay-300 {
-  animation-delay: 0.3s;
-}
-
-.animate-delay-400 {
-  animation-delay: 0.4s;
-}
-
 /* Stagger анимация для списков */
 .stagger-item {
   opacity: 0;
@@ -336,50 +319,6 @@
 .stagger-item:nth-child(5) { animation-delay: 0.5s; }
 .stagger-item:nth-child(6) { animation-delay: 0.6s; }
 
-/* Улучшенные анимации для кнопок */
-@keyframes buttonRipple {
-  0% {
-    transform: scale(0);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(4);
-    opacity: 0;
-  }
-}
-
-@keyframes buttonBounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-2px);
-  }
-}
-
-.button-ripple {
-  position: relative;
-  overflow: hidden;
-}
-
-.button-ripple::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
-  transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
-}
-
-.button-ripple:active::after {
-  width: 300px;
-  height: 300px;
-}
-
 /* Плавные переходы для карточек */
 .card-enter {
   animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -391,7 +330,7 @@
 
 .card-hover:hover {
   transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 12px 32px rgba(15, 42, 29, 0.15);
+  box-shadow: 0 12px 32px rgba(3, 83, 58, 0.15);
 }
 
 /* Анимация для таблиц */
@@ -422,9 +361,9 @@
 .skeleton {
   background: linear-gradient(
     90deg,
-    #E3EED4 0px,
-    #AEC380 40px,
-    #E3EED4 80px
+    #E8F8F3 0px,
+    #07B981 40px,
+    #E8F8F3 80px
   );
   background-size: 200px 100%;
   animation: skeleton 1.5s ease-in-out infinite;
@@ -433,31 +372,15 @@
 /* Улучшенная пульсация */
 @keyframes pulseGreen {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(104, 144, 113, 0.4);
+    box-shadow: 0 0 0 0 rgba(3, 83, 58, 0.4);
   }
   50% {
-    box-shadow: 0 0 0 10px rgba(104, 144, 113, 0);
+    box-shadow: 0 0 0 10px rgba(3, 83, 58, 0);
   }
 }
 
 .pulse-green {
   animation: pulseGreen 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Эффект появления с поворотом */
-@keyframes rotateIn {
-  from {
-    opacity: 0;
-    transform: rotate(-10deg) scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: rotate(0deg) scale(1);
-  }
-}
-
-.rotate-in {
-  animation: rotateIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Эффект для градиентного текста */
@@ -474,11 +397,10 @@
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #0F2A1D 0%, #689071 50%, #AEC380 100%);
+  background: linear-gradient(135deg, #03533A 0%, #07B981 50%, #10B981 100%);
   background-size: 200% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   animation: gradientText 3s ease infinite;
 }
-

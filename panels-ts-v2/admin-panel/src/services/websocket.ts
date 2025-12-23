@@ -26,10 +26,6 @@ class WebSocketService {
       return; // WebSocket отключен или уже провалился
     }
 
-    if (this.isConnecting || (this.ws && this.ws.readyState === WebSocket.OPEN)) {
-      return; // Уже подключен или подключается
-    }
-
     this.url = wsUrl;
     this.isConnecting = true;
 
@@ -269,20 +265,14 @@ export const wsService = new WebSocketService();
 // В production используем полный URL
 const getWebSocketUrl = (): string => {
   if (import.meta.env.DEV) {
-    // В development используем полный URL до бэкенда
-    return 'ws://localhost:8000/api/v1/ws';
+    // В development используем относительный путь через Vite proxy
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    return `${protocol}//${window.location.host}/api/v1/ws`;
   }
   // В production используем относительный путь
-  const IS_PROD = import.meta.env.PROD;
-  if (IS_PROD) {
-    // В production используем протокол текущей страницы
-    const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = typeof window !== 'undefined' ? window.location.host : 'localhost';
-    return `${protocol}//${host}/ws`;
-  }
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-  const wsUrl = API_BASE_URL.replace('http://', 'ws://').replace('https://', 'wss://');
-  return `${wsUrl}/api/v1/ws`;
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const host = window.location.host;
+  return `${protocol}//${host}/api/v1/ws`;
 };
 
 export const connectWebSocket = (baseUrl?: string): void => {
@@ -323,6 +313,7 @@ export const connectWebSocket = (baseUrl?: string): void => {
   }
 
   const token = localStorage.getItem('admin_token');
+
   wsService.connect(wsUrl, token ? token : undefined);
 };
 

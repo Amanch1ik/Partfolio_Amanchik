@@ -16,18 +16,20 @@ export default defineConfig(({ mode }) => {
       extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'],
     },
     server: {
-      port: 3003,
+      port: 3001,
       strictPort: true,
       proxy: {
         '/api': {
-          target: 'http://localhost:8001',  // Docker Backend на порту 8001
+          target: 'https://api.yessgo.org',  // Реальный Backend API
           changeOrigin: true,
           secure: false,
+          rewrite: (path) => path.replace(/^\/api/, '/api'), // Убеждаемся, что префикс /api сохраняется, если нужно
         },
         '/api/v1/ws': {
-          target: 'http://localhost:8001',  // Docker Backend на порту 8001
+          target: 'wss://api.yessgo.org',  // WebSocket
           changeOrigin: true,
           ws: true,
+          secure: false,
         },
       },
     },

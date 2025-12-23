@@ -37,9 +37,9 @@ export const TransactionsPage = () => {
   };
 
   const getTypeColor = (type: string) => {
-    if (type === 'topup' || type === 'bonus' || type === 'accrual') return '#689071';
+    if (type === 'topup' || type === 'bonus' || type === 'accrual') return '#07B981';
     if (type === 'discount' || type === 'refund' || type === 'writeoff') return '#ff4d4f';
-    return '#0F2A1D';
+    return '#03533A';
   };
 
   const handleExport = (format: 'csv' | 'excel' | 'json' = 'csv') => {
@@ -140,10 +140,10 @@ export const TransactionsPage = () => {
         const label = getTypeLabel(type);
         return (
           <Tag
-            color={color === '#689071' ? 'success' : color === '#ff4d4f' ? 'error' : 'default'}
+            color={color === '#07B981' ? 'success' : color === '#ff4d4f' ? 'error' : 'default'}
             style={{
-              color: color === '#0F2A1D' ? 'var(--color-text-primary)' : 'var(--color-text-inverse)',
-              border: color === '#0F2A1D' ? '1px solid var(--color-border)' : 'none',
+              color: color === '#03533A' ? 'var(--color-text-primary)' : 'var(--color-text-inverse)',
+              border: color === '#03533A' ? '1px solid var(--color-border)' : 'none',
             }}
           >
             {label}

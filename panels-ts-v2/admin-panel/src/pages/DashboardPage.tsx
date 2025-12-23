@@ -99,6 +99,7 @@ export const DashboardPage = () => {
   
   const { data: stats, isLoading: statsLoading, error: statsError } = useQuery({
     queryKey: ['dashboard-stats', dateRange],
+    enabled: !!(dateRange?.[0] && dateRange?.[1]),
     queryFn: async () => {
       try {
         const res = await analyticsApi.getDashboardStats();
@@ -163,8 +164,8 @@ export const DashboardPage = () => {
     const inactive = (stats.total_users || 0) - active;
     if (active === 0 && inactive === 0) return [];
     return [
-      { name: t('users.active', 'Активные'), value: active, color: 'var(--color-primary)' },
-      { name: t('users.inactive', 'Не активные'), value: inactive, color: 'var(--color-error)' },
+      { name: t('users.active', 'Активные'), value: active, color: '#07B981' },
+      { name: t('users.inactive', 'Не активные'), value: inactive, color: '#EF4444' },
     ];
   }, [stats]);
 
@@ -515,7 +516,7 @@ export const DashboardPage = () => {
                     }}
                     format="DD.MM.YYYY"
                     size="small"
-                    style={{ width: 280 }}
+                    style={{ width: '100%', maxWidth: 280 }}
                     allowClear={false}
                     maxDate={dayjs()}
                   />
@@ -565,8 +566,8 @@ export const DashboardPage = () => {
                   >
                     <defs>
                       <linearGradient id="colorGradientTransactions" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="var(--color-primary)" stopOpacity={1}/>
-                        <stop offset="100%" stopColor="var(--color-primary-light)" stopOpacity={1}/>
+                        <stop offset="0%" stopColor="#03533A" stopOpacity={1}/>
+                        <stop offset="100%" stopColor="#07B981" stopOpacity={1}/>
                       </linearGradient>
                     </defs>
                   </Bar>
@@ -612,25 +613,25 @@ export const DashboardPage = () => {
                 <AreaChart data={activeUsersData} className="fade-in-up">
                     <defs>
                     <linearGradient id="colorActive" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="var(--color-primary-light)" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#07B981" stopOpacity={0.8} />
+                      <stop offset="95%" stopColor="#03533A" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
-                  <XAxis dataKey="time" stroke="var(--color-primary)" tick={{ fill: 'var(--color-text-secondary)' }} />
-                  <YAxis stroke="var(--color-primary)" tick={{ fill: 'var(--color-text-secondary)' }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E8F8F3" />
+                  <XAxis dataKey="time" stroke="#07B981" tick={{ fill: '#045A42' }} />
+                  <YAxis stroke="#07B981" tick={{ fill: '#045A42' }} />
                   <Tooltip 
                     contentStyle={{ 
                       borderRadius: 12,
-                      border: '1px solid var(--color-border)',
-                      background: 'var(--chart-tooltip-bg)',
-                      color: 'var(--color-text-primary)',
+                      border: '1px solid #E8F8F3',
+                      background: '#ffffff',
+                      color: '#03533A',
                     }}
                   />
                   <Area 
                     type="monotone" 
                     dataKey="value" 
-                    stroke="var(--color-primary)" 
+                    stroke="#07B981" 
                     strokeWidth={2}
                     fillOpacity={1} 
                     fill="url(#colorActive)"

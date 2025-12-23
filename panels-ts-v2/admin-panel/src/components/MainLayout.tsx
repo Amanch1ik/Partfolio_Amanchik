@@ -80,6 +80,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
   // Получаем уведомления
   const { data: notificationsResponse } = useQuery({
     queryKey: ['notifications'],
+    enabled: !!user,
     queryFn: async () => {
       try {
         const response = await api.notificationsApi.getAll();
@@ -301,16 +302,25 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
         collapsible={false}
         width={250}
         style={{
-          background: 'linear-gradient(180deg, #689071 0%, #4a6b52 100%)',
-          boxShadow: 'var(--shadow-md)',
+          background: 'linear-gradient(180deg, #03533A 0%, #045A42 100%)',
+          boxShadow: '0 4px 12px rgba(3, 83, 58, 0.15)',
         }}
         role="navigation"
         aria-label={t('common.mainNavigation', 'Основная навигация')}
       >
         <div className="sidebar-logo">
-          <span style={{ color: 'var(--color-text-inverse)', fontWeight: 'bold', fontSize: 24 }} aria-label="YESS! Admin Panel">
-            YESS!Admin
-          </span>
+          <Link to="/" style={{ 
+            color: '#ffffff', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            width: '100%',
+            fontSize: 20,
+            fontWeight: 700,
+            letterSpacing: '0.5px'
+          }}>
+            Admin-Yess!Go
+          </Link>
         </div>
         <Menu
           mode="inline"
@@ -342,14 +352,22 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
               },
             ]}
             style={{ borderRight: 0, background: 'transparent' }}
-            theme="light"
+            theme="dark"
           />
         </div>
       </Sider>
-      <Layout style={{ marginLeft: 0, transition: 'margin-left 0.3s ease' }}>
+      <Layout className="content-layout">
         <Header className="main-header" role="banner">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1, position: 'relative' }}>
-            <div className={`admin-search ${isSearchActive ? 'active' : ''}`} role="search">
+          <div className="header-left">
+            {isMobile && (
+              <Button
+                type="text"
+                icon={<MenuUnfoldOutlined />}
+                onClick={() => setIsMobileMenuOpen(true)}
+                style={{ fontSize: '20px', color: 'var(--color-primary)' }}
+              />
+            )}
+            <div className="admin-search" role="search">
               <Input
                 ref={searchInputRef}
                 className="admin-search-input"
@@ -357,41 +375,15 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onPressEnter={(e) => handleSearch((e.target as HTMLInputElement).value)}
-                onFocus={() => {
-                  if (searchQuery.trim().length >= 2) {
-                    // Показываем результаты если есть запрос
-                  }
-                }}
-                onBlur={() => {
-                  // Не закрываем сразу, чтобы можно было кликнуть на результат
-                  setTimeout(() => {
-                    if (!searchQuery.trim()) {
-                      setIsSearchActive(false);
-                    }
-                  }, 200);
-                }}
+                prefix={<SearchOutlined style={{ color: 'var(--color-primary)' }} />}
                 allowClear
                 aria-label={t('common.search', 'Поиск')}
-                aria-expanded={isSearchActive}
-                aria-haspopup="listbox"
               />
-              <button
-                className="admin-search-btn"
-                onClick={handleSearchToggle}
-                type="button"
-                aria-label={isSearchActive ? t('common.closeSearch', 'Закрыть поиск') : t('common.openSearch', 'Открыть поиск')}
-                aria-expanded={isSearchActive}
-              >
-                <SearchOutlined aria-hidden="true" />
-              </button>
-              {isSearchActive && (
+              {searchQuery.trim().length >= 2 && (
                 <SearchResults
                   query={searchQuery}
-                  visible={isSearchActive && searchQuery.trim().length >= 2}
-                  onClose={() => {
-                    setSearchQuery('');
-                    setIsSearchActive(false);
-                  }}
+                  visible={searchQuery.trim().length >= 2}
+                  onClose={() => setSearchQuery('')}
                 />
               )}
             </div>

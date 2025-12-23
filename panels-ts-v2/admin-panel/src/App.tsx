@@ -27,6 +27,8 @@ const ReferralsPage = lazy(() => import('@/pages/ReferralsPage').then(module => 
 const AuditPage = lazy(() => import('@/pages/AuditPage').then(module => ({ default: module.AuditPage })));
 const PartnersMapPage = lazy(() => import('@/pages/PartnersMapPage').then(module => ({ default: module.PartnersMapPage })));
 const MonitoringPage = lazy(() => import('@/pages/MonitoringPage').then(module => ({ default: module.MonitoringPage })));
+const ProductsPage = lazy(() => import('@/pages/ProductsPage').then(module => ({ default: module.ProductsPage })));
+const RegisterPage = lazy(() => import('@/pages/RegisterPage').then(module => ({ default: module.RegisterPage })));
 // PartnerLocationsPage удалена - точки партнеров теперь управляются через форму добавления партнеров
 
 const queryClient = new QueryClient({
@@ -100,10 +102,10 @@ const LoadingFallback = () => (
     alignItems: 'center',
     justifyContent: 'center',
     height: '100vh',
-    background: 'linear-gradient(135deg, #689071 0%, #AEC380 50%, #E3EED4 100%)',
+    background: 'linear-gradient(135deg, #03533A 0%, #07B981 50%, #E8F8F3 100%)',
   }}>
     <Spin size="large" />
-    <span style={{ marginLeft: 16, color: 'var(--color-text-primary)' }}>Загрузка...</span>
+    <span style={{ marginLeft: 16, color: '#ffffff', fontWeight: 500 }}>Загрузка...</span>
   </div>
 );
 
@@ -168,45 +170,45 @@ function App() {
         <ConfigProvider
           locale={antdLocale}
           theme={{
-            algorithm: isDark ? undefined : undefined, // Можно использовать theme.darkAlgorithm для темной темы
+            algorithm: isDark ? undefined : undefined,
             token: {
-              colorPrimary: isDark ? '#AEC380' : '#689071',
+              colorPrimary: '#07B981',
               borderRadius: 12,
               fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              colorSuccess: '#52c41a',
-              colorError: '#ff4d4f',
-              colorWarning: '#AEC380',
-              colorInfo: '#1890ff',
-              colorBgBase: isDark ? '#0d1a12' : '#ffffff',
-              colorText: '#1a1a1a',
+              colorSuccess: '#10B981',
+              colorError: '#EF4444',
+              colorWarning: '#F59E0B',
+              colorInfo: '#3B82F6',
+              colorBgBase: '#ffffff',
+              colorText: '#03533A',
             },
             components: {
               Menu: {
-                itemSelectedBg: 'var(--color-primary, #689071)',
-                itemSelectedColor: 'var(--color-text-inverse, #ffffff)',
-                itemHoverBg: 'var(--color-bg-hover)',
-                itemActiveBg: 'var(--color-primary, #689071)',
+                itemSelectedBg: 'linear-gradient(135deg, #03533A 0%, #07B981 100%)',
+                itemSelectedColor: '#ffffff',
+                itemHoverBg: '#E8F8F3',
+                itemActiveBg: '#07B981',
                 itemBorderRadius: 12,
               },
               Button: {
                 borderRadius: 12,
-                primaryShadow: '0 4px 12px rgba(104, 144, 113, 0.3)',
+                primaryShadow: '0 4px 12px rgba(3, 83, 58, 0.3)',
                 fontWeight: 500,
               },
               Card: {
                 borderRadius: 16,
-                boxShadow: 'var(--shadow-md)',
+                boxShadow: '0 4px 12px rgba(3, 83, 58, 0.08)',
                 paddingLG: 24,
               },
               Input: {
                 borderRadius: 12,
-                activeBorderColor: 'var(--color-primary)',
-                hoverBorderColor: 'var(--color-border-hover)',
+                activeBorderColor: '#07B981',
+                hoverBorderColor: '#07B981',
               },
               Table: {
                 borderRadius: 12,
-                headerBg: 'var(--color-bg-tertiary)',
-                headerColor: '#1a1a1a',
+                headerBg: '#F0FDF9',
+                headerColor: '#03533A',
               },
             },
           }}
@@ -222,6 +224,7 @@ function App() {
               <Suspense fallback={<LoadingFallback />}>
                 <Routes>
                   <Route path="/login" element={<LoginPage />} />
+                  <Route path="/register" element={<RegisterPage />} />
                   <Route
                     path="/*"
                     element={
@@ -233,6 +236,7 @@ function App() {
                               <Route path="/users" element={<UsersPage />} />
                               <Route path="/partners" element={<PartnersPage />} />
                               <Route path="/partners/map" element={<PartnersMapPage />} />
+                              <Route path="/partners/:partnerId/products" element={<ProductsPage />} />
                               {/* PartnerLocationsPage удалена - точки партнеров управляются через форму добавления партнеров */}
                               <Route path="/transactions" element={<TransactionsPage />} />
                               <Route path="/notifications" element={<NotificationsPage />} />

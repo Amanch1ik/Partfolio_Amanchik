@@ -78,7 +78,7 @@ export const ReferralsPage = () => {
       key: 'invited',
       width: 150,
       render: (value: number) => (
-        <span style={{ color: '#0F2A1D', fontWeight: 500 }}>
+        <span style={{ color: '#03533A', fontWeight: 500 }}>
           {value.toLocaleString()}
         </span>
       ),
@@ -89,7 +89,7 @@ export const ReferralsPage = () => {
       key: 'active',
       width: 150,
       render: (value: number) => (
-        <span style={{ color: '#0F2A1D', fontWeight: 500 }}>
+        <span style={{ color: '#03533A', fontWeight: 500 }}>
           {value.toLocaleString()}
         </span>
       ),
@@ -110,7 +110,7 @@ export const ReferralsPage = () => {
   return (
     <div className="fade-in">
       <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 style={{ fontSize: 24, fontWeight: 600, color: '#0F2A1D', margin: 0 }}>
+        <h1 style={{ fontSize: 24, fontWeight: 600, color: '#03533A', margin: 0 }}>
           {t('referrals.title', 'Рефералы')}
         </h1>
         <Space>
@@ -126,7 +126,7 @@ export const ReferralsPage = () => {
             <Button 
               type="primary"
               icon={<DownloadOutlined />}
-              style={{ backgroundColor: '#689071', borderColor: '#689071' }}
+              style={{ backgroundColor: '#07B981', borderColor: '#07B981' }}
             >
               {t('common.export', 'Экспорт')}
             </Button>

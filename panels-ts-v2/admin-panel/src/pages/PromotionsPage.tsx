@@ -187,7 +187,7 @@ export const PromotionsPage = () => {
           </div>
           <div>
             <div style={{ fontWeight: 500, color: 'var(--color-text-primary)' }}>{record.title || t('promotions.defaultTitle', 'Пятерочка')}</div>
-            <div style={{ fontSize: 12, color: '#689071' }}>
+            <div style={{ fontSize: 12, color: '#07B981' }}>
               -{record.discount_percent || 20}% {t('promotions.discount', 'скидка')}
             </div>
           </div>
@@ -198,7 +198,7 @@ export const PromotionsPage = () => {
       title: t('promotions.period', 'Период'),
       key: 'period',
       render: (_: any, record: Promotion) => (
-        <span style={{ color: '#0F2A1D' }}>
+        <span style={{ color: '#03533A' }}>
           {dayjs(record.start_date).format('DD.MM')} - {dayjs(record.end_date).format('DD.MM')} {dayjs(record.start_date).format('YYYY')} {t('promotions.year', 'год')}
         </span>
       ),
@@ -211,11 +211,11 @@ export const PromotionsPage = () => {
           <Avatar 
             icon={<ShopOutlined />} 
             size="small"
-            style={{ backgroundColor: '#689071' }}
+            style={{ backgroundColor: '#07B981' }}
           >
             G
           </Avatar>
-          <span style={{ color: '#0F2A1D' }}>{t('partners.defaultName', 'Глобус')}</span>
+          <span style={{ color: '#03533A' }}>{t('partners.defaultName', 'Глобус')}</span>
         </Space>
       ),
     },
@@ -223,19 +223,19 @@ export const PromotionsPage = () => {
       title: t('promotions.priority', 'Приоритет'),
       dataIndex: 'priority',
       key: 'priority',
-      render: (priority: number) => <span style={{ color: '#0F2A1D' }}>{priority || '190 000'}</span>,
+      render: (priority: number) => <span style={{ color: '#03533A' }}>{priority || '190 000'}</span>,
     },
     {
       title: 'CTR',
       dataIndex: 'ctr',
       key: 'ctr',
-      render: (ctr: number) => <span style={{ color: '#0F2A1D' }}>{ctr ? `${ctr}%` : '6,75%'}</span>,
+      render: (ctr: number) => <span style={{ color: '#03533A' }}>{ctr ? `${ctr}%` : '6,75%'}</span>,
     },
     {
       title: t('promotions.statistics', 'Статистика'),
       dataIndex: 'statistics',
       key: 'statistics',
-      render: (stats: number) => <span style={{ color: '#0F2A1D' }}>{stats ? `${stats}%` : '6,9%'}</span>,
+      render: (stats: number) => <span style={{ color: '#03533A' }}>{stats ? `${stats}%` : '6,9%'}</span>,
     },
     {
       title: t('common.actions', 'Действие'),
@@ -319,6 +319,7 @@ export const PromotionsPage = () => {
           rowKey="id"
           loading={isLoading}
           pagination={{ pageSize: 20 }}
+          scroll={{ x: 'max-content' }}
         />
       </Card>
 

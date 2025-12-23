@@ -1,10 +1,11 @@
 import { useState, useRef } from 'react';
 import { Button, Input, Form, Space, Alert, App } from 'antd';
 import { UserOutlined, LockOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { api } from '@/services/api';
 import './LoginPage.css';
+import AppIcon from '@/assets/app-icon.svg';
 
 export const LoginPage = () => {
   const { message } = App.useApp();
@@ -12,7 +13,7 @@ export const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const { setUser, setLastCheckTime } = useAuth();
   const lastClickRef = useRef<number>(0);
 
   // Debounce для предотвращения double-click
@@ -29,21 +30,21 @@ export const LoginPage = () => {
       if (loading) return;
       
       setErrorMessage(null); // Очищаем предыдущие ошибки
-    setLoading(true);
+      setLoading(true);
       
       try {
+        // Очищаем старый токен перед попыткой входа
+        localStorage.removeItem('admin_token');
+        
         console.log('🔐 LoginPage: Начинаем вход с данными:', { username: values.username, passwordLength: values.password.length });
         const response = await api.authApi.login(values.username, values.password);
         console.log('✅ LoginPage: Получен ответ от API:', response);
 
         if (response && response.access_token) {
           console.log('🎯 LoginPage: Токен получен, устанавливаем пользователя');
-          // Токен уже сохранен в adminApi.login()
-          setUser(response.admin || {
-            id: '1',
-            email: values.username,
-            role: 'admin'
-          });
+          // Данные админа уже нормализованы в adminApi.login()
+          setUser(response.admin);
+          setLastCheckTime(Date.now()); // Устанавливаем время проверки, чтобы useAuth не делал повторный запрос сразу
           message.success('Успешный вход!');
           console.log('🚀 LoginPage: Перенаправляем на dashboard');
           navigate('/');
@@ -87,22 +88,26 @@ export const LoginPage = () => {
             errorText = '🌐 Не удалось подключиться к серверу. Проверьте, что сервер запущен и попробуйте снова.';
           }
         } 
-        // Обработка HTTP ошибок (когда есть response с статусом)
-        else if (error?.response) {
-          const status = error.response.status;
-          const data = error.response.data || {};
-          // Извлекаем сообщение об ошибке из разных возможных полей
-          const detail = data.detail || data.error || data.message || '';
-          
-          switch (status) {
-            case 401:
-              // Используем сообщение от сервера, если есть, иначе стандартное
-              if (detail && typeof detail === 'string') {
-                errorText = `❌ ${detail}`;
-              } else {
-                errorText = '❌ Неверное имя пользователя или пароль. Проверьте правильность введенных данных и попробуйте снова.';
-              }
-              break;
+          // Обработка HTTP ошибок (когда есть response с статусом)
+          else if (error?.response) {
+            const status = error.response.status;
+            const data = error.response.data || {};
+            // Извлекаем сообщение об ошибке из разных возможных полей
+            let detail = data.detail || data.error || data.message || '';
+            
+            if (!detail && data.errors) {
+              detail = Object.values(data.errors).flat().join(', ');
+            }
+            
+            switch (status) {
+              case 401:
+                // Используем сообщение от сервера, если есть, иначе стандартное
+                if (detail && typeof detail === 'string') {
+                  errorText = `❌ ${detail}`;
+                } else {
+                  errorText = '❌ Неверное имя пользователя или пароль. Убедитесь, что вы ввели данные точно так же, как при регистрации (с учетом регистра букв).';
+                }
+                break;
             case 403:
               if (detail && typeof detail === 'string') {
                 errorText = `🚫 ${detail}`;
@@ -183,8 +188,22 @@ export const LoginPage = () => {
       <div className="login-right">
         <div className="login-form-container">
           {/* Название приложения */}
-          <div className="login-logo">
-            <h1>YESS!Admin</h1>
+          <div
+            className="login-logo"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
+            <img
+              src={AppIcon}
+              alt="YESS!Admin"
+              style={{ width: 48, height: 48, borderRadius: 12 }}
+              loading="lazy"
+            />
+            <h1 style={{ margin: 0 }}>YESS!Admin</h1>
           </div>
 
           <div className="login-header">
@@ -304,6 +323,17 @@ export const LoginPage = () => {
                 {loading ? 'Вход в систему...' : 'Войти'}
             </Button>
           </Form.Item>
+
+          <div style={{ textAlign: 'center', marginTop: 16 }}>
+            <p style={{ color: 'var(--color-text-secondary)', marginBottom: 8 }}>
+              Нет учетной записи?
+            </p>
+            <Link to="/register">
+              <Button size="large" block>
+                Зарегистрировать админа
+              </Button>
+            </Link>
+          </div>
         </Form>
         </div>
 

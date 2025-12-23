@@ -11,6 +11,7 @@ import type { DashboardStats, User, Partner, Promotion, Transaction } from '@/ty
  */
 export const authApi = {
   login: (username: string, password: string) => adminApi.login(username, password),
+  register: (data: any) => adminApi.register(data),
   logout: () => adminApi.logout(),
   getCurrentAdmin: () => adminApi.getCurrentAdmin(),
   getCurrentUser: () => adminApi.getCurrentUser(),
@@ -54,6 +55,12 @@ export const partnersApi = {
   delete: (id: number) => adminApi.deletePartner(id),
   approve: (id: number) => adminApi.approvePartner(id),
   reject: (id: number, reason?: string) => adminApi.rejectPartner(id, reason),
+  products: {
+    getAll: (partnerId: number, page?: number, page_size?: number) => adminApi.getPartnerProducts(partnerId, page, page_size),
+    create: (partnerId: number, data: any) => adminApi.createPartnerProduct(partnerId, data),
+    update: (partnerId: number, productId: number, data: any) => adminApi.updatePartnerProduct(partnerId, productId, data),
+    delete: (partnerId: number, productId: number) => adminApi.deletePartnerProduct(partnerId, productId),
+  },
 };
 
 /**

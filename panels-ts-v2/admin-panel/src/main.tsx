@@ -57,6 +57,15 @@ setupOnlineStatusListener(
 
 // Инициализация темы при загрузке - всегда светлая
 const initTheme = () => {
+  // Очистка устаревших флагов "дефолтного админа", чтобы не мешали работе с реальными данными
+  if (localStorage.getItem('is_default_admin') === 'true' || localStorage.getItem('admin_token') === 'dummy-admin-token-2025') {
+    console.log('🧹 Обнаружены устаревшие флаги отладки, очищаем localStorage...');
+    localStorage.removeItem('is_default_admin');
+    localStorage.removeItem('admin_token');
+    localStorage.removeItem('admin_user');
+    // Не вызываем reload, чтобы не зациклиться, просто продолжаем с чистым стейтом
+  }
+
   document.documentElement.setAttribute('data-theme', 'light');
   localStorage.setItem('admin_panel_theme', 'light');
   

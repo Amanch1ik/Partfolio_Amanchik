@@ -77,21 +77,21 @@ export const useAuth = () => {
       setLoading(true);
 
       try {
-        const response = await authApi.getCurrentUser();
-        console.log('✅ useAuth: Получен ответ от API:', response);
+        console.log('🔍 useAuth: Вызов authApi.getCurrentAdmin()...');
+        const response = await authApi.getCurrentAdmin();
+        console.log('✅ useAuth: Получен ответ от getCurrentAdmin:', response);
 
-        // authApi.getCurrentUser возвращает ApiResponse, поэтому извлекаем data при наличии
         const payload: any = (response as any)?.data ?? response;
 
         if (payload) {
           const userData = {
-            id: payload.id?.toString() || '',
-            email: payload.email || payload.phone || '',
-            role: 'admin' as const,
-            username: payload.email || payload.phone,
-            avatar_url: payload.avatar_url,
-            firstName: payload.firstName,
-            lastName: payload.lastName,
+            id: (payload.Id || payload.id || '').toString(),
+            email: payload.Email || payload.email || payload.Phone || payload.phone || '',
+            role: (payload.Role || payload.role || 'admin').toLowerCase() as any,
+            username: payload.Username || payload.username || payload.Email || payload.email || '',
+            avatar_url: payload.AvatarUrl || payload.avatar_url,
+            firstName: payload.FirstName || payload.firstName,
+            lastName: payload.LastName || payload.lastName,
           };
           console.log('👤 useAuth: Устанавливаем пользователя:', userData);
           setUser(userData);
@@ -101,20 +101,48 @@ export const useAuth = () => {
           setUser(null);
         }
       } catch (error: any) {
-        console.error('❌ useAuth: Ошибка при проверке пользователя:', error);
+        console.error('❌ useAuth: Ошибка при проверке пользователя (admin/me):', error);
         const status = error?.response?.status;
+        
+        // Если /admin/me вернул 401 или 404, пробуем /auth/me как запасной вариант
+        if (status === 401 || status === 404) {
+          try {
+            console.log('🔄 useAuth: Пробуем запасной вариант /auth/me...');
+            const userResponse = await authApi.getCurrentUser();
+            console.log('✅ useAuth: Получен ответ от getCurrentUser:', userResponse);
+            const payload = (userResponse as any)?.data ?? userResponse;
+            
+            if (payload) {
+              const userData = {
+                id: (payload.Id || payload.id || '').toString(),
+                email: payload.Email || payload.email || payload.Phone || payload.phone || '',
+                role: (payload.Role || payload.role || 'admin').toLowerCase() as any,
+                username: payload.Username || payload.username || payload.Email || payload.email || '',
+                avatar_url: payload.AvatarUrl || payload.avatar_url,
+                firstName: payload.FirstName || payload.firstName,
+                lastName: payload.LastName || payload.lastName,
+              };
+              console.log('👤 useAuth: Устанавливаем пользователя через запасной вариант:', userData);
+              setUser(userData);
+              setLastCheckTime(Date.now());
+              return; // Успешно выходим
+            }
+          } catch (fallbackError) {
+            console.error('❌ useAuth: Запасной вариант /auth/me тоже не сработал:', fallbackError);
+          }
+        }
+
         console.log('📊 useAuth: Код ошибки:', status);
 
         if (status === 429) {
           console.log('⏰ useAuth: Rate limit достигнут');
           setRateLimitUntil(Date.now() + 60 * 1000);
         } else if (status === 500) {
-          // Ошибка 500 - блокируем повторные попытки на 30 секунд
-          console.log('🚫 useAuth: Ошибка 500 - блокируем повторные попытки на 30 секунд');
+          console.log('🚫 useAuth: Ошибка 500');
           last500ErrorTime = Date.now();
           if (!user) setUser(null);
         } else if (error?.code === 'ERR_NETWORK' || status === 401) {
-          console.log('🚫 useAuth: Токен невалиден');
+          console.log('🚫 useAuth: Сетевая ошибка или токен невалиден');
           localStorage.removeItem('admin_token');
           setUser(null);
         } else {
@@ -153,5 +181,6 @@ export const useAuth = () => {
     isLoading,
     logout,
     setUser, // Добавляем setUser для обновления профиля
+    setLastCheckTime, // Экспортируем для ручного обновления времени проверки
   };
 };

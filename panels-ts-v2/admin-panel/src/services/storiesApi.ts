@@ -1,11 +1,7 @@
 import axios from 'axios';
 
-// В development используем относительный путь через Vite proxy
-const IS_DEV = import.meta.env.DEV;
-const ENV_API_BASE = import.meta.env.VITE_API_URL || '';
-const API_PATH = IS_DEV && ENV_API_BASE
-  ? `${ENV_API_BASE.replace(/\/$/, '')}/api/v1`
-  : '/api/v1';
+// Конфигурация API
+const API_PATH = '/api/v1'; // Всегда используем относительный путь для проксирования
 
 // Создаем экземпляр axios с настройками
 const apiClient = axios.create({
@@ -13,6 +9,7 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 30000,
 });
 
 // Интерцептор для добавления токена
@@ -24,9 +21,7 @@ apiClient.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 const storiesApi = {
@@ -79,4 +74,3 @@ const storiesApi = {
 };
 
 export default storiesApi;
-

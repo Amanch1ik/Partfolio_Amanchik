@@ -163,7 +163,7 @@ export const PartnerLocationsPage = () => {
                 message.error(e?.response?.data?.detail || t('common.error', 'Ошибка'));
               }
             }}
-            style={{ backgroundColor: '#689071', borderColor: '#689071' }}
+            style={{ backgroundColor: '#07B981', borderColor: '#07B981' }}
           >
             {t('partners.addPoint', 'Добавить точку')}
           </Button>

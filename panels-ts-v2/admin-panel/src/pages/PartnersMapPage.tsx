@@ -1024,8 +1024,8 @@ export const PartnersMapPage = () => {
                 center={userLocation}
                 radius={searchRadius * 1000} // переводим км в метры
                 pathOptions={{
-                  color: '#689071',
-                  fillColor: '#689071',
+                  color: '#07B981',
+                  fillColor: '#07B981',
                   fillOpacity: 0.1,
                   weight: 2,
                   dashArray: '10, 10'
@@ -1037,7 +1037,7 @@ export const PartnersMapPage = () => {
               <Polyline
                 positions={routePath}
                 pathOptions={{
-                  color: routeMode === 'walking' ? '#AEC380' : routeMode === 'cycling' ? '#ff9800' : routeMode === 'transit' ? '#7C4DFF' : '#689071',
+                  color: routeMode === 'walking' ? '#10B981' : routeMode === 'cycling' ? '#ff9800' : routeMode === 'transit' ? '#7C4DFF' : '#07B981',
                   weight: 4,
                   opacity: 0.7,
                   dashArray: '10, 10'
@@ -1051,7 +1051,7 @@ export const PartnersMapPage = () => {
                 position={routePath[0]}
                 icon={L.divIcon({
                   className: 'route-start-marker',
-                  html: '<div style="width: 20px; height: 20px; background: #689071; border: 3px solid white; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"></div>',
+                  html: '<div style="width: 20px; height: 20px; background: #07B981; border: 3px solid white; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"></div>',
                   iconSize: [20, 20],
                   iconAnchor: [10, 10],
                 })}
@@ -1207,7 +1207,7 @@ export const PartnersMapPage = () => {
           >
             {selectedPartner && isFavorite(selectedPartner.id) ? t('partners.removeFavorite', 'Убрать из избранного') : t('partners.addFavorite', 'В избранное')}
           </Button>,
-          <Button key="route" type="primary" icon={<TeamOutlined />} onClick={buildRouteToPartner} style={{ backgroundColor: '#689071', borderColor: '#689071' }}>
+          <Button key="route" type="primary" icon={<TeamOutlined />} onClick={buildRouteToPartner} style={{ backgroundColor: '#07B981', borderColor: '#07B981' }}>
             {t('partners.buildRoute', 'Построить маршрут')}
           </Button>,
         ]}
@@ -1276,11 +1276,11 @@ export const PartnersMapPage = () => {
         >
           <Space size="large" wrap>
             <Space>
-              <ClockCircleOutlined style={{ color: '#689071' }} />
+              <ClockCircleOutlined style={{ color: '#07B981' }} />
               <span style={{ color: 'var(--color-text-primary)' }}>{routeInfo.duration}</span>
             </Space>
             <Space>
-              <SwapRightOutlined style={{ color: '#689071' }} />
+              <SwapRightOutlined style={{ color: '#07B981' }} />
               <span style={{ color: 'var(--color-text-primary)' }}>{routeInfo.distance}</span>
             </Space>
             <Tag color="green">

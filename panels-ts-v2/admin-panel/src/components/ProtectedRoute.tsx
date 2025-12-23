@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
 
   // Проверяем токен напрямую, чтобы не зависеть от состояния загрузки
   const token = localStorage.getItem('admin_token');
@@ -33,23 +33,25 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     return <Navigate to="/login" replace />;
   }
 
-  // Если загрузка и не прошло 3 секунды, показываем спиннер
-  if (isLoading && !hasTimedOut) {
+  // Разрешаем доступ только если есть и токен, и данные пользователя загружены
+  // Если токен есть, но пользователя нет — показываем спиннер (идет проверка)
+  if (token && !user && !hasTimedOut) {
     return (
       <div style={{
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #689071 0%, #AEC380 50%, #E3EED4 100%)',
+        background: 'linear-gradient(135deg, #03533A 0%, #07B981 100%)',
       }}>
-        <Spin size="large" />
-        <span style={{ marginLeft: 16, color: '#0F2A1D' }}>Загрузка...</span>
+        <div style={{ textAlign: 'center' }}>
+          <Spin size="large" />
+          <div style={{ marginTop: 16, color: '#ffffff', fontWeight: 500 }}>Авторизация...</div>
+        </div>
       </div>
     );
   }
 
-  // Если токен есть, разрешаем доступ (даже если isAuthenticated еще false)
-  // useAuth установит пользователя в фоне
+  // Если токен есть и пользователь загружен (или таймаут проверки) — разрешаем доступ
   return <>{children}</>;
 };
