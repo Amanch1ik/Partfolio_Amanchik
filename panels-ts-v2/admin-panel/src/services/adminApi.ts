@@ -11,7 +11,11 @@ import { createMetricsInterceptor, errorLogger } from '@shared/monitoring';
 import { createRetryInterceptor, isRetryableError } from '@shared/utils/retryUtils';
 
 // Конфигурация API
-const API_PATH = '/api/v1'; // Всегда используем относительный путь для проксирования
+// При разработке можно переопределить целевой бэкенд через VITE_API_PROXY_TARGET (например http://localhost:4000)
+// During local development, default to the local mock backend if present
+const API_PATH = import.meta.env.DEV
+  ? (import.meta.env.VITE_API_PROXY_TARGET ? `${import.meta.env.VITE_API_PROXY_TARGET}/api` : 'http://localhost:4000/api')
+  : (import.meta.env.VITE_API_PROXY_TARGET ? `${import.meta.env.VITE_API_PROXY_TARGET}/api` : '/api/v1');
 
 // Создаем экземпляр axios
 const apiClient: AxiosInstance = axios.create({
