@@ -16,17 +16,17 @@ export default defineConfig(({ mode }) => {
       extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'],
     },
     server: {
-      port: 3001,
+      port: Number(process.env.PORT) || 3001,
       strictPort: true,
       proxy: {
         '/api': {
-          target: 'https://api.yessgo.org',  // Реальный Backend API
+          target: process.env.VITE_API_PROXY_TARGET || 'https://api.yessgo.org',  // Backend API (override with env)
           changeOrigin: true,
           secure: false,
-          rewrite: (path) => path.replace(/^\/api/, '/api'), // Убеждаемся, что префикс /api сохраняется, если нужно
+          rewrite: (path) => path.replace(/^\/api/, '/api'),
         },
         '/api/v1/ws': {
-          target: 'wss://api.yessgo.org',  // WebSocket
+          target: (process.env.VITE_API_PROXY_TARGET_WS || process.env.VITE_API_PROXY_TARGET) || 'wss://api.yessgo.org',  // WebSocket (override if needed)
           changeOrigin: true,
           ws: true,
           secure: false,
