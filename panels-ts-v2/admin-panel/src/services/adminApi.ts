@@ -347,19 +347,19 @@ const adminApi = {
   },
 
   async getCurrentAdmin(): Promise<ApiResponse<AdminUser>> {
-    console.log("📡 adminApi.getCurrentAdmin: Запрос на /admin/me");
-    const response = await apiClient.get("/admin/me");
+    console.log("📡 adminApi.getCurrentAdmin: Запрос на /api/v1/admin/me");
+    const response = await apiClient.get("/api/v1/admin/me");
     return response.data;
   },
 
   async getCurrentUser(): Promise<ApiResponse<any>> {
-    const response = await apiClient.get("/auth/me");
+    const response = await apiClient.get("/api/v1/auth/me");
     return response.data;
   },
 
   // Дашборд
   async getDashboardStats(): Promise<ApiResponse<DashboardStats>> {
-    const response = await apiClient.get("/admin/dashboard/stats");
+    const response = await apiClient.get("/api/v1/admin/dashboard/stats");
     const data = unwrapResponse(response);
     return { data: data.items?.[0] ?? data, message: response.data?.message };
   },
@@ -372,7 +372,7 @@ const adminApi = {
   ): Promise<ApiResponse<PaginatedResponse<User>>> {
     const params: any = { page, page_size };
     if (search?.trim()) params.search = search.trim();
-    const response = await apiClient.get("/admin/users", { params });
+    const response = await apiClient.get("/api/v1/admin/users", { params });
     const payload = unwrapResponse(response);
     return {
       data: {
@@ -386,7 +386,7 @@ const adminApi = {
   },
 
   async getUserById(id: number): Promise<ApiResponse<User>> {
-    const response = await apiClient.get(`/admin/users/${id}`);
+    const response = await apiClient.get(`/api/v1/admin/users/${id}`);
     return response.data;
   },
 
@@ -394,20 +394,20 @@ const adminApi = {
     id: number,
     data: Partial<User>
   ): Promise<ApiResponse<User>> {
-    const response = await apiClient.put(`/admin/users/${id}`, data);
+    const response = await apiClient.put(`/api/v1/admin/users/${id}`, data);
     return response.data;
   },
 
   async deleteUser(id: number): Promise<void> {
-    await apiClient.delete(`/admin/users/${id}`);
+    await apiClient.delete(`/api/v1/admin/users/${id}`);
   },
 
   async activateUser(id: number): Promise<void> {
-    await apiClient.post(`/admin/users/${id}/activate`);
+    await apiClient.post(`/api/v1/admin/users/${id}/activate`);
   },
 
   async deactivateUser(id: number): Promise<void> {
-    await apiClient.post(`/admin/users/${id}/deactivate`);
+    await apiClient.post(`/api/v1/admin/users/${id}/deactivate`);
   },
 
   // Партнеры
@@ -420,7 +420,7 @@ const adminApi = {
     const params: any = { page, page_size };
     if (search?.trim()) params.search = search.trim();
     if (status) params.status = status;
-    const response = await apiClient.get("/admin/partners", { params });
+    const response = await apiClient.get("/api/v1/admin/partners", { params });
     const payload = unwrapResponse(response);
     return {
       data: {
@@ -434,7 +434,7 @@ const adminApi = {
   },
 
   async getPartnerById(id: number): Promise<ApiResponse<Partner>> {
-    const response = await apiClient.get(`/admin/partners/${id}`);
+    const response = await apiClient.get(`/api/v1/admin/partners/${id}`);
     const payload = unwrapResponse(response);
     return {
       data: payload.items?.[0] ?? payload,
@@ -443,7 +443,7 @@ const adminApi = {
   },
 
   async createPartner(data: Partial<Partner>): Promise<ApiResponse<Partner>> {
-    const response = await apiClient.post("/admin/partners", data);
+    const response = await apiClient.post("/api/v1/admin/partners", data);
     return response.data;
   },
 
@@ -451,20 +451,20 @@ const adminApi = {
     id: number,
     data: Partial<Partner>
   ): Promise<ApiResponse<Partner>> {
-    const response = await apiClient.put(`/admin/partners/${id}`, data);
+    const response = await apiClient.put(`/api/v1/admin/partners/${id}`, data);
     return response.data;
   },
 
   async deletePartner(id: number): Promise<void> {
-    await apiClient.delete(`/admin/partners/${id}`);
+    await apiClient.delete(`/api/v1/admin/partners/${id}`);
   },
 
   async approvePartner(id: number): Promise<void> {
-    await apiClient.post(`/admin/partners/${id}/approve`);
+    await apiClient.post(`/api/v1/admin/partners/${id}/approve`);
   },
 
   async rejectPartner(id: number, reason?: string): Promise<void> {
-    await apiClient.post(`/admin/partners/${id}/reject`, { reason });
+    await apiClient.post(`/api/v1/admin/partners/${id}/reject`, { reason });
   },
 
   // Товары партнеров
@@ -474,7 +474,7 @@ const adminApi = {
     page_size = 20
   ): Promise<ApiResponse<PaginatedResponse<any>>> {
     const response = await apiClient.get(
-      `/admin/partners/${partnerId}/products`,
+      `/api/v1/admin/partners/${partnerId}/products`,
       {
         params: { page, page_size },
       }
@@ -536,7 +536,7 @@ const adminApi = {
     page = 1,
     page_size = 20
   ): Promise<ApiResponse<PaginatedResponse<Promotion>>> {
-    const response = await apiClient.get("/admin/promotions", {
+    const response = await apiClient.get("/api/v1/admin/promotions", {
       params: { page, page_size },
     });
     const payload = unwrapResponse(response);
@@ -552,7 +552,7 @@ const adminApi = {
   },
 
   async getPromotionById(id: number): Promise<ApiResponse<Promotion>> {
-    const response = await apiClient.get(`/admin/promotions/${id}`);
+    const response = await apiClient.get(`/api/v1/admin/promotions/${id}`);
     const payload = unwrapResponse(response);
     return {
       data: payload.items?.[0] ?? payload,
@@ -563,7 +563,7 @@ const adminApi = {
   async createPromotion(
     data: Partial<Promotion>
   ): Promise<ApiResponse<Promotion>> {
-    const response = await apiClient.post("/admin/promotions", data);
+    const response = await apiClient.post("/api/v1/admin/promotions", data);
     return response.data;
   },
 
@@ -571,12 +571,12 @@ const adminApi = {
     id: number,
     data: Partial<Promotion>
   ): Promise<ApiResponse<Promotion>> {
-    const response = await apiClient.put(`/admin/promotions/${id}`, data);
+    const response = await apiClient.put(`/api/v1/admin/promotions/${id}`, data);
     return response.data;
   },
 
   async deletePromotion(id: number): Promise<void> {
-    await apiClient.delete(`/admin/promotions/${id}`);
+    await apiClient.delete(`/api/v1/admin/promotions/${id}`);
   },
 
   // Транзакции
@@ -584,7 +584,7 @@ const adminApi = {
     page = 1,
     page_size = 20
   ): Promise<ApiResponse<PaginatedResponse<Transaction>>> {
-    const response = await apiClient.get("/admin/transactions", {
+    const response = await apiClient.get("/api/v1/admin/transactions", {
       params: { page, page_size },
     });
     return response.data;
@@ -600,7 +600,7 @@ const adminApi = {
     page = 1,
     page_size = 20
   ): Promise<ApiResponse<PaginatedResponse<any>>> {
-    const response = await apiClient.get("/admin/notifications", {
+    const response = await apiClient.get("/api/v1/admin/notifications", {
       params: { page, page_size },
     });
     return response.data;
@@ -612,24 +612,24 @@ const adminApi = {
     segment: string;
     scheduled_for?: string;
   }): Promise<ApiResponse<any>> {
-    const response = await apiClient.post("/admin/notifications", data);
+    const response = await apiClient.post("/api/v1/admin/notifications", data);
     return response.data;
   },
 
   // Рефералы
   async getReferrals(): Promise<ApiResponse<any[]>> {
-    const response = await apiClient.get("/admin/referrals");
+    const response = await apiClient.get("/api/v1/admin/referrals");
     return response.data;
   },
 
   async getReferralsStats(): Promise<ApiResponse<any>> {
-    const response = await apiClient.get("/admin/referrals/stats");
+    const response = await apiClient.get("/api/v1/admin/referrals/stats");
     return response.data;
   },
 
   // Настройки и Справочники
   async getSettings(): Promise<ApiResponse<any>> {
-    const response = await apiClient.get("/admin/settings");
+    const response = await apiClient.get("/api/v1/admin/settings");
     const payload = unwrapResponse(response);
     return {
       data: payload.items?.[0] ?? payload,
@@ -638,27 +638,27 @@ const adminApi = {
   },
 
   async updateSettings(data: Partial<any>): Promise<ApiResponse<any>> {
-    const response = await apiClient.put("/admin/settings", data);
+    const response = await apiClient.put("/api/v1/admin/settings", data);
     return response.data;
   },
 
   async getCategories(): Promise<ApiResponse<any[]>> {
-    const response = await apiClient.get("/admin/categories");
+    const response = await apiClient.get("/api/v1/admin/categories");
     return response.data;
   },
 
   async createCategory(data: { name: string }): Promise<ApiResponse<any>> {
-    const response = await apiClient.post("/admin/categories", data);
+    const response = await apiClient.post("/api/v1/admin/categories", data);
     return response.data;
   },
 
   async getCities(): Promise<ApiResponse<any[]>> {
-    const response = await apiClient.get("/admin/cities");
+    const response = await apiClient.get("/api/v1/admin/cities");
     return response.data;
   },
 
   async createCity(data: { name: string }): Promise<ApiResponse<any>> {
-    const response = await apiClient.post("/admin/cities", data);
+    const response = await apiClient.post("/api/v1/admin/cities", data);
     return response.data;
   },
 
