@@ -135,6 +135,26 @@ interface PaginatedResponse<T> {
   total_pages?: number;
 }
 
+// Вспомогательные утилиты нормализации ответа
+function unwrapResponse<T>(response: any): any {
+  // API может возвращать { data: { items: [...] } } или { data: [...] } или { items: [...] } или plain array
+  if (!response) return null;
+  const payload = response.data ?? response;
+  if (payload == null) return null;
+  // If payload has items, return payload
+  if (payload.items !== undefined) return payload;
+  // If payload itself is an array, return as items
+  if (Array.isArray(payload)) return { items: payload, total: payload.length, page: 1, page_size: payload.length };
+  // If payload is object with nested data
+  if (payload.data !== undefined) {
+    const inner = payload.data;
+    if (Array.isArray(inner)) return { items: inner, total: inner.length, page: 1, page_size: inner.length };
+    if (inner.items !== undefined) return inner;
+  }
+  // Fallback - return payload as single item list
+  return { items: [payload], total: 1, page: 1, page_size: 1 };
+}
+
 // Методы Admin API
 const adminApi = {
   // Аутентификация
@@ -209,7 +229,8 @@ const adminApi = {
   // Дашборд
   async getDashboardStats(): Promise<ApiResponse<DashboardStats>> {
     const response = await apiClient.get('/admin/dashboard/stats');
-    return response.data;
+    const data = unwrapResponse(response);
+    return { data: data.items?.[0] ?? data, message: response.data?.message };
   },
 
   // Пользователи
@@ -217,7 +238,8 @@ const adminApi = {
     const params: any = { page, page_size };
     if (search?.trim()) params.search = search.trim();
     const response = await apiClient.get('/admin/users', { params });
-    return response.data;
+    const payload = unwrapResponse(response);
+    return { data: { items: payload.items, total: payload.total ?? payload.items.length, page: payload.page ?? page, page_size: payload.page_size ?? page_size }, message: response.data?.message };
   },
 
   async getUserById(id: number): Promise<ApiResponse<User>> {
@@ -248,12 +270,14 @@ const adminApi = {
     if (search?.trim()) params.search = search.trim();
     if (status) params.status = status;
     const response = await apiClient.get('/admin/partners', { params });
-    return response.data;
+    const payload = unwrapResponse(response);
+    return { data: { items: payload.items, total: payload.total ?? payload.items.length, page: payload.page ?? page, page_size: payload.page_size ?? page_size }, message: response.data?.message };
   },
 
   async getPartnerById(id: number): Promise<ApiResponse<Partner>> {
     const response = await apiClient.get(`/admin/partners/${id}`);
-    return response.data;
+    const payload = unwrapResponse(response);
+    return { data: payload.items?.[0] ?? payload, message: response.data?.message };
   },
 
   async createPartner(data: Partial<Partner>): Promise<ApiResponse<Partner>> {
@@ -283,17 +307,20 @@ const adminApi = {
     const response = await apiClient.get(`/admin/partners/${partnerId}/products`, {
       params: { page, page_size },
     });
-    return response.data;
+    const payload = unwrapResponse(response);
+    return { data: { items: payload.items, total: payload.total ?? payload.items.length, page: payload.page ?? page, page_size: payload.page_size ?? page_size }, message: response.data?.message };
   },
 
   async createPartnerProduct(partnerId: number, data: any): Promise<ApiResponse<any>> {
     const response = await apiClient.post(`/admin/partners/${partnerId}/products`, data);
-    return response.data;
+    const payload = unwrapResponse(response);
+    return { data: payload.items?.[0] ?? payload, message: response.data?.message };
   },
 
   async updatePartnerProduct(partnerId: number, productId: number, data: any): Promise<ApiResponse<any>> {
     const response = await apiClient.put(`/admin/partners/${partnerId}/products/${productId}`, data);
-    return response.data;
+    const payload = unwrapResponse(response);
+    return { data: payload.items?.[0] ?? payload, message: response.data?.message };
   },
 
   async deletePartnerProduct(partnerId: number, productId: number): Promise<void> {
@@ -305,12 +332,14 @@ const adminApi = {
     const response = await apiClient.get('/admin/promotions', {
       params: { page, page_size },
     });
-    return response.data;
+    const payload = unwrapResponse(response);
+    return { data: { items: payload.items, total: payload.total ?? payload.items.length, page: payload.page ?? page, page_size: payload.page_size ?? page_size }, message: response.data?.message };
   },
 
   async getPromotionById(id: number): Promise<ApiResponse<Promotion>> {
     const response = await apiClient.get(`/admin/promotions/${id}`);
-    return response.data;
+    const payload = unwrapResponse(response);
+    return { data: payload.items?.[0] ?? payload, message: response.data?.message };
   },
 
   async createPromotion(data: Partial<Promotion>): Promise<ApiResponse<Promotion>> {
@@ -372,7 +401,8 @@ const adminApi = {
   // Настройки и Справочники
   async getSettings(): Promise<ApiResponse<any>> {
     const response = await apiClient.get('/admin/settings');
-    return response.data;
+    const payload = unwrapResponse(response);
+    return { data: payload.items?.[0] ?? payload, message: response.data?.message };
   },
 
   async updateSettings(data: Partial<any>): Promise<ApiResponse<any>> {
@@ -411,7 +441,8 @@ const adminApi = {
     const response = await apiClient.post(`/upload/partner/logo/${partnerId}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
-    return response.data;
+    const payload = unwrapResponse(response);
+    return { data: payload.items?.[0] ?? payload, message: response.data?.message };
   },
 
   async uploadPartnerCover(partnerId: number, file: File): Promise<ApiResponse<{ cover_image_url: string }>> {
