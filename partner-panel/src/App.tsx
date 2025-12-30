@@ -1,6 +1,18 @@
 import React, { useEffect, useState } from 'react';
 
-const API_BASE = import.meta.env.DEV ? (import.meta.env.VITE_API_PROXY_TARGET || 'http://localhost:4000') : (import.meta.env.VITE_API_PROXY_TARGET || '');
+const useMock = import.meta.env.VITE_USE_MOCK === 'true';
+const explicitBase = import.meta.env.VITE_API_BASE_URL;
+const proxyTarget = import.meta.env.VITE_API_PROXY_TARGET;
+
+const API_BASE = (() => {
+  if (import.meta.env.DEV) {
+    if (useMock) return proxyTarget || 'http://localhost:4000';
+    if (explicitBase) return explicitBase;
+    return proxyTarget || 'http://localhost:4000';
+  }
+  // production
+  return explicitBase || proxyTarget || '';
+})();
 
 type Partner = { id: number; name: string; status: string; logo?: string };
 

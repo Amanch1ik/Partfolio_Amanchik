@@ -11,11 +11,32 @@ import { createMetricsInterceptor, errorLogger } from '@shared/monitoring';
 import { createRetryInterceptor, isRetryableError } from '@shared/utils/retryUtils';
 
 // Конфигурация API
-// При разработке можно переопределить целевой бэкенд через VITE_API_PROXY_TARGET (например http://localhost:4000)
-// During local development, default to the local mock backend if present
-const API_PATH = import.meta.env.DEV
-  ? (import.meta.env.VITE_API_PROXY_TARGET ? `${import.meta.env.VITE_API_PROXY_TARGET}/api` : 'http://localhost:4000/api')
-  : (import.meta.env.VITE_API_PROXY_TARGET ? `${import.meta.env.VITE_API_PROXY_TARGET}/api` : '/api/v1');
+// Порядок приоритета:
+// 1) Если явно включен mock (VITE_USE_MOCK === 'true') — используем локальный mock (VITE_API_PROXY_TARGET || http://localhost:4000)
+// 2) Если указан VITE_API_BASE_URL — используем его (без /api суффикса, добавляем /api при необходимости)
+// 3) В противном случае используем VITE_API_PROXY_TARGET в development или '/api/v1' в production
+const useMock = import.meta.env.VITE_USE_MOCK === 'true';
+const explicitBase = import.meta.env.VITE_API_BASE_URL;
+const proxyTarget = import.meta.env.VITE_API_PROXY_TARGET;
+
+const API_PATH = (() => {
+  if (useMock) {
+    const base = proxyTarget || 'http://localhost:4000';
+    return `${base.replace(/\/$/, '')}/api`;
+  }
+
+  if (explicitBase) {
+    // если явно указали базовый URL (например https://api.yessgo.org), используем его
+    return `${explicitBase.replace(/\/$/, '')}/api`;
+  }
+
+  if (import.meta.env.DEV) {
+    return proxyTarget ? `${proxyTarget.replace(/\/$/, '')}/api` : 'http://localhost:4000/api';
+  }
+
+  // production default (relative)
+  return proxyTarget ? `${proxyTarget.replace(/\/$/, '')}/api` : '/api/v1';
+})();
 
 // Создаем экземпляр axios
 const apiClient: AxiosInstance = axios.create({
