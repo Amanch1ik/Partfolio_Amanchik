@@ -23,7 +23,9 @@ export default defineConfig(({ mode }) => {
           target: process.env.VITE_API_PROXY_TARGET || 'https://api.yessgo.org',  // Backend API (override with env)
           changeOrigin: true,
           secure: false,
-          rewrite: (path) => path.replace(/^\/api/, '/api'),
+          // В некоторых окружениях внешний API ожидает пути без префикса `/api`.
+          // Убираем префикс `/api` при проксировании чтобы попасть в корневые эндпоинты, например `/admin/auth/login`.
+          rewrite: (path) => path.replace(/^\/api/, ''),
         },
         '/api/v1/ws': {
           target: (process.env.VITE_API_PROXY_TARGET_WS || process.env.VITE_API_PROXY_TARGET) || 'wss://api.yessgo.org',  // WebSocket (override if needed)
