@@ -161,30 +161,60 @@ function unwrapResponse<T>(response: any): any {
 const adminApi = {
   // Аутентификация
   async login(username: string, password: string) {
-    console.log('📡 adminApi.login: Запрос на', `${API_PATH}/admin/auth/login`);
-    const payload = {
-      Username: username,
-      Password: password,
-    };
+    console.log('📡 adminApi.login: Attempting login for', username);
+    const payload = { Username: username, Password: password };
     console.log('📦 adminApi.login: Payload:', { Username: username, Password: '***' });
-    
+
+    // Try multiple candidate paths (useful when external API path differs)
+    const candidatePaths = [
+      '/api/admin/auth/login',
+      '/api/v1/admin/auth/login',
+      '/admin/auth/login',
+      '/auth/admin/login',
+      '/admin/login',
+    ];
+
+    async function tryPaths(): Promise<any> {
+      for (const p of candidatePaths) {
+        try {
+          if (import.meta.env.DEV) {
+            // Use fetch in dev to go through Vite proxy reliably
+            const res = await fetch(p, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+            });
+            if (!res.ok) {
+              console.warn(`adminApi.login: attempt ${p} returned ${res.status}`);
+              if (res.status === 404) continue;
+            } else {
+              const data = await res.json();
+              return { data, status: res.status };
+            }
+          } else {
+            // Production: use axios client with absolute path
+            const resp = await apiClient.post(p.replace(/^\/api/, ''), payload, { timeout: 15000 });
+            return resp;
+          }
+        } catch (err: any) {
+          console.warn(`adminApi.login: attempt ${p} failed`, err?.message || err);
+          continue;
+        }
+      }
+      throw new Error('All login attempts failed');
+    }
+
     try {
-      const response = await apiClient.post('/admin/auth/login', payload, {
-        timeout: 15000,
-      });
-
-      // Бэкенд возвращает PascalCase: AccessToken
-      const token = response.data?.AccessToken || response.data?.access_token;
-
+      const response = await tryPaths();
+      const responseData = response.data ?? response;
+      const token = responseData?.AccessToken || responseData?.access_token || responseData?.accessToken;
       if (token) {
         localStorage.setItem('admin_token', token);
-        // Бэкенд может возвращать данные в PascalCase или camelCase
-        const adminData = response.data.Admin || response.data.admin || response.data.User || response.data.user;
-        
+        const adminData = responseData.Admin || responseData.admin || responseData.User || responseData.user;
         return {
           access_token: token,
           admin: {
-            id: (adminData?.Id || adminData?.id || response.data.user_id || '1').toString(),
+            id: (adminData?.Id || adminData?.id || responseData.user_id || '1').toString(),
             email: adminData?.Email || adminData?.email || username,
             role: (adminData?.Role || adminData?.role || 'admin').toLowerCase() as any,
           },
@@ -192,25 +222,54 @@ const adminApi = {
       }
       throw new Error('Invalid response from server');
     } catch (error: any) {
-      console.error('❌ adminApi.login: Error response:', error.response?.data);
+      console.error('❌ adminApi.login: Error response:', error?.message || error);
       throw error;
     }
   },
 
   async register(data: any) {
-    console.log('📡 adminApi.register: Запрос на', `${API_PATH}/admin/auth/register`);
-    // Преобразуем ключи в PascalCase для бэкенда
+    console.log('📡 adminApi.register: Attempting register for', data?.username || data?.email);
     const payload = {
       Username: data.username,
       Email: data.email,
       Password: data.password,
-      Role: data.role || 'admin'
+      Role: data.role || 'admin',
     };
-    console.log('📦 adminApi.register: Payload:', payload);
-    const response = await apiClient.post('/admin/auth/register', payload, {
-      timeout: 15000,
-    });
-    return response.data;
+    console.log('📦 adminApi.register: Payload:', { Username: payload.Username, Email: payload.Email, Password: '***' });
+
+    const candidatePaths = [
+      '/api/admin/auth/register',
+      '/api/v1/admin/auth/register',
+      '/admin/auth/register',
+      '/auth/admin/register',
+      '/admin/register',
+    ];
+
+    for (const p of candidatePaths) {
+      try {
+        if (import.meta.env.DEV) {
+          const res = await fetch(p, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          if (!res.ok) {
+            console.warn(`adminApi.register: attempt ${p} returned ${res.status}`);
+            if (res.status === 404) continue;
+          } else {
+            const d = await res.json();
+            return d;
+          }
+        } else {
+          const resp = await apiClient.post(p.replace(/^\/api/, ''), payload, { timeout: 15000 });
+          return resp.data;
+        }
+      } catch (err: any) {
+        console.warn(`adminApi.register: attempt ${p} failed`, err?.message || err);
+        continue;
+      }
+    }
+    throw new Error('All register attempts failed');
   },
 
   logout() {
