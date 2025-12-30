@@ -10,7 +10,7 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3003,
+    port: Number(process.env.PORT) || 3003,
     strictPort: true,
   },
 });

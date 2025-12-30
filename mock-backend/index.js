@@ -91,6 +91,41 @@ app.get('/api/admin/partners', (req, res) => {
   res.json({ data: { items: partners.slice(0, page_size), total: partners.length, page, page_size } });
 });
 
+// Transactions endpoints (mock)
+app.get('/api/admin/transactions', (req, res) => {
+  const page = Number(req.query.page || 1);
+  const page_size = Number(req.query.page_size || 20);
+  // Build simple transaction objects from orders for the dashboard
+  const transactions = orders.map((o) => ({
+    id: o.id,
+    amount: o.totalAmount ?? o.total_amount ?? o.totalAmount,
+    currency: o.currency || 'сом',
+    created_at: o.createdAt || o.created_at || new Date().toISOString(),
+    status: o.status || 'pending',
+    partnerId: o.partnerId,
+    transactionNumber: o.transactionNumber,
+  }));
+  const start = (page - 1) * page_size;
+  const paged = transactions.slice(start, start + page_size);
+  res.json({ data: { items: paged, total: transactions.length, page, page_size } });
+});
+
+app.get('/api/admin/transactions/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const o = orders.find((x) => x.id === id);
+  if (!o) return res.status(404).json({ message: 'Not found' });
+  const tx = {
+    id: o.id,
+    amount: o.totalAmount ?? o.total_amount ?? o.totalAmount,
+    currency: o.currency || 'сом',
+    created_at: o.createdAt || o.created_at || new Date().toISOString(),
+    status: o.status || 'pending',
+    partnerId: o.partnerId,
+    transactionNumber: o.transactionNumber,
+  };
+  res.json({ data: tx });
+});
+
 app.post('/api/admin/partners', (req, res) => {
   const id = partners.length + 1;
   const p = { id, ...req.body };
