@@ -25,16 +25,18 @@ const API_PATH = (() => {
     return `${base.replace(/\/$/, '')}/api`;
   }
 
+  // В development предпочитаем относительный путь '/api' чтобы Vite dev-server
+  // мог проксировать запросы к реальному API и избежать CORS.
+  if (import.meta.env.DEV) {
+    return '/api';
+  }
+
   if (explicitBase) {
     // если явно указали базовый URL (например https://api.yessgo.org), используем его
     return `${explicitBase.replace(/\/$/, '')}/api`;
   }
 
-  if (import.meta.env.DEV) {
-    return proxyTarget ? `${proxyTarget.replace(/\/$/, '')}/api` : 'http://localhost:4000/api';
-  }
-
-  // production default (relative)
+  // production default (relative) or proxyTarget if provided
   return proxyTarget ? `${proxyTarget.replace(/\/$/, '')}/api` : '/api/v1';
 })();
 

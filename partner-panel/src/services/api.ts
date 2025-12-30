@@ -5,8 +5,8 @@ const proxyTarget = import.meta.env.VITE_API_PROXY_TARGET;
 export const API_BASE = (() => {
   if (import.meta.env.DEV) {
     if (useMock) return proxyTarget || 'http://localhost:4000';
-    if (explicitBase) return explicitBase;
-    return proxyTarget || 'http://localhost:4000';
+    // В development — используем относительный путь, чтобы Vite проксировал запросы и не было CORS
+    return '/api';
   }
   return explicitBase || proxyTarget || '';
 })();
