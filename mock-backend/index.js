@@ -36,6 +36,29 @@ let users = [
 let partners = [
   { id: 1, name: 'Demo Partner', status: 'active', logo: null },
 ];
+let products = [
+  { id: 1, partnerId: 1, name: 'Product A', price: 100, image: null },
+];
+let orders = [
+  {
+    id: 1,
+    partnerId: 1,
+    transactionNumber: 'ORD-1001',
+    status: 'pending',
+    paymentStatus: 'pending',
+    products: [{ productId: 1, productName: 'Product A', quantity: 1, price: 100, subtotal: 100 }],
+    subtotal: 100,
+    totalAmount: 100,
+    createdAt: new Date().toISOString(),
+  },
+];
+let promotions = [
+  { id: 1, title: 'Welcome Promo', active: true, startDate: new Date().toISOString(), endDate: null },
+];
+let settings = {
+  siteName: 'Yess!Go Mock',
+  maintenanceMode: false,
+};
 
 // Routes
 app.post('/api/admin/auth/login', (req, res) => {
@@ -75,6 +98,96 @@ app.post('/api/admin/partners', (req, res) => {
   res.status(201).json({ data: p });
 });
 
+// Products endpoints
+app.get('/api/admin/partners/:partnerId/products', (req, res) => {
+  const partnerId = Number(req.params.partnerId);
+  const page = Number(req.query.page || 1);
+  const page_size = Number(req.query.page_size || 20);
+  const items = products.filter((p) => p.partnerId === partnerId);
+  res.json({ data: { items: items.slice((page-1)*page_size, page*page_size), total: items.length, page, page_size } });
+});
+
+app.post('/api/admin/partners/:partnerId/products', (req, res) => {
+  const partnerId = Number(req.params.partnerId);
+  const id = products.length + 1;
+  const p = { id, partnerId, ...req.body };
+  products.push(p);
+  res.status(201).json({ data: p });
+});
+
+app.put('/api/admin/partners/:partnerId/products/:productId', (req, res) => {
+  const productId = Number(req.params.productId);
+  const idx = products.findIndex((x) => x.id === productId);
+  if (idx === -1) return res.status(404).json({ message: 'Not found' });
+  products[idx] = { ...products[idx], ...req.body };
+  res.json({ data: products[idx] });
+});
+
+app.delete('/api/admin/partners/:partnerId/products/:productId', (req, res) => {
+  const productId = Number(req.params.productId);
+  products = products.filter((x) => x.id !== productId);
+  res.status(204).send();
+});
+
+// Orders endpoints
+app.get('/api/admin/orders', (req, res) => {
+  const page = Number(req.query.page || 1);
+  const page_size = Number(req.query.page_size || 20);
+  res.json({ data: { items: orders.slice((page-1)*page_size, page*page_size), total: orders.length, page, page_size } });
+});
+
+app.get('/api/admin/orders/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const o = orders.find((x) => x.id === id);
+  if (!o) return res.status(404).json({ message: 'Not found' });
+  res.json({ data: o });
+});
+
+app.put('/api/admin/orders/:id/status', (req, res) => {
+  const id = Number(req.params.id);
+  const status = req.body.status;
+  const o = orders.find((x) => x.id === id);
+  if (!o) return res.status(404).json({ message: 'Not found' });
+  o.status = status;
+  res.json({ data: o });
+});
+
+// Promotions endpoints
+app.get('/api/admin/promotions', (req, res) => {
+  res.json({ data: { items: promotions, total: promotions.length } });
+});
+
+app.post('/api/admin/promotions', (req, res) => {
+  const id = promotions.length + 1;
+  const p = { id, ...req.body };
+  promotions.push(p);
+  res.status(201).json({ data: p });
+});
+
+app.put('/api/admin/promotions/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const idx = promotions.findIndex((x) => x.id === id);
+  if (idx === -1) return res.status(404).json({ message: 'Not found' });
+  promotions[idx] = { ...promotions[idx], ...req.body };
+  res.json({ data: promotions[idx] });
+});
+
+app.delete('/api/admin/promotions/:id', (req, res) => {
+  const id = Number(req.params.id);
+  promotions = promotions.filter((x) => x.id !== id);
+  res.status(204).send();
+});
+
+// Settings endpoints
+app.get('/api/admin/settings', (req, res) => {
+  res.json({ data: settings });
+});
+
+app.put('/api/admin/settings', (req, res) => {
+  settings = { ...settings, ...req.body };
+  res.json({ data: settings });
+});
+
 app.post('/api/upload/partner/logo/:partnerId', upload.single('file'), (req, res) => {
   const file = req.file;
   if (!file) return res.status(400).json({ message: 'No file uploaded' });
@@ -96,5 +209,6 @@ app.use('/api/*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Mock backend listening on http://localhost:${PORT}`);
 });
+
 
 
