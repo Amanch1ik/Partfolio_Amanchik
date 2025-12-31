@@ -261,18 +261,10 @@ class WebSocketService {
 export const wsService = new WebSocketService();
 
 // Хелпер для подключения с токеном из localStorage
-// В development используем относительный путь через Vite proxy
-// В production используем полный URL
+// Всегда используем относительный путь через Vite proxy для корректной работы в dev и prod
 const getWebSocketUrl = (): string => {
-  if (import.meta.env.DEV) {
-    // В development используем относительный путь через Vite proxy
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    return `${protocol}//${window.location.host}/api/v1/ws`;
-  }
-  // В production используем относительный путь
-  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const host = window.location.host;
-  return `${protocol}//${host}/api/v1/ws`;
+  // Используем относительный путь /api/v1/ws, который Vite прокси перенаправит на реальный сервер
+  return '/api/v1/ws';
 };
 
 export const connectWebSocket = (baseUrl?: string): void => {

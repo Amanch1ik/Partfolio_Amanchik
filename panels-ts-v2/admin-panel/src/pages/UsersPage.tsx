@@ -222,7 +222,7 @@ export const UsersPage = () => {
       { key: 'name', title: t('users.export.name', 'Имя') },
       { key: 'phone', title: t('users.export.phone', 'Телефон') },
       { key: 'email', title: t('users.export.email', 'Email') },
-      { key: 'balance', title: t('users.export.balance', 'Баланс'), render: (val: number) => `${val.toLocaleString()} Yess!Coin` },
+      { key: 'balance', title: t('users.export.balance', 'Баланс'), render: (val: number) => `${(val ?? 0).toLocaleString()} Yess!Coin` },
       { 
         key: 'is_active', 
         title: t('users.export.status', 'Статус'),
@@ -287,7 +287,7 @@ export const UsersPage = () => {
       width: 120,
       render: (balance: number) => (
         <span style={{ color: '#07B981', fontWeight: 500 }}>
-          {balance.toLocaleString()} Y
+          {(balance ?? 0).toLocaleString()} Y
         </span>
       ),
     },
@@ -314,7 +314,7 @@ export const UsersPage = () => {
       dataIndex: 'created_at',
       key: 'created_at',
       width: 140,
-      render: (date: string) => dayjs(date).format('DD.MM.YYYY'),
+      render: (date: string) => (date ? dayjs(date).format('DD.MM.YYYY') : '-'),
     },
     {
       title: t('common.actions', 'Действие'),

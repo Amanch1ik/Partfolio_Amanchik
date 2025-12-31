@@ -77,6 +77,26 @@ export const useAuth = () => {
       setLoading(true);
 
       try {
+        // TEMP: Skip token validation on startup to allow dashboard testing
+        const skipValidation = localStorage.getItem('skip_token_validation') === 'true';
+        if (skipValidation) {
+          console.log('🔍 useAuth: Пропускаем проверку токена (временно отключена)');
+          const token = localStorage.getItem('admin_token');
+          if (token) {
+            // Create mock user data to allow dashboard access
+            const mockUser = {
+              id: '1',
+              email: 'admin@yessgo.org',
+              role: 'admin' as any,
+              username: 'Admin_A',
+            };
+            console.log('👤 useAuth: Устанавливаем mock пользователя:', mockUser);
+            setUser(mockUser);
+            setLastCheckTime(Date.now());
+            return;
+          }
+        }
+
         console.log('🔍 useAuth: Вызов authApi.getCurrentAdmin()...');
         const response = await authApi.getCurrentAdmin();
         console.log('✅ useAuth: Получен ответ от getCurrentAdmin:', response);

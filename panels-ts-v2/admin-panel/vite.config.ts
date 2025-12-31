@@ -28,13 +28,32 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path,
         },
         "/api/v1/ws": {
-          target:
-            process.env.VITE_API_PROXY_TARGET_WS ||
-            process.env.VITE_API_PROXY_TARGET ||
-            "wss://api.yessgo.org", // WebSocket (override if needed)
+          // Prefer an explicit WS target. If only HTTP(S) proxy target is provided,
+          // derive a WS(S) URL from it (http -> ws, https -> wss).
+          target: (() => {
+            const explicitWs = process.env.VITE_API_PROXY_TARGET_WS;
+            const proxyTarget = process.env.VITE_API_PROXY_TARGET;
+            if (explicitWs) return explicitWs;
+            if (proxyTarget) return proxyTarget.replace(/^http/, "ws");
+            return "wss://api.yessgo.org";
+          })(),
           changeOrigin: true,
           ws: true,
           secure: false,
+          // Optionally inject an Authorization header into proxied WS upgrade requests
+          // for local development. Set VITE_WS_AUTH_TOKEN to a valid token when starting dev server.
+          configure: (proxy, options) => {
+            try {
+              const token = process.env.VITE_WS_AUTH_TOKEN;
+              if (token) {
+                proxy.on("proxyReqWs", (proxyReq, req, socket, options) => {
+                  proxyReq.setHeader("Authorization", `Bearer ${token}`);
+                });
+              }
+            } catch (e) {
+              // ignore
+            }
+          },
         },
       },
     },

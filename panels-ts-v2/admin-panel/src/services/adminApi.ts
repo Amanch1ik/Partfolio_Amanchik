@@ -66,6 +66,8 @@ apiClient.interceptors.request.use(
   (config) => {
     // Не добавляем токен для запросов входа и регистрации
     if (
+      config.url?.includes("/v1/admin/auth/login") ||
+      config.url?.includes("/v1/admin/auth/register") ||
       config.url?.includes("/admin/auth/login") ||
       config.url?.includes("/admin/auth/register")
     ) {
@@ -126,8 +128,22 @@ apiClient.interceptors.response.use(
         if (error.response?.data) {
           console.warn("🔓 adminApi: 401 details:", error.response.data);
         }
-        // Убрали localStorage.removeItem('admin_token'), чтобы избежать race condition
-        // Токен будет очищен в useAuth.logout() или при явном логауте
+        // Токен недействителен — очищаем чтобы прекратить повторные неудачные запросы.
+        // Это предотвращает бесконечные попытки и даёт пользователю возможность перелогиниться.
+        try {
+          localStorage.removeItem("admin_token");
+          console.warn("🔓 adminApi: removed invalid admin_token from localStorage");
+        } catch (e) {
+          // ignore
+        }
+        // Optionally trigger a reload so UI returns to login state
+        if (typeof window !== "undefined") {
+          try {
+            window.dispatchEvent(new Event("yessgo:token-invalid"));
+          } catch (e) {
+            // ignore
+          }
+        }
       }
     }
 
@@ -195,8 +211,7 @@ const adminApi = {
 
     // Try multiple candidate paths (useful when external API path differs)
     const candidatePaths = [
-      "/api/admin/auth/login",
-      "/api/v1/admin/auth/login",
+      "/v1/admin/auth/login",
       "/admin/auth/login",
       "/auth/admin/login",
       "/admin/login",
@@ -205,37 +220,16 @@ const adminApi = {
     async function tryPaths(): Promise<any> {
       for (const p of candidatePaths) {
         try {
-          if (import.meta.env.DEV) {
-            // Use fetch in dev to go through Vite proxy reliably
-            const res = await fetch(p, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            });
-            if (!res.ok) {
-              console.warn(
-                `adminApi.login: attempt ${p} returned ${res.status}`
-              );
-              if (res.status === 404) continue;
-            } else {
-              const data = await res.json();
-              return { data, status: res.status };
-            }
-          } else {
-            // Production: use axios client with absolute path
-            const resp = await apiClient.post(
-              p.replace(/^\/api/, ""),
-              payload,
-              { timeout: 15000 }
-            );
-            return resp;
-          }
+          console.log(`📡 adminApi.login: Trying path ${p}`);
+          const resp = await apiClient.post(p, payload, { timeout: 15000 });
+          return resp;
         } catch (err: any) {
           console.warn(
-            `adminApi.login: attempt ${p} failed`,
+            `adminApi.login: attempt ${p} failed with status ${err?.response?.status}`,
             err?.message || err
           );
-          continue;
+          if (err?.response?.status === 404) continue;
+          throw err; // Re-throw non-404 errors immediately
         }
       }
       throw new Error("All login attempts failed");
@@ -243,13 +237,14 @@ const adminApi = {
 
     try {
       const response = await tryPaths();
-      const responseData = response.data ?? response;
+      const responseData = response.data;
       const token =
         responseData?.AccessToken ||
         responseData?.access_token ||
         responseData?.accessToken;
       if (token) {
         localStorage.setItem("admin_token", token);
+        console.log("✅ adminApi.login: Token saved to localStorage");
         const adminData =
           responseData.Admin ||
           responseData.admin ||
@@ -347,19 +342,69 @@ const adminApi = {
   },
 
   async getCurrentAdmin(): Promise<ApiResponse<AdminUser>> {
-    console.log("📡 adminApi.getCurrentAdmin: Запрос на /api/v1/admin/me");
-    const response = await apiClient.get("/api/v1/admin/me");
-    return response.data;
+    // Try multiple possible endpoints because different backends expose /me or /profile under different paths
+    const candidates = [
+      "/v1/admin/me",
+      "/v1/admin/profile",
+      "/v1/auth/me",
+      "/v1/me",
+      "/admin/me",
+      "/auth/me",
+    ];
+
+    let lastError: any = null;
+    for (const path of candidates) {
+      try {
+        console.log(`📡 adminApi.getCurrentAdmin: Trying ${path}`);
+        const resp = await apiClient.get(path);
+        return resp.data;
+      } catch (err: any) {
+        lastError = err;
+        const status = err?.response?.status;
+        console.warn(`adminApi.getCurrentAdmin: ${path} failed (${status || "no-response"})`);
+        // try next candidate on 404 or 401 (backend may use another path)
+        if (status && status !== 404 && status !== 401) {
+          // For other errors, stop and rethrow
+          throw err;
+        }
+      }
+    }
+    // If all attempts failed, rethrow the last error for upstream handling
+    throw lastError || new Error("Failed to fetch current admin");
   },
 
   async getCurrentUser(): Promise<ApiResponse<any>> {
-    const response = await apiClient.get("/api/v1/auth/me");
-    return response.data;
+    // Mirror getCurrentAdmin fallback list
+    const candidates = [
+      "/v1/admin/me",
+      "/v1/admin/profile",
+      "/v1/auth/me",
+      "/v1/me",
+      "/admin/me",
+      "/auth/me",
+    ];
+
+    let lastError: any = null;
+    for (const path of candidates) {
+      try {
+        console.log(`📡 adminApi.getCurrentUser: Trying ${path}`);
+        const resp = await apiClient.get(path);
+        return resp.data;
+      } catch (err: any) {
+        lastError = err;
+        const status = err?.response?.status;
+        console.warn(`adminApi.getCurrentUser: ${path} failed (${status || "no-response"})`);
+        if (status && status !== 404 && status !== 401) {
+          throw err;
+        }
+      }
+    }
+    throw lastError || new Error("Failed to fetch current user");
   },
 
   // Дашборд
   async getDashboardStats(): Promise<ApiResponse<DashboardStats>> {
-    const response = await apiClient.get("/api/v1/admin/dashboard/stats");
+    const response = await apiClient.get("/v1/admin/dashboard/stats");
     const data = unwrapResponse(response);
     return { data: data.items?.[0] ?? data, message: response.data?.message };
   },
@@ -372,7 +417,7 @@ const adminApi = {
   ): Promise<ApiResponse<PaginatedResponse<User>>> {
     const params: any = { page, page_size };
     if (search?.trim()) params.search = search.trim();
-    const response = await apiClient.get("/api/v1/admin/users", { params });
+    const response = await apiClient.get("/v1/admin/users", { params });
     const payload = unwrapResponse(response);
     return {
       data: {
@@ -386,7 +431,7 @@ const adminApi = {
   },
 
   async getUserById(id: number): Promise<ApiResponse<User>> {
-    const response = await apiClient.get(`/api/v1/admin/users/${id}`);
+    const response = await apiClient.get(`/v1/admin/users/${id}`);
     return response.data;
   },
 
@@ -394,20 +439,20 @@ const adminApi = {
     id: number,
     data: Partial<User>
   ): Promise<ApiResponse<User>> {
-    const response = await apiClient.put(`/api/v1/admin/users/${id}`, data);
+    const response = await apiClient.put(`/v1/admin/users/${id}`, data);
     return response.data;
   },
 
   async deleteUser(id: number): Promise<void> {
-    await apiClient.delete(`/api/v1/admin/users/${id}`);
+    await apiClient.delete(`/v1/admin/users/${id}`);
   },
 
   async activateUser(id: number): Promise<void> {
-    await apiClient.post(`/api/v1/admin/users/${id}/activate`);
+    await apiClient.post(`/v1/admin/users/${id}/activate`);
   },
 
   async deactivateUser(id: number): Promise<void> {
-    await apiClient.post(`/api/v1/admin/users/${id}/deactivate`);
+    await apiClient.post(`/v1/admin/users/${id}/deactivate`);
   },
 
   // Партнеры
@@ -420,7 +465,7 @@ const adminApi = {
     const params: any = { page, page_size };
     if (search?.trim()) params.search = search.trim();
     if (status) params.status = status;
-    const response = await apiClient.get("/api/v1/admin/partners", { params });
+    const response = await apiClient.get("/v1/admin/partners", { params });
     const payload = unwrapResponse(response);
     return {
       data: {
@@ -434,7 +479,7 @@ const adminApi = {
   },
 
   async getPartnerById(id: number): Promise<ApiResponse<Partner>> {
-    const response = await apiClient.get(`/api/v1/admin/partners/${id}`);
+    const response = await apiClient.get(`/v1/admin/partners/${id}`);
     const payload = unwrapResponse(response);
     return {
       data: payload.items?.[0] ?? payload,
@@ -443,7 +488,7 @@ const adminApi = {
   },
 
   async createPartner(data: Partial<Partner>): Promise<ApiResponse<Partner>> {
-    const response = await apiClient.post("/api/v1/admin/partners", data);
+    const response = await apiClient.post("/v1/admin/partners", data);
     return response.data;
   },
 
@@ -451,20 +496,20 @@ const adminApi = {
     id: number,
     data: Partial<Partner>
   ): Promise<ApiResponse<Partner>> {
-    const response = await apiClient.put(`/api/v1/admin/partners/${id}`, data);
+    const response = await apiClient.put(`/v1/admin/partners/${id}`, data);
     return response.data;
   },
 
   async deletePartner(id: number): Promise<void> {
-    await apiClient.delete(`/api/v1/admin/partners/${id}`);
+    await apiClient.delete(`/v1/admin/partners/${id}`);
   },
 
   async approvePartner(id: number): Promise<void> {
-    await apiClient.post(`/api/v1/admin/partners/${id}/approve`);
+    await apiClient.post(`/v1/admin/partners/${id}/approve`);
   },
 
   async rejectPartner(id: number, reason?: string): Promise<void> {
-    await apiClient.post(`/api/v1/admin/partners/${id}/reject`, { reason });
+    await apiClient.post(`/v1/admin/partners/${id}/reject`, { reason });
   },
 
   // Товары партнеров
@@ -474,7 +519,7 @@ const adminApi = {
     page_size = 20
   ): Promise<ApiResponse<PaginatedResponse<any>>> {
     const response = await apiClient.get(
-      `/api/v1/admin/partners/${partnerId}/products`,
+      `/v1/admin/partners/${partnerId}/products`,
       {
         params: { page, page_size },
       }
@@ -536,7 +581,7 @@ const adminApi = {
     page = 1,
     page_size = 20
   ): Promise<ApiResponse<PaginatedResponse<Promotion>>> {
-    const response = await apiClient.get("/api/v1/admin/promotions", {
+    const response = await apiClient.get("/v1/admin/promotions", {
       params: { page, page_size },
     });
     const payload = unwrapResponse(response);
@@ -552,7 +597,7 @@ const adminApi = {
   },
 
   async getPromotionById(id: number): Promise<ApiResponse<Promotion>> {
-    const response = await apiClient.get(`/api/v1/admin/promotions/${id}`);
+    const response = await apiClient.get(`/v1/admin/promotions/${id}`);
     const payload = unwrapResponse(response);
     return {
       data: payload.items?.[0] ?? payload,
@@ -563,7 +608,7 @@ const adminApi = {
   async createPromotion(
     data: Partial<Promotion>
   ): Promise<ApiResponse<Promotion>> {
-    const response = await apiClient.post("/api/v1/admin/promotions", data);
+    const response = await apiClient.post("/v1/admin/promotions", data);
     return response.data;
   },
 
@@ -571,12 +616,12 @@ const adminApi = {
     id: number,
     data: Partial<Promotion>
   ): Promise<ApiResponse<Promotion>> {
-    const response = await apiClient.put(`/api/v1/admin/promotions/${id}`, data);
+    const response = await apiClient.put(`/v1/admin/promotions/${id}`, data);
     return response.data;
   },
 
   async deletePromotion(id: number): Promise<void> {
-    await apiClient.delete(`/api/v1/admin/promotions/${id}`);
+    await apiClient.delete(`/v1/admin/promotions/${id}`);
   },
 
   // Транзакции
@@ -584,7 +629,7 @@ const adminApi = {
     page = 1,
     page_size = 20
   ): Promise<ApiResponse<PaginatedResponse<Transaction>>> {
-    const response = await apiClient.get("/api/v1/admin/transactions", {
+    const response = await apiClient.get("/v1/admin/transactions", {
       params: { page, page_size },
     });
     return response.data;
@@ -600,7 +645,7 @@ const adminApi = {
     page = 1,
     page_size = 20
   ): Promise<ApiResponse<PaginatedResponse<any>>> {
-    const response = await apiClient.get("/api/v1/admin/notifications", {
+    const response = await apiClient.get("/v1/admin/notifications", {
       params: { page, page_size },
     });
     return response.data;
@@ -612,24 +657,24 @@ const adminApi = {
     segment: string;
     scheduled_for?: string;
   }): Promise<ApiResponse<any>> {
-    const response = await apiClient.post("/api/v1/admin/notifications", data);
+    const response = await apiClient.post("/v1/admin/notifications", data);
     return response.data;
   },
 
   // Рефералы
   async getReferrals(): Promise<ApiResponse<any[]>> {
-    const response = await apiClient.get("/api/v1/admin/referrals");
+    const response = await apiClient.get("/v1/admin/referrals");
     return response.data;
   },
 
   async getReferralsStats(): Promise<ApiResponse<any>> {
-    const response = await apiClient.get("/api/v1/admin/referrals/stats");
+    const response = await apiClient.get("/v1/admin/referrals/stats");
     return response.data;
   },
 
   // Настройки и Справочники
   async getSettings(): Promise<ApiResponse<any>> {
-    const response = await apiClient.get("/api/v1/admin/settings");
+    const response = await apiClient.get("/v1/admin/settings");
     const payload = unwrapResponse(response);
     return {
       data: payload.items?.[0] ?? payload,
@@ -638,27 +683,27 @@ const adminApi = {
   },
 
   async updateSettings(data: Partial<any>): Promise<ApiResponse<any>> {
-    const response = await apiClient.put("/api/v1/admin/settings", data);
+    const response = await apiClient.put("/v1/admin/settings", data);
     return response.data;
   },
 
   async getCategories(): Promise<ApiResponse<any[]>> {
-    const response = await apiClient.get("/api/v1/admin/categories");
+    const response = await apiClient.get("/v1/admin/categories");
     return response.data;
   },
 
   async createCategory(data: { name: string }): Promise<ApiResponse<any>> {
-    const response = await apiClient.post("/api/v1/admin/categories", data);
+    const response = await apiClient.post("/v1/admin/categories", data);
     return response.data;
   },
 
   async getCities(): Promise<ApiResponse<any[]>> {
-    const response = await apiClient.get("/api/v1/admin/cities");
+    const response = await apiClient.get("/v1/admin/cities");
     return response.data;
   },
 
   async createCity(data: { name: string }): Promise<ApiResponse<any>> {
-    const response = await apiClient.post("/api/v1/admin/cities", data);
+    const response = await apiClient.post("/v1/admin/cities", data);
     return response.data;
   },
 
