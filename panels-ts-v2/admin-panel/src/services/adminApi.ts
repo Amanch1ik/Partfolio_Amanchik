@@ -74,7 +74,9 @@ apiClient.interceptors.request.use(
       return config;
     }
 
-    const token = localStorage.getItem("admin_token");
+    // Attach stored access token if present and valid ASCII
+    const rawToken = localStorage.getItem("admin_token");
+    const token = sanitizeToken(rawToken);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
       if (import.meta.env.DEV) {
@@ -92,6 +94,23 @@ apiClient.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
+
+// Helper: ensure token contains only ASCII characters acceptable for HTTP headers.
+function sanitizeToken(raw?: string | null): string | null {
+  if (!raw) return null;
+  // If token contains non-ASCII, it was likely corrupted when copied (ellipsis etc).
+  // In that case, remove stored token and return null to force re-login.
+  if (/[^\x00-\x7F]/.test(raw)) {
+    try {
+      console.warn("adminApi: token contains non-ASCII characters - removing from storage");
+      localStorage.removeItem("admin_token");
+    } catch (e) {
+      // ignore
+    }
+    return null;
+  }
+  return raw;
+}
 
 // Интерцептор ответов: обработка ошибок и метрик
 apiClient.interceptors.response.use(
@@ -128,15 +147,35 @@ apiClient.interceptors.response.use(
         if (error.response?.data) {
           console.warn("🔓 adminApi: 401 details:", error.response.data);
         }
-        // Токен недействителен — очищаем чтобы прекратить повторные неудачные запросы.
-        // Это предотвращает бесконечные попытки и даёт пользователю возможность перелогиниться.
+
+        // Если запрос ещё не был ретрачен через refresh — попробуем обновить токен и повторить один раз.
+        const originalConfig: any = error.config;
+        if (originalConfig && !originalConfig._isRetry) {
+          try {
+            const newToken = await refreshAccessToken();
+            if (newToken) {
+              // отметим что это ретрай и повторим исходный запрос с новым токеном
+              originalConfig._isRetry = true;
+              originalConfig.headers = originalConfig.headers || {};
+              originalConfig.headers.Authorization = `Bearer ${newToken}`;
+              if (import.meta.env.DEV) {
+                console.log("🔁 adminApi: Retrying original request with refreshed token");
+              }
+              return apiClient.request(originalConfig);
+            }
+          } catch (e) {
+            // ignore and fall through to remove tokens below
+          }
+        }
+
+        // Если мы сюда дошли — refresh не сработал или уже был выполнен: очищаем токены.
         try {
           localStorage.removeItem("admin_token");
+          localStorage.removeItem("admin_refresh_token");
           console.warn("🔓 adminApi: removed invalid admin_token from localStorage");
         } catch (e) {
           // ignore
         }
-        // Optionally trigger a reload so UI returns to login state
         if (typeof window !== "undefined") {
           try {
             window.dispatchEvent(new Event("yessgo:token-invalid"));
@@ -151,6 +190,48 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// Try to refresh access token using stored refresh token.
+async function refreshAccessToken(): Promise<string | null> {
+  const refreshToken =
+    localStorage.getItem("admin_refresh_token") || localStorage.getItem("refresh_token");
+  if (!refreshToken) return null;
+
+  const candidatePaths = [
+    "/v1/admin/auth/refresh",
+    "/v1/auth/refresh",
+    "/admin/auth/refresh",
+    "/auth/refresh",
+  ];
+
+  for (const p of candidatePaths) {
+    try {
+      const resp = await apiClient.post(p, { refreshToken }, { timeout: 10000 });
+      const data = resp.data;
+      const newToken =
+        data?.AccessToken || data?.access_token || data?.accessToken || null;
+      const newRefresh =
+        data?.RefreshToken || data?.refresh_token || data?.refreshToken || null;
+      if (newToken) {
+        try {
+          localStorage.setItem("admin_token", newToken);
+          if (newRefresh) localStorage.setItem("admin_refresh_token", newRefresh);
+        } catch (e) {
+          // ignore storage errors
+        }
+        return newToken;
+      }
+    } catch (err: any) {
+      if (err?.response?.status === 404) {
+        // try next candidate
+        continue;
+      }
+      // If refresh endpoint returned 401 or other error, stop trying further
+      return null;
+    }
+  }
+  return null;
+}
 
 // Интерфейсы ответов
 interface ApiResponse<T> {
@@ -242,8 +323,18 @@ const adminApi = {
         responseData?.AccessToken ||
         responseData?.access_token ||
         responseData?.accessToken;
+      const refreshToken =
+        responseData?.RefreshToken ||
+        responseData?.refresh_token ||
+        responseData?.refreshToken;
+
       if (token) {
-        localStorage.setItem("admin_token", token);
+        try {
+          localStorage.setItem("admin_token", token);
+          if (refreshToken) localStorage.setItem("admin_refresh_token", refreshToken);
+        } catch (e) {
+          // ignore storage errors
+        }
         console.log("✅ adminApi.login: Token saved to localStorage");
         const adminData =
           responseData.Admin ||
@@ -338,7 +429,12 @@ const adminApi = {
   },
 
   logout() {
-    localStorage.removeItem("admin_token");
+    try {
+      localStorage.removeItem("admin_token");
+      localStorage.removeItem("admin_refresh_token");
+    } catch (e) {
+      // ignore
+    }
   },
 
   async getCurrentAdmin(): Promise<ApiResponse<AdminUser>> {

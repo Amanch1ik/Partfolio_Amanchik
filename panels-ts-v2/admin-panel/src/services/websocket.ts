@@ -6,6 +6,23 @@
 type MessageHandler = (data: any) => void;
 type EventType = 'notification' | 'transaction' | 'user_update' | 'partner_update' | 'system';
 
+// Sanitize stored token (remove if non-ASCII/corrupted)
+function sanitizeStoredToken(raw?: string | null): string | null {
+  if (!raw) return null;
+  if (/[^\x00-\x7F]/.test(raw)) {
+    if (import.meta.env.DEV) {
+      console.warn('wsService: stored token contains non-ASCII characters - removing');
+    }
+    try {
+      localStorage.removeItem('admin_token');
+    } catch (e) {
+      // ignore
+    }
+    return null;
+  }
+  return raw;
+}
+
 class WebSocketService {
   private ws: WebSocket | null = null;
   private url: string = '';
@@ -31,7 +48,8 @@ class WebSocketService {
 
     try {
       // Добавляем токен в URL если есть
-      const urlWithToken = token ? `${wsUrl}?token=${token}` : wsUrl;
+      const safeToken = sanitizeStoredToken(token);
+      const urlWithToken = safeToken ? `${wsUrl}?token=${safeToken}` : wsUrl;
       this.ws = new WebSocket(urlWithToken);
 
       this.ws.onopen = () => {
@@ -117,7 +135,7 @@ class WebSocketService {
     }
 
     this.reconnectTimer = setTimeout(() => {
-      const token = localStorage.getItem('admin_token');
+      const token = sanitizeStoredToken(localStorage.getItem('admin_token'));
       const wsUrl = getWebSocketUrl();
       this.connect(wsUrl, token || undefined);
     }, this.reconnectDelay);

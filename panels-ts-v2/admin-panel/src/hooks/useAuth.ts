@@ -193,6 +193,27 @@ export const useAuth = () => {
     };
   }, []);
 
+  // Listen for global token-invalid events (fired by api layer) to force logout
+  useEffect(() => {
+    const handler = () => {
+      try {
+        console.log("useAuth: received yessgo:token-invalid -> logging out");
+        logout();
+        setUser(null);
+      } catch (e) {
+        // ignore
+      }
+    };
+    if (typeof window !== "undefined") {
+      window.addEventListener("yessgo:token-invalid", handler);
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("yessgo:token-invalid", handler);
+      }
+    };
+  }, [logout, setUser]);
+
   const tokenExists = !!localStorage.getItem('admin_token');
   
   return {
