@@ -66,6 +66,7 @@ function initLanguageSwitcher() {
     });
 
     function applyLanguage(lang) {
+        document.documentElement.lang = lang;
         const elements = document.querySelectorAll('[data-lang-ru][data-lang-en]');
         elements.forEach(el => {
             const text = el.getAttribute(`data-lang-${lang}`);
@@ -424,6 +425,7 @@ function initContactForm() {
         e.preventDefault();
         const btn = form.querySelector('button');
         const btnText = btn.innerHTML;
+        const lang = document.documentElement.lang || 'ru';
 
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
@@ -439,7 +441,7 @@ function initContactForm() {
             });
 
             if (response.ok) {
-                showToast(currentLang === 'ru' ? 'Сообщение отправлено!' : 'Message sent successfully!');
+                showToast(lang === 'ru' ? 'Сообщение отправлено!' : 'Message sent successfully!');
                 form.reset();
                 btn.innerHTML = btnText;
                 btn.disabled = false;
@@ -447,7 +449,7 @@ function initContactForm() {
                 throw new Error();
             }
         } catch (err) {
-            showToast(currentLang === 'ru' ? 'Ошибка при отправке' : 'Error sending message', 'error');
+            showToast(lang === 'ru' ? 'Ошибка при отправке' : 'Error sending message', 'error');
             btn.innerHTML = btnText;
             btn.disabled = false;
         }
