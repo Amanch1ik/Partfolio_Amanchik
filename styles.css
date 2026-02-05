@@ -1625,3 +1625,48 @@ section {
     opacity: 0.5;
 }
 
+
+/* Branded Tech Icons Refinement */
+.skill-tag i {
+    font-size: 1.25rem !important;
+    transition: var(--transition-fast);
+}
+
+.skill-tag i.colored {
+    color: unset !important; /* Use Devicon branded colors */
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.1));
+}
+
+.skill-tag:hover i.colored {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+}
+
+.terminal-branded {
+    color: #4D4D4D !important;
+}
+
+
+/* Refinement: Hide Lottie background symbols and fix branded icons */
+.image-wrapper {
+    overflow: hidden !important;
+}
+
+.skill-tag i {
+    font-size: 1.25rem !important;
+    transition: var(--transition-fast);
+}
+
+.skill-tag i.colored {
+    color: unset !important;
+}
+
+.skill-tag:hover i.colored {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+}
+
+.terminal-branded {
+    color: #4D4D4D !important;
+}
+
