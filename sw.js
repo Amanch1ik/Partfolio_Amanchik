@@ -4,13 +4,19 @@ const ASSETS = [
     './index.html',
     './styles.css',
     './script.js',
-    './resources/photo.jpg'
+    './resources/photo.jpg',
+    './resources/icon-192.png',
+    './resources/icon-512.png',
+    './manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(ASSETS);
+            // Use individual add for resilience
+            return Promise.allSettled(
+                ASSETS.map(url => cache.add(url).catch(err => console.log('Failed to cache:', url, err)))
+            );
         })
     );
 });
