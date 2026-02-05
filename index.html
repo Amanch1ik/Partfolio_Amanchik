@@ -8,6 +8,8 @@
         content="Amanbol Aitbekov - Software Developer | Full-Stack / Backend Developer from Kyrgyzstan">
     <title>Amanbol Aitbekov | Software Developer</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0a0a">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
@@ -35,6 +37,8 @@
 </head>
 
 <body>
+    <!-- Interactive Background -->
+    <div class="interactive-bg"></div>
     <!-- Scroll Progress Bar -->
     <div class="scroll-progress"></div>
 
@@ -760,10 +764,28 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <div class="footer-content">
-                <a href="#home" class="footer-logo">
-                    <span class="logo-accent">A</span>manbol
-                </a>
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="#home" class="footer-logo">
+                        <span class="logo-accent">A</span>manbol
+                    </a>
+                    <p class="footer-mission"
+                        data-lang-ru="Создаю масштабируемые бэкенд-решения с акцентом на производительность и чистоту кода."
+                        data-lang-en="Building scalable backend solutions with a focus on performance and clean code.">
+                        Создаю масштабируемые бэкенд-решения с акцентом на производительность и чистоту кода.
+                    </p>
+                </div>
+                <div class="footer-links">
+                    <h4 data-lang-ru="Навигация" data-lang-en="Navigation">Навигация</h4>
+                    <ul>
+                        <li><a href="#about" data-lang-ru="Обо мне" data-lang-en="About">Обо мне</a></li>
+                        <li><a href="#projects" data-lang-ru="Проекты" data-lang-en="Projects">Проекты</a></li>
+                        <li><a href="#skills" data-lang-ru="Навыки" data-lang-en="Skills">Навыки</a></li>
+                        <li><a href="#contact" data-lang-ru="Контакты" data-lang-en="Contact">Контакты</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
                 <p class="footer-text">
                     © 2026 Amanbol Aitbekov. <span data-lang-ru="Все права защищены"
                         data-lang-en="All rights reserved">Все права защищены</span>
@@ -777,12 +799,6 @@
                     </a>
                     <a href="https://leetcode.com/u/Amanch1ik/" target="_blank" aria-label="LeetCode">
                         <i class="devicon-leetcode-plain"></i>
-                    </a>
-                    <a href="https://www.instagram.com/amanch1ik_/" target="_blank" aria-label="Instagram">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                    <a href="https://wa.me/996551697296" target="_blank" aria-label="WhatsApp">
-                        <i class="fab fa-whatsapp"></i>
                     </a>
                 </div>
             </div>
