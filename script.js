@@ -5,6 +5,8 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     initLanguageSwitcher();
+    initThemeToggle();
+    initScrollProgress();
     initNavigation();
     initMobileMenu();
     initScrollAnimations();
@@ -13,6 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initCustomCursor();
     initProjectModals();
     initContactForm();
+    initGitHubRepos();
+    initLottie();
 });
 
 /**
@@ -80,6 +84,37 @@ function initLanguageSwitcher() {
             langInactive.textContent = 'RU';
         }
     }
+}
+
+/**
+ * Theme Toggle - Switch between Dark and Light mode
+ */
+function initThemeToggle() {
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = themeToggle.querySelector('i');
+    const body = document.body;
+
+    // Get saved theme or default to dark
+    const currentTheme = localStorage.getItem('portfolio-theme') || 'dark';
+
+    // Apply saved theme on load
+    if (currentTheme === 'light') {
+        body.classList.add('light-mode');
+        themeIcon.classList.replace('fa-moon', 'fa-sun');
+    }
+
+    themeToggle.addEventListener('click', () => {
+        body.classList.toggle('light-mode');
+        const isLight = body.classList.contains('light-mode');
+
+        if (isLight) {
+            themeIcon.classList.replace('fa-moon', 'fa-sun');
+            localStorage.setItem('portfolio-theme', 'light');
+        } else {
+            themeIcon.classList.replace('fa-sun', 'fa-moon');
+            localStorage.setItem('portfolio-theme', 'dark');
+        }
+    });
 }
 
 /**
@@ -383,25 +418,118 @@ function initContactForm() {
             });
 
             if (response.ok) {
-                btn.innerHTML = '<i class="fas fa-check"></i> Sent!';
-                btn.style.backgroundColor = '#22c55e';
+                showToast(currentLang === 'ru' ? 'Сообщение отправлено!' : 'Message sent successfully!');
                 form.reset();
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.innerHTML = btnText;
-                    btn.style.backgroundColor = '';
-                }, 3000);
+                btn.innerHTML = btnText;
+                btn.disabled = false;
             } else {
                 throw new Error();
             }
         } catch (err) {
-            btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
-            btn.style.backgroundColor = '#ef4444';
-            setTimeout(() => {
-                btn.disabled = false;
-                btn.innerHTML = btnText;
-                btn.style.backgroundColor = '';
-            }, 3000);
+            showToast(currentLang === 'ru' ? 'Ошибка при отправке' : 'Error sending message', 'error');
+            btn.innerHTML = btnText;
+            btn.disabled = false;
         }
+    });
+}
+
+/**
+ * Toast Notifications
+ */
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `
+        <div class="toast-content">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+
+    document.body.appendChild(toast);
+
+    // Animate in
+    setTimeout(() => toast.classList.add('visible'), 100);
+
+    // Remove after 4 seconds
+    setTimeout(() => {
+        toast.classList.remove('visible');
+        setTimeout(() => toast.remove(), 500);
+    }, 4000);
+}
+
+/**
+ * GitHub API Integration
+ */
+async function initGitHubRepos() {
+    const projectsGrid = document.querySelector('.projects-grid');
+    if (!projectsGrid) return;
+
+    try {
+        const response = await fetch('https://api.github.com/users/Amanch1ik/repos?sort=updated&per_page=6');
+        const repos = await response.json();
+
+        const githubSection = document.createElement('div');
+        githubSection.className = 'github-repos-container';
+        githubSection.innerHTML = `
+            <div class="container">
+                <div class="section-header" style="margin-top: 80px;">
+                    <span class="section-label">GitHub Activity</span>
+                    <h2 class="section-title" data-lang-ru="Последние репозитории" data-lang-en="Latest Repositories">Последние репозитории</h2>
+                </div>
+                <div class="repos-grid"></div>
+            </div>
+        `;
+
+        const reposGrid = githubSection.querySelector('.repos-grid');
+
+        repos.filter(repo => !repo.fork).forEach(repo => {
+            const repoCard = document.createElement('div');
+            repoCard.className = 'repo-card fade-in';
+            repoCard.innerHTML = `
+                <div class="repo-header">
+                    <i class="fab fa-github"></i>
+                    <div class="repo-stats">
+                        <span><i class="fas fa-star"></i> ${repo.stargazers_count}</span>
+                        <span><i class="fas fa-code-branch"></i> ${repo.forks_count}</span>
+                    </div>
+                </div>
+                <h3 class="repo-name">${repo.name}</h3>
+                <p class="repo-desc">${repo.description || 'No description available'}</p>
+                <div class="repo-footer">
+                    <span class="repo-lang">${repo.language || 'Code'}</span>
+                    <a href="${repo.html_url}" target="_blank" class="repo-link">View <i class="fas fa-external-link-alt"></i></a>
+                </div>
+            `;
+            reposGrid.appendChild(repoCard);
+        });
+
+        projectsGrid.parentNode.insertBefore(githubSection, projectsGrid.nextSibling);
+
+        initScrollAnimations();
+
+    } catch (error) {
+        console.error('Error fetching GitHub repos:', error);
+    }
+}
+
+/**
+ * Lottie Animations
+ */
+function initLottie() {
+    // We can add lottie players dynamically or just rely on the script
+}
+/**
+ * Scroll Progress Bar
+ */
+function initScrollProgress() {
+    const progressBar = document.querySelector('.scroll-progress');
+    if (!progressBar) return;
+
+    window.addEventListener('scroll', () => {
+        const windowScroll = document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (windowScroll / height) * 100;
+        progressBar.style.width = scrolled + '%';
     });
 }

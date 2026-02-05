@@ -10,9 +10,33 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+    <!-- SEO Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Amanbol Aitbekov",
+      "jobTitle": "Software Developer",
+      "url": "https://github.com/Amanch1ik",
+      "sameAs": [
+        "https://github.com/Amanch1ik",
+        "https://www.instagram.com/amanch1ik_/"
+      ],
+      "knowsAbout": ["Full-Stack Development", "Backend Development", "Django", "FastAPI", "React", "Docker"],
+      "alumniOf": {
+        "@type": "CollegeOrUniversity",
+        "name": "Kyrgyz State Technical University named after I. Razzakov"
+      }
+    }
+    </script>
 </head>
 
 <body>
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress"></div>
+
     <!-- Custom Cursor -->
     <div class="cursor-dot"></div>
     <div class="cursor-outline"></div>
@@ -38,6 +62,9 @@
                 <li><a href="#contact" class="nav-link" data-lang-ru="Контакты" data-lang-en="Contact">Контакты</a></li>
             </ul>
             <div class="nav-actions">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
                 <button class="lang-switcher" id="langSwitcher">
                     <span class="lang-active">RU</span>
                     <span class="lang-divider">/</span>
@@ -109,8 +136,14 @@
             </div>
             <div class="hero-image">
                 <div class="image-wrapper">
-                    <img src="resources/IMG_9465.jpg" alt="Amanbol Aitbekov">
+                    <img src="resources/IMG_9465.jpg" alt="Amanbol Aitbekov" loading="lazy">
                     <div class="image-border"></div>
+                    <!-- Lottie Animation Overlay -->
+                    <div class="lottie-overlay">
+                        <lottie-player src="https://assets10.lottiefiles.com/packages/lf20_m6cuL6.json"
+                            background="transparent" speed="1" style="width: 100%; height: 100%;" loop
+                            autoplay></lottie-player>
+                    </div>
                 </div>
             </div>
         </div>
@@ -138,6 +171,20 @@
                         стабильности, безопасности и масштабируемости решений.
                     </p>
                 </div>
+
+                <div class="education-block fade-in">
+                    <div class="education-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="education-details">
+                        <h3 class="education-university">КГТУ им. И. Раззакова</h3>
+                        <p class="education-specialty" data-lang-ru="Программная инженерия, 2 курс"
+                            data-lang-en="Software Engineering, 2nd Year">
+                            Программная инженерия, 2 курс
+                        </p>
+                    </div>
+                </div>
+
                 <div class="about-cards">
                     <div class="about-card">
                         <div class="card-icon">
@@ -183,79 +230,76 @@
         </div>
     </section>
 
-    <!-- Experience Section -->
+    <!-- Timeline Section (Experience & Education) -->
     <section id="experience" class="experience">
         <div class="container">
             <div class="section-header">
-                <span class="section-label" data-lang-ru="Опыт работы" data-lang-en="Work Experience">Опыт работы</span>
-                <h2 class="section-title" data-lang-ru="Коммерческий опыт" data-lang-en="Commercial Experience">
-                    Коммерческий опыт</h2>
+                <span class="section-label" data-lang-ru="Мой путь" data-lang-en="My Path">Мой путь</span>
+                <h2 class="section-title" data-lang-ru="Опыт и Образование" data-lang-en="Experience & Education">Опыт и
+                    Образование</h2>
             </div>
-            <div class="experience-content">
-                <div class="experience-summary">
-                    <div class="exp-stat">
-                        <span class="stat-number">5-6</span>
-                        <span class="stat-label" data-lang-ru="месяцев опыта"
-                            data-lang-en="months of experience">месяцев опыта</span>
+
+            <div class="timeline">
+                <!-- Education -->
+                <div class="timeline-item education">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">2024 — <span data-lang-ru="Наст. время" data-lang-en="Present">Наст.
+                            время</span></div>
+                    <div class="timeline-content">
+                        <div class="timeline-icon"><i class="fas fa-graduation-cap"></i></div>
+                        <h3 class="timeline-title">КГТУ им. И. Раззакова</h3>
+                        <p class="timeline-subtitle" data-lang-ru="Программная инженерия, 2 курс"
+                            data-lang-en="Software Engineering, 2nd Year">Программная инженерия, 2 курс</p>
                     </div>
-                    <p class="exp-description"
-                        data-lang-ru="Работал разработчиком в нескольких проектах, где принимал участие во всех этапах разработки — от проектирования до деплоя и поддержки."
-                        data-lang-en="Worked as a developer on several projects, participating in all stages of development — from design to deployment and support.">
-                        Работал разработчиком в нескольких проектах, где принимал участие во всех этапах разработки — от
-                        проектирования до деплоя и поддержки.
-                    </p>
                 </div>
 
-                <div class="experience-grid">
-                    <div class="exp-card">
-                        <div class="exp-icon">
-                            <i class="fas fa-briefcase"></i>
-                        </div>
-                        <h3 data-lang-ru="Текущая деятельность" data-lang-en="Current Activities">Текущая деятельность
-                        </h3>
-                        <ul>
-                            <li data-lang-ru="Разработка образовательных онлайн-порталов"
-                                data-lang-en="Development of educational online portals">Разработка образовательных
-                                онлайн-порталов</li>
-                            <li data-lang-ru="Выполнение коммерческих заказов"
-                                data-lang-en="Completing commercial orders">Выполнение коммерческих заказов</li>
-                            <li data-lang-ru="Настройка и поддержка серверной части"
-                                data-lang-en="Server-side setup and support">Настройка и поддержка серверной части</li>
-                        </ul>
+                <!-- Experience 1 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date" data-lang-ru="5-6 месяцев назад" data-lang-en="5-6 months ago">5-6
+                        месяцев назад</div>
+                    <div class="timeline-content">
+                        <div class="timeline-icon"><i class="fas fa-briefcase"></i></div>
+                        <h3 class="timeline-title" data-lang-ru="Разработка образовательных порталов"
+                            data-lang-en="Edu Portal Development">Разработка образовательных порталов</h3>
+                        <p class="timeline-text"
+                            data-lang-ru="Участие во всех этапах: от проектирования до деплоя и поддержки."
+                            data-lang-en="Participated in all stages: from design to deployment and support.">Участие во
+                            всех этапах: от проектирования до деплоя и поддержки.</p>
                     </div>
-                    <div class="exp-card">
-                        <div class="exp-icon">
-                            <i class="fas fa-code"></i>
-                        </div>
-                        <h3 data-lang-ru="В рамках проектов" data-lang-en="Within Projects">В рамках проектов</h3>
-                        <ul>
-                            <li data-lang-ru="Разработка backend-логики и REST API"
-                                data-lang-en="Backend logic and REST API development">Разработка backend-логики и REST
-                                API</li>
+                </div>
+
+                <!-- Experience 2 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date" data-lang-ru="Коммерческие проекты" data-lang-en="Commercial Projects">
+                        Коммерческие проекты</div>
+                    <div class="timeline-content">
+                        <div class="timeline-icon"><i class="fas fa-code"></i></div>
+                        <h3 class="timeline-title" data-lang-ru="Full-Stack / Backend"
+                            data-lang-en="Full-Stack / Backend">Full-Stack / Backend</h3>
+                        <ul class="timeline-list">
+                            <li data-lang-ru="Разработка REST API и логики" data-lang-en="REST API & Logic development">
+                                Разработка REST API и логики</li>
                             <li data-lang-ru="Настройка баз данных" data-lang-en="Database configuration">Настройка баз
                                 данных</li>
-                            <li data-lang-ru="Развёртывание проектов на серверах"
-                                data-lang-en="Project deployment on servers">Развёртывание проектов на серверах</li>
-                            <li data-lang-ru="Обеспечение стабильной работы" data-lang-en="Ensuring stable operation">
-                                Обеспечение стабильной работы</li>
                         </ul>
                     </div>
-                    <div class="exp-card">
-                        <div class="exp-icon">
-                            <i class="fas fa-server"></i>
-                        </div>
-                        <h3 data-lang-ru="Серверы и инфраструктура" data-lang-en="Servers & Infrastructure">Серверы и
-                            инфраструктура</h3>
-                        <ul>
-                            <li data-lang-ru="Администрирование серверов" data-lang-en="Server administration">
-                                Администрирование серверов</li>
-                            <li data-lang-ru="Деплой веб-приложений" data-lang-en="Web application deployment">Деплой
-                                веб-приложений</li>
-                            <li data-lang-ru="Docker-контейнеризация" data-lang-en="Docker containerization">
-                                Docker-контейнеризация</li>
-                            <li data-lang-ru="Работа с Linux-серверами" data-lang-en="Linux server management">Работа с
-                                Linux-серверами</li>
-                        </ul>
+                </div>
+
+                <!-- Experience 3 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date" data-lang-ru="Инфраструктура" data-lang-en="Infrastructure">
+                        Инфраструктура</div>
+                    <div class="timeline-content">
+                        <div class="timeline-icon"><i class="fas fa-server"></i></div>
+                        <h3 class="timeline-title" data-lang-ru="DevOps & Deploy" data-lang-en="DevOps & Deploy">DevOps
+                            & Deploy</h3>
+                        <p class="timeline-text"
+                            data-lang-ru="Docker-контейнеризация и администрирование Linux-серверов."
+                            data-lang-en="Docker containerization and Linux server administration.">
+                            Docker-контейнеризация и администрирование Linux-серверов.</p>
                     </div>
                 </div>
             </div>
@@ -362,6 +406,39 @@
                         <div class="skill-tag">
                             <i class="fab fa-windows"></i>
                             <span>Windows</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Tools Section -->
+                <div class="skill-category">
+                    <h3 class="category-title">
+                        <i class="fas fa-toolbox"></i>
+                        <span data-lang-ru="Инструменты" data-lang-en="Tools Stack">Инструменты</span>
+                    </h3>
+                    <div class="skill-items">
+                        <div class="skill-tag">
+                            <i class="fas fa-laptop-code"></i>
+                            <span>VS Code</span>
+                        </div>
+                        <div class="skill-tag">
+                            <i class="fas fa-terminal"></i>
+                            <span>PyCharm</span>
+                        </div>
+                        <div class="skill-tag">
+                            <i class="fas fa-paper-plane"></i>
+                            <span>Postman</span>
+                        </div>
+                        <div class="skill-tag">
+                            <i class="fas fa-database"></i>
+                            <span>DBeaver</span>
+                        </div>
+                        <div class="skill-tag">
+                            <i class="fas fa-terminal"></i>
+                            <span>Terminals</span>
+                        </div>
+                        <div class="skill-tag">
+                            <i class="fas fa-database"></i>
+                            <span>pgAdmin</span>
                         </div>
                     </div>
                 </div>
