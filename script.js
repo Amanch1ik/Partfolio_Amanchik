@@ -324,24 +324,32 @@ function initProjectModals() {
         'Yess-Go Backend': {
             title: 'Yess-Go Backend',
             desc: 'A full-featured REST API for a mobile delivery application. Built with Django and PostgreSQL, featuring secure JWT authentication, real-time order processing, and comprehensive documentation.',
-            tags: ['Python', 'Django', 'PostgreSQL', 'REST API'],
+            challenge: 'Handling real-time order status updates and ensuring secure authentication for multiple user roles (client, courier, admin).',
+            solution: 'Implemented a robust JWT-based auth system and optimized Django ORM queries for high-concurrency order tracking.',
+            tags: ['Python', 'Django', 'PostgreSQL', 'JWT'],
             link: 'https://github.com/Amanch1ik/PANEL-s_YESS-Go'
         },
         'MotoDelivery Karakol': {
             title: 'MotoDelivery Karakol',
             desc: 'Dynamic delivery management system for local businesses. Streamlines the process from order placement to final delivery, with automated assignments and status tracking.',
+            challenge: 'Creating a simple yet effective interface for local businesses to manage complex delivery queues without technical knowledge.',
+            solution: 'Developed a streamlined Bootstrap-based UI and a reliable SQLite backend with custom status-tracking logic.',
             tags: ['Python', 'Django', 'SQLite', 'Bootstrap'],
             link: 'https://github.com/Amanch1ik/motodelivery-karakol'
         },
         'Karakol Delivery v2': {
             title: 'Karakol Delivery v2',
             desc: 'Architectural refactor of the delivery platform focusing on scalability and performance. Implemented advanced caching, optimized database queries, and a more modular codebase.',
+            challenge: 'Overcoming performance bottlenecks in the first version and migrating to a more performant framework.',
+            solution: 'Migrated to FastAPI, implemented Redis caching for hot data, and dockerized the environment for consistent deployment.',
             tags: ['Python', 'FastAPI', 'Redis', 'Docker'],
             link: 'https://github.com/Amanch1ik/Karakol-delivery-backend-02'
         },
         'Degrees of Separation': {
             title: 'Degrees of Separation',
             desc: 'Graph-based algorithm implementation demonstrating the theory of six degrees of separation. Efficiently finds short paths between nodes in a large dataset of social connections.',
+            challenge: 'Efficiently traversing large social graphs with thousands of nodes while maintaining sub-second query times.',
+            solution: 'Implemented BFS/DFS optimized with adjacency lists and heuristic pruning to find shortest paths rapidly.',
             tags: ['Python', 'Algorithms', 'Graph Theory'],
             link: 'https://github.com/Amanch1ik/degrees-of-separation'
         }
@@ -355,11 +363,24 @@ function initProjectModals() {
             if (details) {
                 modalBody.innerHTML = `
                     <h2 class="modal-title">${details.title}</h2>
-                    <p class="modal-desc">${details.desc}</p>
-                    <div class="project-tags">
+                    <div class="modal-tags">
                         ${details.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
                     </div>
-                    <div style="margin-top: 30px;">
+                    <div class="modal-section">
+                        <h4 class="modal-section-title">Overview</h4>
+                        <p class="modal-desc">${details.desc}</p>
+                    </div>
+                    <div class="modal-grid">
+                        <div class="modal-section">
+                            <h4 class="modal-section-title"><i class="fas fa-exclamation-circle"></i> The Challenge</h4>
+                            <p class="modal-text">${details.challenge}</p>
+                        </div>
+                        <div class="modal-section">
+                            <h4 class="modal-section-title"><i class="fas fa-check-circle"></i> The Solution</h4>
+                            <p class="modal-text">${details.solution}</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
                         <a href="${details.link}" target="_blank" class="btn btn-primary">
                             <i class="fab fa-github"></i> View Source
                         </a>
