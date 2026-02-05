@@ -15,23 +15,23 @@
 
 /* CSS Variables */
 :root {
-    /* Colors */
-    --bg-primary: #0a0a0f;
-    --bg-secondary: #111118;
-    --bg-card: #16161f;
-    --bg-card-hover: #1c1c28;
+    /* Colors - Elegant Warm Palette */
+    --bg-primary: #0f1623;
+    --bg-secondary: #151d2e;
+    --bg-card: #1a2438;
+    --bg-card-hover: #232f47;
 
-    --accent: #3b82f6;
-    --accent-hover: #2563eb;
-    --accent-soft: rgba(59, 130, 246, 0.1);
-    --accent-glow: rgba(59, 130, 246, 0.3);
+    --accent: #d4a574;
+    --accent-hover: #c49464;
+    --accent-soft: rgba(212, 165, 116, 0.12);
+    --accent-glow: rgba(212, 165, 116, 0.3);
 
-    --text-primary: #ffffff;
-    --text-secondary: #a0a0b0;
-    --text-muted: #6b6b7b;
+    --text-primary: #f8f6f3;
+    --text-secondary: #c5c0b8;
+    --text-muted: #8a8580;
 
-    --border-color: rgba(255, 255, 255, 0.08);
-    --border-hover: rgba(255, 255, 255, 0.15);
+    --border-color: rgba(212, 165, 116, 0.08);
+    --border-hover: rgba(212, 165, 116, 0.18);
 
     /* Typography */
     --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -469,6 +469,7 @@ body.light-mode .navbar.scrolled {
     border: 2px solid var(--accent);
     border-radius: calc(var(--radius-xl) + 8px);
     opacity: 0.3;
+    display: none;
 }
 
 /* ========================================
@@ -1474,7 +1475,9 @@ section {
     .info-item {
         font-size: 0.85rem;
     }
-}/* ========================================
+}
+
+/* ========================================
    TOAST NOTIFICATIONS
    ======================================== */
 .toast {
@@ -1633,7 +1636,8 @@ section {
 }
 
 .skill-tag i.colored {
-    color: unset !important; /* Use Devicon branded colors */
+    color: unset !important;
+    /* Use Devicon branded colors */
     filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.1));
 }
 
@@ -1757,8 +1761,13 @@ section {
 }
 
 @keyframes skeleton-loading {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
 }
 
 .skeleton-card {
@@ -1794,7 +1803,7 @@ section {
     width: 100%;
     height: 100%;
     z-index: -1;
-    background-image: 
+    background-image:
         radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
     background-size: 40px 40px;
     opacity: 0.5;
@@ -1853,11 +1862,10 @@ section {
         grid-template-columns: 1fr;
         gap: 2rem;
     }
-    
+
     .footer-bottom {
         flex-direction: column;
         gap: 1.5rem;
         text-align: center;
     }
 }
-
