@@ -15,11 +15,11 @@
 
 /* CSS Variables */
 :root {
-    /* Colors - Warm Terracotta & Espresso */
-    --bg-primary: #1a1210;
-    --bg-secondary: #211916;
-    --bg-card: #2a1f1b;
-    --bg-card-hover: #352924;
+    /* Colors - Warm Charcoal & Terracotta */
+    --bg-primary: #0e0c10;
+    --bg-secondary: #15131a;
+    --bg-card: #1c1a22;
+    --bg-card-hover: #26242e;
 
     --accent: #e07a5f;
     --accent-hover: #c1666b;
@@ -27,12 +27,12 @@
     --accent-soft: rgba(224, 122, 95, 0.12);
     --accent-glow: rgba(224, 122, 95, 0.35);
 
-    --text-primary: #faf3eb;
-    --text-secondary: #d4c4b0;
-    --text-muted: #9a8878;
+    --text-primary: #f5f0ea;
+    --text-secondary: #b8b0a8;
+    --text-muted: #7a7270;
 
-    --border-color: rgba(224, 122, 95, 0.1);
-    --border-hover: rgba(224, 122, 95, 0.22);
+    --border-color: rgba(224, 122, 95, 0.08);
+    --border-hover: rgba(224, 122, 95, 0.2);
 
     /* Typography */
     --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -146,7 +146,7 @@ button {
 }
 
 body:not(.light-mode) .navbar {
-    --bg-primary-fade: rgba(26, 18, 16, 0.85);
+    --bg-primary-fade: rgba(14, 12, 16, 0.88);
 }
 
 body.light-mode .navbar {
@@ -158,7 +158,7 @@ body.light-mode .navbar {
 }
 
 body:not(.light-mode) .navbar.scrolled {
-    background: rgba(26, 18, 16, 0.95);
+    background: rgba(14, 12, 16, 0.97);
 }
 
 body.light-mode .navbar.scrolled {
@@ -1756,7 +1756,7 @@ section {
 
 /* Skeleton Loading Animation */
 .skeleton {
-    background: linear-gradient(90deg, #2a1f1b 25%, #352924 50%, #2a1f1b 75%);
+    background: linear-gradient(90deg, #1c1a22 25%, #26242e 50%, #1c1a22 75%);
     background-size: 200% 100%;
     animation: skeleton-loading 1.5s infinite linear;
     border-radius: var(--radius-md);
