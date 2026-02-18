@@ -69,3 +69,7 @@ A premium, high-performance portfolio website redesigned with a focus on **Minim
 > The project uses **Vanilla JavaScript** to handle complex animations (Intersection Observer for scroll reveals, Custom Pointer Events for magnetic effect) to ensure zero dependency overhead.
 
 ---
+
+
+
+
