@@ -176,15 +176,10 @@ body {
 /* --- Video showcase (hand background) --- */
 .showcase {
     position: relative;
-    min-height: 92vh;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    text-align: center;
+    min-height: 70vh;
     overflow: hidden;
-    margin: 90px 0;
-    border-top: 1px solid var(--border-color);
-    border-bottom: 1px solid var(--border-color);
+    /* negative margins so the decorative band blends seamlessly into the dark page */
+    margin: -40px 0;
 }
 
 .showcase__video {
@@ -224,27 +219,29 @@ body {
     }
 }
 
-/* vertical scrim: dark at the bottom for legible text, lightly toned at the top so the big hand shows */
+/* vignette scrim: fully dark at top & bottom edges so the hand floats out of, and back into, the page */
 .showcase__scrim {
     position: absolute;
     inset: 0;
     z-index: 1;
     background: linear-gradient(
-        0deg,
-        rgba(14, 12, 16, 0.97) 0%,
-        rgba(14, 12, 16, 0.78) 28%,
-        rgba(14, 12, 16, 0.46) 60%,
-        rgba(14, 12, 16, 0.52) 100%
+        180deg,
+        var(--bg-primary) 0%,
+        rgba(14, 12, 16, 0.55) 24%,
+        rgba(14, 12, 16, 0.34) 50%,
+        rgba(14, 12, 16, 0.6) 78%,
+        var(--bg-primary) 100%
     );
 }
 
 .light-mode .showcase__scrim {
     background: linear-gradient(
-        0deg,
-        rgba(253, 246, 238, 0.95) 0%,
-        rgba(253, 246, 238, 0.7) 30%,
-        rgba(253, 246, 238, 0.3) 65%,
-        rgba(253, 246, 238, 0.4) 100%
+        180deg,
+        var(--bg-primary) 0%,
+        rgba(253, 246, 238, 0.5) 24%,
+        rgba(253, 246, 238, 0.28) 50%,
+        rgba(253, 246, 238, 0.55) 78%,
+        var(--bg-primary) 100%
     );
 }
 
