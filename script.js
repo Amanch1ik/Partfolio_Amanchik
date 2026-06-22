@@ -277,14 +277,14 @@ function initProjectModals() {
             tags: ['Next.js', 'Prisma', 'Docker', 'AI'],
             link: null
         },
-        'Mainframe концепт': {
+        'Mainframe live': {
             title: 'Mainframe — лендинг креативного агентства',
             desc: 'Cinematic hero для креативного агентства с интерактивным персонажем (A.R.I.A). Фоновое видео скрабится горизонтальным движением мыши, печатающийся текст-интро, навигация-оверлей и пилюли-CTA. React + TypeScript + Tailwind, без тяжёлых библиотек.',
             challenge: 'Сделать «живого» персонажа без 3D и тяжёлых зависимостей — чтобы реагировал на пользователя плавно, без рывков и подвисаний.',
             solution: 'Скраб видео через requestAnimation-подобный контроль currentTime с защитой от seek-flooding (onSeeked догоняет цель). Тайпрайтер на кастомном хуке, анимации — на чистом CSS/Tailwind.',
             architecture: 'React + TypeScript → Vite → Tailwind · mouse-scrub video',
             tags: ['React', 'TypeScript', 'Tailwind', 'Vite'],
-            link: null
+            link: 'https://amanch1ik.github.io/mainframe/'
         },
         '3D-визитка live': {
             title: '3D-визитка — интерактивный лендинг',
