@@ -14,6 +14,7 @@
         buildGrain();
         initHeroReveal();
         initRevealUpgrade();
+        initShowcase();
         if (reduceMotion) return;
         if (isDesktop) {
             initHeroCanvas();
@@ -21,6 +22,45 @@
             initParallax();
         }
     });
+
+    /* ---------- Showcase: hand video eases out + plays when section enters view ---------- */
+    function initShowcase() {
+        const showcase = document.querySelector('.showcase');
+        if (!showcase) return;
+        const video = showcase.querySelector('.showcase__video');
+
+        const reveal = () => {
+            showcase.classList.add('is-revealed');
+            if (video && !reduceMotion) {
+                try {
+                    video.currentTime = 0;
+                } catch (_) {
+                    /* seeking before metadata is fine to ignore */
+                }
+                const played = video.play();
+                if (played && played.catch) played.catch(() => {});
+            }
+        };
+
+        // Mark for animation only when not reduced-motion (no-JS / reduced stays static-visible).
+        if (!reduceMotion) showcase.classList.add('js-anim');
+
+        if (!('IntersectionObserver' in window)) {
+            reveal();
+            return;
+        }
+        const io = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((e) => {
+                    if (!e.isIntersecting) return;
+                    reveal();
+                    io.unobserve(showcase);
+                });
+            },
+            { threshold: 0.35 }
+        );
+        io.observe(showcase);
+    }
 
     /* ---------- Cinematic reveal: titles wipe, labels fade, steps slide ---------- */
     function initRevealUpgrade() {

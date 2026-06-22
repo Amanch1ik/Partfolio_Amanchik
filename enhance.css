@@ -197,6 +197,30 @@ body {
     filter: saturate(0.92) contrast(1.03);
 }
 
+/* Animate only when JS marked the section (no-JS fallback: hand stays visible).
+   Smooth entrance: the hand eases out when the section scrolls into view. */
+.showcase.js-anim .showcase__video {
+    opacity: 0;
+    transform: scale(1.14);
+    transform-origin: 70% 60%;
+    transition: opacity 1.1s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 1.7s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform, opacity;
+}
+
+.showcase.js-anim.is-revealed .showcase__video {
+    opacity: 1;
+    transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .showcase.js-anim .showcase__video {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}
+
 /* dark scrim: strong on the left for legible text, light on the right so the hand shows */
 .showcase__scrim {
     position: absolute;
