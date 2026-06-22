@@ -166,6 +166,80 @@
     will-change: transform;
 }
 
+/* --- Services CTA banner (replaces pricing) --- */
+.services-cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-top: 3rem;
+    padding: 2.2rem 2.6rem;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border-hover);
+    background:
+        radial-gradient(120% 140% at 0% 0%, var(--accent-soft), transparent 55%),
+        var(--bg-card);
+    position: relative;
+    overflow: hidden;
+}
+
+.services-cta::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, transparent 30%, var(--accent-glow) 50%, transparent 70%);
+    background-size: 250% 100%;
+    opacity: 0.25;
+    animation: ctaSheen 6s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.services-cta__text {
+    max-width: 60ch;
+    position: relative;
+    z-index: 1;
+}
+
+.services-cta__text h3 {
+    font-family: var(--font-display);
+    font-size: clamp(1.3rem, 1rem + 1.4vw, 2rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    margin-bottom: 0.6rem;
+}
+
+.services-cta__text p {
+    color: var(--text-secondary);
+    font-size: 1.02rem;
+    line-height: 1.6;
+}
+
+.services-cta__btn {
+    position: relative;
+    z-index: 1;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+@keyframes ctaSheen {
+    0%, 100% { background-position: 140% 0; }
+    50% { background-position: -40% 0; }
+}
+
+@media (max-width: 640px) {
+    .services-cta {
+        padding: 1.8rem 1.4rem;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .services-cta::before { animation: none; opacity: 0.12; }
+}
+
 /* --- Marquee for tech stack (optional decorative strip) --- */
 .tech-marquee {
     overflow: hidden;
