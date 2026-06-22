@@ -466,12 +466,34 @@ body.light-mode .navbar.scrolled {
     height: 100%;
     object-fit: cover;
     border-radius: var(--radius-xl);
-    filter: grayscale(20%);
-    transition: var(--transition-medium);
+    /* grade the portrait into the moody palette; full colour returns on hover */
+    filter: grayscale(0.6) contrast(1.07) brightness(0.9);
+    transition: filter 0.5s ease;
+}
+
+/* terracotta-to-charcoal tint so the photo shares the hero's palette */
+.image-wrapper::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-xl);
+    background: linear-gradient(
+        155deg,
+        rgba(224, 122, 95, 0.16) 0%,
+        rgba(14, 12, 16, 0.05) 40%,
+        rgba(14, 12, 16, 0.5) 100%
+    );
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    z-index: 1;
 }
 
 .image-wrapper:hover img {
-    filter: grayscale(0%);
+    filter: grayscale(0) contrast(1) brightness(1);
+}
+
+.image-wrapper:hover::after {
+    opacity: 0.3;
 }
 
 .image-border {
