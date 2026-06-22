@@ -16,6 +16,7 @@
         initRevealUpgrade();
         initHeroVideoPerf();
         initCharReveal();
+        initCaseStack();
         if (reduceMotion) return;
         if (isDesktop) {
             // Particle canvas is now hidden behind the hero hand-video, so we skip it
@@ -117,6 +118,47 @@
         if (sw) sw.addEventListener('click', () => setTimeout(splitAll, 0));
     }
 
+    /* ---------- Sticky-stacking case cards (scale down as the next slides over) ---------- */
+    function initCaseStack() {
+        if (reduceMotion) return;
+        const container = document.querySelector('.case-stack');
+        if (!container) return;
+        const cards = [...container.querySelectorAll('.case-card')];
+        const N = cards.length;
+        if (!N) return;
+
+        const update = () => {
+            const cr = container.getBoundingClientRect();
+            const total = cr.height - window.innerHeight;
+            const scrolled = Math.max(0, -cr.top);
+            const progress = total > 0 ? Math.min(1, scrolled / total) : 0;
+            cards.forEach((card, i) => {
+                const targetScale = 1 - (N - 1 - i) * 0.04;
+                const start = i / N;
+                const range = 1 - start;
+                const p = range > 0 ? Math.max(0, Math.min(1, (progress - start) / range)) : 0;
+                const scale = 1 - (1 - targetScale) * p;
+                card.style.transform = `scale(${scale})`;
+            });
+        };
+
+        let ticking = false;
+        window.addEventListener(
+            'scroll',
+            () => {
+                if (ticking) return;
+                ticking = true;
+                requestAnimationFrame(() => {
+                    update();
+                    ticking = false;
+                });
+            },
+            { passive: true }
+        );
+        window.addEventListener('resize', update);
+        update();
+    }
+
     /* ---------- Pause the hero hand-video when it scrolls out of view (saves decode) ---------- */
     function initHeroVideoPerf() {
         const video = document.querySelector('.hero-hand-bg');
@@ -186,7 +228,7 @@
     /* ---------- 3D tilt + spotlight ---------- */
     function initTilt() {
         const cards = document.querySelectorAll(
-            '.service-card, .package-card, .project-card, .repo-card, .about-card'
+            '.service-card, .package-card, .repo-card, .about-card'
         );
         const MAX = 7;
         cards.forEach((card) => {

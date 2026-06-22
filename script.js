@@ -158,7 +158,7 @@ function closeMobileMenu() {
  */
 function initScrollAnimations() {
     const animatedElements = document.querySelectorAll(
-        '.about-card, .exp-card, .skill-category, .project-card, .contact-item, .approach, .contact-goal, .hobbies, .repo-card, .service-card, .package-card'
+        '.about-card, .exp-card, .skill-category, .contact-item, .approach, .contact-goal, .hobbies, .repo-card, .service-card, .package-card'
     );
     // Fallback: если IntersectionObserver недоступен — показываем всё сразу, не прячем контент
     if (!('IntersectionObserver' in window)) {
