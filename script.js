@@ -361,16 +361,65 @@ function showToast(message, type = 'success') {
 /**
  * GitHub API with Skeleton Loaders
  */
+// Repos already featured in Кейсы, meta, or that must never be shown (ADAPTIVA / kinez_project).
+const REPO_BLOCKLIST = [
+    'Partfolio_Amanchik', 'tengri-avia', 'minitask', 'reklama_ai_gen', 'kinez_project',
+    'KD-app', 'Karakol-deliveryVN', // duplicate Karakol-delivery variants
+];
+
+// Private projects — shown with limited access (lock, no public link). Hand-curated:
+// the unauthenticated GitHub API never returns private repos, and embedding a token
+// in client code would be a security hole, so these are static metadata.
+const PRIVATE_PROJECTS = [
+    {
+        name: 'web-version-YES-GO',
+        description: 'Веб-версия сервиса доставки YES-GO: интерфейс заказа и интеграция с бэкендом.',
+        language: 'TypeScript',
+    },
+    {
+        name: 'MMORPG',
+        description: 'Telegram-бот MMORPG на Python: боссы, крафтинг и игровая прогрессия.',
+        language: 'Python',
+    },
+    {
+        name: 'agents_analyze',
+        description: 'Сервис распознавания эмоций по лицу (компьютерное зрение).',
+        language: 'Python',
+    },
+];
+
+function buildRepoCard(repo) {
+    const isPrivate = repo._private === true;
+    const lang = repo.language || repo._lang || 'Code';
+    const desc = repo.description || 'GitHub репозиторий';
+    const stats = isPrivate
+        ? '<span class="repo-private-badge"><i class="fas fa-lock"></i></span>'
+        : `<div class="repo-stats"><span><i class="fas fa-star"></i> ${repo.stargazers_count}</span><span><i class="fas fa-code-branch"></i> ${repo.forks_count}</span></div>`;
+    const footer = isPrivate
+        ? '<span class="repo-private" data-lang-ru="Приватный · доступ по запросу" data-lang-en="Private · access on request">Приватный · доступ по запросу</span>'
+        : `<a href="${repo.html_url}" target="_blank" rel="noopener" class="repo-link" data-lang-ru="Открыть" data-lang-en="Open">Открыть <i class="fas fa-external-link-alt"></i></a>`;
+    const el = document.createElement('div');
+    el.className = 'repo-card' + (isPrivate ? ' repo-card--private' : '');
+    el.innerHTML = `
+        <div class="repo-header"><i class="fab fa-github"></i>${stats}</div>
+        <h3 class="repo-name">${repo.name}</h3>
+        <p class="repo-desc">${desc}</p>
+        <div class="repo-footer"><span class="repo-lang">${lang}</span>${footer}</div>
+    `;
+    return el;
+}
+
 async function initGitHubRepos() {
     const projectsGrid = document.querySelector('.projects-grid');
     if (!projectsGrid) return;
+
     const githubSection = document.createElement('div');
     githubSection.className = 'github-repos-container';
     githubSection.innerHTML = `
         <div class="container">
-            <div class="section-header" style="margin-top: 40px;">
-                <span class="section-label">GitHub Activity</span>
-                <h2 class="section-title" data-lang-ru="Последние репозитории" data-lang-en="Latest Repositories">Последние репозитории</h2>
+            <div class="section-header">
+                <span class="section-label">GitHub</span>
+                <h2 class="section-title" data-lang-ru="Больше проектов" data-lang-en="More projects">Больше проектов</h2>
             </div>
             <div class="repos-grid">
                 <div class="skeleton skeleton-card"></div>
@@ -382,31 +431,36 @@ async function initGitHubRepos() {
     projectsGrid.parentNode.insertBefore(githubSection, projectsGrid.nextSibling);
 
     try {
-        const response = await fetch('https://api.github.com/users/Amanch1ik/repos?sort=updated&per_page=6');
+        // Live fetch keeps the public projects always up to date.
+        const response = await fetch('https://api.github.com/users/Amanch1ik/repos?sort=pushed&per_page=100');
         const repos = await response.json();
         const reposGrid = githubSection.querySelector('.repos-grid');
         reposGrid.innerHTML = '';
-        repos.filter(repo => !repo.fork).slice(0, 3).forEach(repo => {
-            const repoCard = document.createElement('div');
-            repoCard.className = 'repo-card fade-in';
-            repoCard.innerHTML = `
-                <div class="repo-header">
-                    <i class="fab fa-github"></i>
-                    <div class="repo-stats">
-                        <span><i class="fas fa-star"></i> ${repo.stargazers_count}</span>
-                        <span><i class="fas fa-code-branch"></i> ${repo.forks_count}</span>
-                    </div>
-                </div>
-                <h3 class="repo-name">${repo.name}</h3>
-                <p class="repo-desc">${repo.description || 'GitHub Repo'}</p>
-                <div class="repo-footer">
-                    <span class="repo-lang">${repo.language || 'Code'}</span>
-                    <a href="${repo.html_url}" target="_blank" class="repo-link">View <i class="fas fa-external-link-alt"></i></a>
-                </div>
-            `;
-            reposGrid.appendChild(repoCard);
-        });
+
+        const bigPublic = (Array.isArray(repos) ? repos : [])
+            .filter((r) => !r.fork && r.description && r.size > 5000 && !REPO_BLOCKLIST.includes(r.name))
+            .sort((a, b) => new Date(b.pushed_at) - new Date(a.pushed_at))
+            .slice(0, 4);
+
+        bigPublic.forEach((r) => reposGrid.appendChild(buildRepoCard(r)));
+        PRIVATE_PROJECTS.forEach((p) =>
+            reposGrid.appendChild(
+                buildRepoCard({ name: p.name, description: p.description, _lang: p.language, _private: true })
+            )
+        );
+
         initScrollAnimations();
+        // re-apply current language to the freshly injected bilingual bits
+        const lang = localStorage.getItem('portfolio-lang') || 'ru';
+        githubSection.querySelectorAll('[data-lang-ru][data-lang-en]').forEach((el) => {
+            const text = el.getAttribute(`data-lang-${lang}`);
+            if (text) {
+                // keep the trailing icon for the public "Open" link
+                const icon = el.querySelector('i');
+                el.textContent = text + ' ';
+                if (icon) el.appendChild(icon);
+            }
+        });
     } catch (error) {
         githubSection.remove();
     }

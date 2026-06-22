@@ -245,6 +245,36 @@ body {
     gap: 44px;
 }
 
+/* --- Private repo cards (limited access) --- */
+.repo-card--private {
+    border-style: dashed;
+    border-color: var(--border-hover);
+}
+
+.repo-private-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 0.85rem;
+}
+
+.repo-private {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+.repo-private i {
+    color: var(--accent);
+}
+
 /* --- Case studies: sticky-stacking cards --- */
 .projects-grid.case-stack {
     display: flex;
