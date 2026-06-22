@@ -285,6 +285,15 @@ function initProjectModals() {
             architecture: 'React + TypeScript → Vite → Tailwind · mouse-scrub video',
             tags: ['React', 'TypeScript', 'Tailwind', 'Vite'],
             link: null
+        },
+        '3D-визитка live': {
+            title: '3D-визитка — интерактивный лендинг',
+            desc: 'Cinematic 3D-портфолио: магнитный портрет, посимвольное проявление текста по скроллу, sticky-стекинг проектов и бегущая маркиза превью. Полностью адаптивно, под живым доменом.',
+            challenge: 'Сделать насыщенный интерактив (магнит, scroll-driven анимации, стекинг карточек) плавным и без лагов на любом устройстве.',
+            solution: 'React + TypeScript + Framer Motion (useScroll / useTransform), Vite и Tailwind. Кастомные компоненты Magnet, AnimatedText, FadeIn; деплой на GitHub Pages.',
+            architecture: 'React + TypeScript → Vite → Tailwind · Framer Motion',
+            tags: ['React', 'TypeScript', 'Framer Motion', 'Vite'],
+            link: 'https://amanch1ik.github.io/amanbol-3d/'
         }
     };
     projectCards.forEach(card => {
