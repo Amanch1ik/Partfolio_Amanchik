@@ -14,13 +14,34 @@
         buildGrain();
         initHeroReveal();
         initRevealUpgrade();
+        initHeroVideoPerf();
         if (reduceMotion) return;
         if (isDesktop) {
-            initHeroCanvas();
+            // Particle canvas is now hidden behind the hero hand-video, so we skip it
+            // to save a continuous requestAnimationFrame loop.
             initTilt();
             initParallax();
         }
     });
+
+    /* ---------- Pause the hero hand-video when it scrolls out of view (saves decode) ---------- */
+    function initHeroVideoPerf() {
+        const video = document.querySelector('.hero-hand-bg');
+        if (!video || !('IntersectionObserver' in window)) return;
+        const io = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((e) => {
+                    if (e.isIntersecting) {
+                        video.play().catch(() => {});
+                    } else {
+                        video.pause();
+                    }
+                });
+            },
+            { threshold: 0.05 }
+        );
+        io.observe(video);
+    }
 
     /* ---------- Cinematic reveal: titles wipe, labels fade, steps slide ---------- */
     function initRevealUpgrade() {
@@ -74,17 +95,23 @@
         const cards = document.querySelectorAll(
             '.service-card, .package-card, .project-card, .repo-card, .about-card'
         );
+        const MAX = 7;
         cards.forEach((card) => {
             card.classList.add('tilt');
             const glow = document.createElement('span');
             glow.className = 'tilt-glow';
             card.appendChild(glow);
 
-            const MAX = 7;
+            // Cache the rect on enter so mousemove doesn't force a layout read every frame.
+            let rect = null;
+            card.addEventListener('mouseenter', () => {
+                rect = card.getBoundingClientRect();
+                card.classList.add('is-tilting');
+            });
             card.addEventListener('mousemove', (e) => {
-                const r = card.getBoundingClientRect();
-                const px = (e.clientX - r.left) / r.width;
-                const py = (e.clientY - r.top) / r.height;
+                if (!rect) rect = card.getBoundingClientRect();
+                const px = (e.clientX - rect.left) / rect.width;
+                const py = (e.clientY - rect.top) / rect.height;
                 const ry = (px - 0.5) * MAX * 2;
                 const rx = (0.5 - py) * MAX * 2;
                 card.style.transform =
@@ -92,8 +119,8 @@
                 card.style.setProperty('--mx', `${px * 100}%`);
                 card.style.setProperty('--my', `${py * 100}%`);
             });
-            card.addEventListener('mouseenter', () => card.classList.add('is-tilting'));
             card.addEventListener('mouseleave', () => {
+                rect = null;
                 card.classList.remove('is-tilting');
                 card.style.transform = '';
             });

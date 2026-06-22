@@ -368,7 +368,7 @@ async function initGitHubRepos() {
     githubSection.className = 'github-repos-container';
     githubSection.innerHTML = `
         <div class="container">
-            <div class="section-header" style="margin-top: 80px;">
+            <div class="section-header" style="margin-top: 40px;">
                 <span class="section-label">GitHub Activity</span>
                 <h2 class="section-title" data-lang-ru="Последние репозитории" data-lang-en="Latest Repositories">Последние репозитории</h2>
             </div>
