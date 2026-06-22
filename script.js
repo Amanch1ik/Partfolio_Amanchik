@@ -294,6 +294,15 @@ function initProjectModals() {
             architecture: 'React + TypeScript → Vite → Tailwind · Framer Motion',
             tags: ['React', 'TypeScript', 'Framer Motion', 'Vite'],
             link: 'https://amanch1ik.github.io/amanbol-3d/'
+        },
+        'Prosthetics live': {
+            title: 'Prosthetics — лендинг бренда протезов',
+            desc: 'Hero-лендинг бренда умных протезов: полноэкранное автоплей-видео руки на фоне, центрированная pill-навигация и набор анимированных CTA-пилюль (включая copy-to-clipboard). Чистый продуктовый дизайн.',
+            challenge: 'Сделать выразительный продуктовый hero на одном экране, где видео-фон не мешает читаемости и CTA.',
+            solution: 'React + TypeScript + Vite + Tailwind: фон-видео object-cover, аккуратная типографика и состояния кнопок, адаптив от мобайла до десктопа.',
+            architecture: 'React + TypeScript → Vite → Tailwind',
+            tags: ['React', 'TypeScript', 'Tailwind', 'Vite'],
+            link: 'https://amanch1ik.github.io/prosthetics-hero/'
         }
     };
     projectCards.forEach(card => {
