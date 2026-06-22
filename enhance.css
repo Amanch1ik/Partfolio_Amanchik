@@ -198,6 +198,113 @@
     to { transform: translateX(-50%); }
 }
 
+/* ===== Cinematic reveal upgrades ===== */
+
+/* Softer blur-up on existing scroll reveals */
+.fade-in {
+    filter: blur(8px);
+    transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+        filter 0.8s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+.fade-in.visible {
+    filter: blur(0);
+}
+
+/* Section title — mask wipe from bottom up */
+.js-title {
+    opacity: 0;
+    transform: translateY(26px);
+    clip-path: inset(0 0 100% 0);
+    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+        clip-path 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: clip-path, transform;
+}
+
+.js-title.is-in {
+    opacity: 1;
+    transform: translateY(0);
+    clip-path: inset(0 0 -10% 0);
+}
+
+/* Section label — slide + fade */
+.js-label {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.js-label.is-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Process timeline — alternating slide-in */
+.timeline-item.js-step {
+    opacity: 0;
+    transform: translateX(-48px);
+    transition: opacity 0.7s ease, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.timeline-item.js-step:nth-child(even) {
+    transform: translateX(48px);
+}
+
+.timeline-item.js-step.is-in {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Service card icon — lively hover */
+.service-card .service-icon {
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.4s ease;
+}
+
+.service-card:hover .service-icon {
+    transform: translateY(-4px) rotate(-6deg) scale(1.08);
+    box-shadow: 0 12px 30px -8px var(--accent-glow);
+}
+
+/* Hero title — animated gradient sheen sweep */
+.hero-title {
+    background: linear-gradient(
+        100deg,
+        var(--text-primary) 0%,
+        var(--text-primary) 38%,
+        var(--accent-secondary) 50%,
+        var(--text-primary) 62%,
+        var(--text-primary) 100%
+    );
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: nameSheen 7s ease-in-out infinite;
+}
+
+@keyframes nameSheen {
+    0%, 100% { background-position: 130% 0; }
+    50% { background-position: -30% 0; }
+}
+
+/* Reduced motion: disable reveal transforms, show content */
+@media (prefers-reduced-motion: reduce) {
+    .fade-in { filter: none !important; }
+    .js-title, .js-label, .timeline-item.js-step {
+        opacity: 1 !important;
+        transform: none !important;
+        clip-path: none !important;
+        transition: none !important;
+    }
+    .hero-title {
+        animation: none;
+        -webkit-text-fill-color: var(--text-primary);
+    }
+}
+
 /* --- Reduced motion: disable heavy interactivity --- */
 @media (prefers-reduced-motion: reduce) {
     .hero-canvas { display: none; }
