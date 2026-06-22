@@ -235,6 +235,15 @@ body {
     }
 }
 
+/* About: tighten heading→text gap + give the short copy room to breathe */
+.about .section-header {
+    margin-bottom: 32px;
+}
+
+.about-content {
+    gap: 44px;
+}
+
 /* --- Services CTA banner (replaces pricing) --- */
 .services-cta {
     display: flex;
