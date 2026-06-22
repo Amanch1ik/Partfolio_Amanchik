@@ -15,14 +15,107 @@
         initHeroReveal();
         initRevealUpgrade();
         initHeroVideoPerf();
+        initCharReveal();
         if (reduceMotion) return;
         if (isDesktop) {
             // Particle canvas is now hidden behind the hero hand-video, so we skip it
             // to save a continuous requestAnimationFrame loop.
             initTilt();
-            initParallax();
+            initMagneticPortrait();
         }
     });
+
+    /* ---------- Magnetic hero portrait — the photo eases toward the cursor ---------- */
+    function initMagneticPortrait() {
+        const el = document.querySelector('.hero-image');
+        if (!el) return;
+        const PAD = 160;
+        const STRENGTH = 7;
+        let raf = null;
+        let tx = 0;
+        let ty = 0;
+        const onMove = (e) => {
+            const r = el.getBoundingClientRect();
+            const dx = e.clientX - (r.left + r.width / 2);
+            const dy = e.clientY - (r.top + r.height / 2);
+            const inRange =
+                Math.abs(dx) < r.width / 2 + PAD && Math.abs(dy) < r.height / 2 + PAD;
+            tx = inRange ? dx / STRENGTH : 0;
+            ty = inRange ? dy / STRENGTH : 0;
+            el.style.transition = inRange
+                ? 'transform 0.3s ease-out'
+                : 'transform 0.6s ease-in-out';
+            if (!raf) {
+                raf = requestAnimationFrame(() => {
+                    raf = null;
+                    el.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+                });
+            }
+        };
+        window.addEventListener('mousemove', onMove, { passive: true });
+    }
+
+    /* ---------- Char-by-char scroll reveal for the About copy ---------- */
+    function initCharReveal() {
+        if (reduceMotion) return;
+        const paras = [...document.querySelectorAll('.about-text p')];
+        if (!paras.length) return;
+
+        const splitAll = () => {
+            paras.forEach((p) => {
+                const text = p.textContent;
+                p.textContent = '';
+                const spans = [];
+                for (const ch of text) {
+                    const span = document.createElement('span');
+                    span.textContent = ch;
+                    span.style.opacity = '0.25';
+                    span.style.transition = 'opacity 0.3s ease';
+                    p.appendChild(span);
+                    spans.push(span);
+                }
+                p._charSpans = spans;
+            });
+            update();
+        };
+
+        const update = () => {
+            const vh = window.innerHeight;
+            const startLine = vh * 0.82;
+            const endLine = vh * 0.25;
+            paras.forEach((p) => {
+                const spans = p._charSpans;
+                if (!spans) return;
+                const r = p.getBoundingClientRect();
+                const span = r.height + (startLine - endLine);
+                const progress = Math.max(0, Math.min(1, (startLine - r.top) / span));
+                const revealed = Math.round(progress * spans.length);
+                spans.forEach((s, i) => {
+                    s.style.opacity = i < revealed ? '1' : '0.25';
+                });
+            });
+        };
+
+        let ticking = false;
+        window.addEventListener(
+            'scroll',
+            () => {
+                if (ticking) return;
+                ticking = true;
+                requestAnimationFrame(() => {
+                    update();
+                    ticking = false;
+                });
+            },
+            { passive: true }
+        );
+
+        splitAll();
+
+        // Re-split after a language toggle (script.js resets textContent, wiping the spans).
+        const sw = document.getElementById('langSwitcher');
+        if (sw) sw.addEventListener('click', () => setTimeout(splitAll, 0));
+    }
 
     /* ---------- Pause the hero hand-video when it scrolls out of view (saves decode) ---------- */
     function initHeroVideoPerf() {
