@@ -158,8 +158,13 @@ function closeMobileMenu() {
  */
 function initScrollAnimations() {
     const animatedElements = document.querySelectorAll(
-        '.about-card, .exp-card, .skill-category, .project-card, .contact-item, .approach, .contact-goal, .hobbies, .repo-card'
+        '.about-card, .exp-card, .skill-category, .project-card, .contact-item, .approach, .contact-goal, .hobbies, .repo-card, .service-card, .package-card'
     );
+    // Fallback: если IntersectionObserver недоступен — показываем всё сразу, не прячем контент
+    if (!('IntersectionObserver' in window)) {
+        animatedElements.forEach(el => el.classList.add('visible'));
+        return;
+    }
     animatedElements.forEach(el => el.classList.add('fade-in'));
     const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
     const observer = new IntersectionObserver((entries) => {
@@ -168,7 +173,7 @@ function initScrollAnimations() {
         });
     }, observerOptions);
     animatedElements.forEach(el => observer.observe(el));
-    const grids = document.querySelectorAll('.about-cards, .experience-grid, .skills-grid, .projects-grid, .repos-grid');
+    const grids = document.querySelectorAll('.about-cards, .experience-grid, .skills-grid, .projects-grid, .repos-grid, .services-grid, .packages-grid');
     grids.forEach(grid => {
         const items = grid.querySelectorAll('.fade-in');
         items.forEach((item, index) => {
@@ -223,12 +228,14 @@ function initCustomCursor() {
     const links = document.querySelectorAll('a, button, .project-card, .social-link, .repo-card');
     links.forEach(link => {
         link.addEventListener('mouseenter', () => {
-            outline.style.transform = 'translate(-50%, -50%) scale(1.5)';
-            outline.style.borderColor = 'rgba(59, 130, 246, 0.5)';
+            outline.style.transform = 'translate(-50%, -50%) scale(1.6)';
+            outline.style.borderColor = 'var(--accent)';
+            outline.style.background = 'var(--accent-soft)';
         });
         link.addEventListener('mouseleave', () => {
             outline.style.transform = 'translate(-50%, -50%) scale(1)';
             outline.style.borderColor = 'var(--accent-soft)';
+            outline.style.background = 'transparent';
         });
     });
 }
@@ -243,58 +250,58 @@ function initProjectModals() {
     const projectCards = document.querySelectorAll('.project-card');
     if (!modal || !projectCards.length) return;
     const projectDetails = {
-        'Yess-Go Backend': {
-            title: 'Yess-Go Backend',
-            desc: 'A full-featured REST API for a mobile delivery application. Built with Django and PostgreSQL, featuring secure JWT authentication and real-time order processing.',
-            challenge: 'Handling real-time order status updates and ensuring secure authentication for multiple roles.',
-            solution: 'Implemented a robust JWT-based auth system and optimized Django ORM queries.',
-            architecture: 'Client → Nginx → Gunicorn → Django (FastAPI) → Redis → PostgreSQL',
-            tags: ['Python', 'Django', 'PostgreSQL', 'JWT'],
-            link: 'https://github.com/Amanch1ik/PANEL-s_YESS-Go'
+        'minitask — таск-менеджер': {
+            title: 'minitask — таск-менеджер',
+            desc: 'Веб-приложение под ключ в стиле Linear: канбан с drag&drop, режимы Доска / Сегодня / Календарь / Архив, аутентификация с подтверждением email. Сделано как тестовое задание.',
+            challenge: 'Отзывчивый интерфейс задач с надёжным API и чистой схемой данных, который не тормозит при перетаскивании.',
+            solution: 'FastAPI + Pydantic-схемы на бэке, React-клиент, PostgreSQL и Docker — одинаковое окружение от разработки до деплоя.',
+            architecture: 'React → FastAPI → PostgreSQL · Docker',
+            tags: ['FastAPI', 'React', 'PostgreSQL', 'Docker'],
+            link: 'https://github.com/Amanch1ik/minitask'
         },
-        'MotoDelivery Karakol': {
-            title: 'MotoDelivery Karakol',
-            desc: 'Dynamic delivery management system for local businesses. Streamlines the process from order placement to final delivery.',
-            challenge: 'Creating a simple interface for local businesses to manage complex queues.',
-            solution: 'Developed a streamlined Bootstrap UI and a reliable SQLite backend.',
-            architecture: 'Frontend (Bootstrap) → Django → SQLite',
-            tags: ['Python', 'Django', 'SQLite', 'Bootstrap'],
-            link: 'https://github.com/Amanch1ik/motodelivery-karakol'
+        'Tengri Avia live': {
+            title: 'Tengri Avia',
+            desc: 'Многостраничный сайт авиакомпании: поиск и фильтрация рейсов, многошаговое бронирование, личный кабинет пассажира. Полная адаптивность 375–1920px.',
+            challenge: 'Сложный пользовательский путь (поиск → выбор → бронирование) на чистом фронтенде, без тяжёлого фреймворка.',
+            solution: 'Аккуратная компонентная вёрстка на HTML/CSS/JS + Bootstrap, продуманные состояния форм и адаптив под все экраны.',
+            architecture: 'HTML / CSS / JS · Bootstrap · GitHub Pages',
+            tags: ['HTML/CSS/JS', 'Bootstrap', 'Responsive'],
+            link: 'https://amanch1ik.github.io/tengri-avia/'
         },
-        'Karakol Delivery v2': {
-            title: 'Karakol Delivery v2',
-            desc: 'Architectural refactor focusing on scalability. Implemented advanced caching and optimized queries.',
-            challenge: 'Overcoming performance bottlenecks and migrating to a more performant framework.',
-            solution: 'Migrated to FastAPI, implemented Redis caching, and dockerized the environment.',
-            architecture: 'FastAPI → Redis → PostgreSQL → Docker',
-            tags: ['Python', 'FastAPI', 'Redis', 'Docker'],
-            link: 'https://github.com/Amanch1ik/Karakol-delivery-backend-02'
-        },
-        'Degrees of Separation': {
-            title: 'Degrees of Separation',
-            desc: 'Graph-based algorithm implementation demonstrating the theory of six degrees of separation.',
-            challenge: 'Efficiently traversing large social graphs with thousands of nodes.',
-            solution: 'Implemented BFS/DFS optimized with adjacency lists and heuristic pruning.',
-            architecture: 'Graph Data Structure → BFS Search Algorithm',
-            tags: ['Python', 'Algorithms', 'Graph Theory'],
-            link: 'https://github.com/Amanch1ik/degrees-of-separation'
+        'reklama_ai_gen': {
+            title: 'reklama_ai_gen',
+            desc: 'AI-сервис генерации рекламных креативов: API для генерации контента, история запросов и профили пользователей. Полный цикл — от Next.js-фронтенда до развёртывания в Docker.',
+            challenge: 'Связать генерацию через AI, хранение истории и пользовательские профили в одном продакшен-сервисе.',
+            solution: 'Next.js для фронтенда и API-роутов, Prisma как слой данных, контейнеризация в Docker для предсказуемого деплоя.',
+            architecture: 'Next.js → API → Prisma → DB · Docker',
+            tags: ['Next.js', 'Prisma', 'Docker', 'AI'],
+            link: null
         }
     };
     projectCards.forEach(card => {
-        card.addEventListener('click', () => {
-            const title = card.querySelector('.project-title').textContent;
+        card.addEventListener('click', (e) => {
+            // клик по ссылке/иконке внутри карточки — не открываем модалку
+            if (e.target.closest('a, .project-link')) return;
+            const title = card.querySelector('.project-title').textContent.trim();
             const details = projectDetails[title];
             if (details) {
+                const isLive = details.link && details.link.includes('github.io');
+                const footer = details.link
+                    ? `<a href="${details.link}" target="_blank" rel="noopener" class="btn btn-primary">
+                           <i class="fas ${isLive ? 'fa-arrow-up-right-from-square' : 'fa-code'}"></i>
+                           ${isLive ? 'Открыть сайт' : 'Смотреть код'}
+                       </a>`
+                    : `<span class="modal-private"><i class="fas fa-lock"></i> Приватный репозиторий — покажу по запросу</span>`;
                 modalBody.innerHTML = `
                     <h2 class="modal-title">${details.title}</h2>
                     <div class="modal-tags">${details.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>
-                    <div class="modal-section"><h4 class="modal-section-title">Overview</h4><p class="modal-desc">${details.desc}</p></div>
-                    <div class="modal-section architecture-section"><h4 class="modal-section-title"><i class="fas fa-sitemap"></i> System Architecture</h4><div class="architecture-flow">${details.architecture}</div></div>
+                    <div class="modal-section"><h4 class="modal-section-title">Обзор</h4><p class="modal-desc">${details.desc}</p></div>
+                    <div class="modal-section architecture-section"><h4 class="modal-section-title"><i class="fas fa-sitemap"></i> Архитектура</h4><div class="architecture-flow">${details.architecture}</div></div>
                     <div class="modal-grid">
-                        <div class="modal-section"><h4 class="modal-section-title">Challenge</h4><p class="modal-text">${details.challenge}</p></div>
-                        <div class="modal-section"><h4 class="modal-section-title">Solution</h4><p class="modal-text">${details.solution}</p></div>
+                        <div class="modal-section"><h4 class="modal-section-title">Задача</h4><p class="modal-text">${details.challenge}</p></div>
+                        <div class="modal-section"><h4 class="modal-section-title">Решение</h4><p class="modal-text">${details.solution}</p></div>
                     </div>
-                    <div class="modal-footer"><a href="${details.link}" target="_blank" class="btn btn-primary"><i class="fab fa-github"></i> View Source</a></div>
+                    <div class="modal-footer">${footer}</div>
                 `;
                 modal.classList.add('active');
                 document.body.style.overflow = 'hidden';

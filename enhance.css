@@ -1,0 +1,226 @@
+/* ========================================
+   ENHANCE — интерактивный слой студии
+   Частицы · 3D-tilt · spotlight · grain · reveal · parallax
+   Бренд: terracotta #e07a5f, Space Grotesk. Уважает prefers-reduced-motion.
+   ======================================== */
+
+/* --- Hero particle canvas --- */
+.hero-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.9;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+/* --- Film grain / atmosphere --- */
+.grain {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 160px 160px;
+}
+
+.light-mode .grain {
+    opacity: 0.035;
+    mix-blend-mode: multiply;
+}
+
+/* --- 3D Tilt cards --- */
+.tilt {
+    transform-style: preserve-3d;
+    transform: perspective(900px) rotateX(0) rotateY(0);
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+}
+
+.tilt.is-tilting {
+    transition: box-shadow 0.3s ease;
+}
+
+/* Spotlight glow that follows the cursor inside a card.
+   z-index:-1 keeps it above the card background but below all content;
+   the .tilt transform always establishes a stacking context, so it stays contained. */
+.tilt-glow {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    background: radial-gradient(
+        260px circle at var(--mx, 50%) var(--my, 50%),
+        var(--accent-glow),
+        transparent 60%
+    );
+    z-index: -1;
+}
+
+.tilt.is-tilting .tilt-glow {
+    opacity: 0.9;
+}
+
+/* Modal note for private repos */
+.modal-private {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+}
+
+.modal-private i {
+    color: var(--accent);
+}
+
+/* --- Hero load reveal (blur-up) --- */
+.hero-reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    filter: blur(10px);
+    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+        filter 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hero.loaded .hero-reveal {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+}
+
+.hero.loaded .hero-reveal:nth-child(1) { transition-delay: 0.05s; }
+.hero.loaded .hero-reveal:nth-child(2) { transition-delay: 0.13s; }
+.hero.loaded .hero-reveal:nth-child(3) { transition-delay: 0.21s; }
+.hero.loaded .hero-reveal:nth-child(4) { transition-delay: 0.29s; }
+.hero.loaded .hero-reveal:nth-child(5) { transition-delay: 0.37s; }
+.hero.loaded .hero-reveal:nth-child(6) { transition-delay: 0.45s; }
+
+/* --- Animated accent underline on hero title --- */
+.hero-title {
+    position: relative;
+    display: inline-block;
+}
+
+.hero-title::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    height: 3px;
+    width: 0;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+    transition: width 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.5s;
+}
+
+.hero.loaded .hero-title::after {
+    width: 72%;
+}
+
+/* --- Section label shimmer --- */
+.section-label {
+    position: relative;
+    overflow: hidden;
+}
+
+.section-label::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        var(--accent-glow),
+        transparent
+    );
+    transform: skewX(-20deg);
+    animation: labelShimmer 4.5s ease-in-out infinite;
+}
+
+@keyframes labelShimmer {
+    0%, 60% { left: -120%; }
+    100% { left: 220%; }
+}
+
+/* --- Scroll parallax targets get smoothed transform --- */
+.parallax {
+    will-change: transform;
+}
+
+/* --- Marquee for tech stack (optional decorative strip) --- */
+.tech-marquee {
+    overflow: hidden;
+    white-space: nowrap;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+.tech-marquee__track {
+    display: inline-flex;
+    gap: 3rem;
+    padding: 0.5rem 1.5rem;
+    animation: marquee 26s linear infinite;
+}
+
+.tech-marquee__track span {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.tech-marquee:hover .tech-marquee__track {
+    animation-play-state: paused;
+}
+
+@keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+/* --- Reduced motion: disable heavy interactivity --- */
+@media (prefers-reduced-motion: reduce) {
+    .hero-canvas { display: none; }
+    .grain { display: none; }
+    .tilt {
+        transform: none !important;
+        transition: none !important;
+    }
+    .tilt-glow { display: none; }
+    .hero-reveal {
+        opacity: 1 !important;
+        transform: none !important;
+        filter: none !important;
+        transition: none !important;
+    }
+    .hero-title::after { width: 72%; transition: none; }
+    .section-label::after { animation: none; display: none; }
+    .tech-marquee__track { animation: none; }
+}
+
+/* --- Touch / small screens: skip tilt, keep look --- */
+@media (max-width: 1023px) {
+    .tilt { transform: none !important; }
+    .tilt-glow { display: none; }
+    .hero-canvas { opacity: 0.6; }
+}
