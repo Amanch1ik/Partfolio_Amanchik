@@ -4,6 +4,13 @@
    Бренд: terracotta #e07a5f, Space Grotesk. Уважает prefers-reduced-motion.
    ======================================== */
 
+/* --- Kill horizontal scroll from reveal-offsets / blobs / marquee --- */
+html,
+body {
+    overflow-x: hidden;
+    max-width: 100%;
+}
+
 /* --- Hero particle canvas --- */
 .hero-canvas {
     position: absolute;
@@ -329,6 +336,17 @@
 .timeline-item.js-step.is-in {
     opacity: 1;
     transform: translateX(0);
+}
+
+/* On phones slide up instead of sideways — avoids any horizontal overflow */
+@media (max-width: 640px) {
+    .timeline-item.js-step,
+    .timeline-item.js-step:nth-child(even) {
+        transform: translateY(28px);
+    }
+    .timeline-item.js-step.is-in {
+        transform: translateY(0);
+    }
 }
 
 /* Service card icon — lively hover */
