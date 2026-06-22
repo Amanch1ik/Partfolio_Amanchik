@@ -173,6 +173,68 @@ body {
     will-change: transform;
 }
 
+/* --- Hand video as atmospheric hero background (behind the text) --- */
+.hero-hand-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 22% center;
+    z-index: 0;
+    /* darken & desaturate so the bright clip blends into the dark hero */
+    filter: brightness(0.5) saturate(0.82) contrast(1.05);
+    opacity: 0;
+    transform: scale(1.08);
+    transition: opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 1.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hero.loaded .hero-hand-bg {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* scrim: darkest where the text sits (left), keeps copy legible over the hand */
+.hero-hand-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+        linear-gradient(
+            90deg,
+            rgba(14, 12, 16, 0.82) 0%,
+            rgba(14, 12, 16, 0.5) 48%,
+            rgba(14, 12, 16, 0.68) 100%
+        ),
+        linear-gradient(0deg, var(--bg-primary) 0%, rgba(14, 12, 16, 0) 32%);
+}
+
+.light-mode .hero-hand-scrim {
+    background:
+        linear-gradient(
+            90deg,
+            rgba(253, 246, 238, 0.85) 0%,
+            rgba(253, 246, 238, 0.5) 48%,
+            rgba(253, 246, 238, 0.7) 100%
+        ),
+        linear-gradient(0deg, var(--bg-primary) 0%, rgba(253, 246, 238, 0) 32%);
+}
+
+/* keep hero content above the hand background + scrim */
+.hero .hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-hand-bg {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}
+
 /* --- Services CTA banner (replaces pricing) --- */
 .services-cta {
     display: flex;

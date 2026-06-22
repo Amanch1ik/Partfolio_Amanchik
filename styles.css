@@ -461,28 +461,17 @@ body.light-mode .navbar.scrolled {
     border-radius: var(--radius-xl);
 }
 
-.image-wrapper img,
-.image-wrapper video {
+.image-wrapper img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center;
     border-radius: var(--radius-xl);
-    transition: var(--transition-medium);
-}
-
-.image-wrapper img {
     filter: grayscale(20%);
+    transition: var(--transition-medium);
 }
 
 .image-wrapper:hover img {
     filter: grayscale(0%);
-}
-
-.image-wrapper video.hero-hand {
-    background: #efefe9;
-    transform: scale(1.55);
-    object-position: center 58%;
 }
 
 .image-border {
