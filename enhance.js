@@ -58,7 +58,10 @@
 
     /* ---------- Char-by-char scroll reveal for the About copy ---------- */
     function initCharReveal() {
-        if (reduceMotion) return;
+        // Skip the per-character dimming on touch / narrow screens — scroll-driven
+        // reveal is finicky there and leaves text half-faded. Those viewports show
+        // full text. Only desktop (>=1024px, no touch) gets the effect.
+        if (reduceMotion || !isDesktop || window.matchMedia('(hover: none)').matches) return;
         const paras = [...document.querySelectorAll('.about-text p')];
         if (!paras.length) return;
 
@@ -70,7 +73,7 @@
                 for (const ch of text) {
                     const span = document.createElement('span');
                     span.textContent = ch;
-                    span.style.opacity = '0.25';
+                    span.style.opacity = '0.55';
                     span.style.transition = 'opacity 0.3s ease';
                     p.appendChild(span);
                     spans.push(span);
@@ -92,7 +95,7 @@
                 const progress = Math.max(0, Math.min(1, (startLine - r.top) / span));
                 const revealed = Math.round(progress * spans.length);
                 spans.forEach((s, i) => {
-                    s.style.opacity = i < revealed ? '1' : '0.25';
+                    s.style.opacity = i < revealed ? '1' : '0.55';
                 });
             });
         };
@@ -204,6 +207,34 @@
             { threshold: 0.2, rootMargin: '0px 0px -8% 0px' }
         );
         all.forEach((el) => io.observe(el));
+
+        // Safety net: a heading must never stay stuck at opacity:0. If the observer
+        // misses one that's already in or above the viewport (fast scroll, layout
+        // shift, browser quirk, extensions), reveal it. Elements still below the fold
+        // keep their normal scroll reveal.
+        const sweep = () => {
+            all.forEach((el) => {
+                if (el.classList.contains('is-in')) return;
+                if (el.getBoundingClientRect().top < window.innerHeight * 0.95) {
+                    el.classList.add('is-in');
+                    io.unobserve(el);
+                }
+            });
+        };
+        setTimeout(sweep, 1200);
+        let sweepTick = false;
+        window.addEventListener(
+            'scroll',
+            () => {
+                if (sweepTick) return;
+                sweepTick = true;
+                requestAnimationFrame(() => {
+                    sweep();
+                    sweepTick = false;
+                });
+            },
+            { passive: true }
+        );
     }
 
     /* ---------- Grain overlay ---------- */

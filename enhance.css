@@ -192,7 +192,7 @@ body {
 }
 
 .hero.loaded .hero-hand-bg {
-    opacity: 1;
+    opacity: 0.42;
     transform: scale(1);
 }
 
@@ -202,13 +202,14 @@ body {
     inset: 0;
     z-index: 1;
     background:
+        radial-gradient(70% 80% at 40% 72%, rgba(14, 12, 16, 0.6), transparent 72%),
         linear-gradient(
             90deg,
-            rgba(14, 12, 16, 0.88) 0%,
-            rgba(14, 12, 16, 0.64) 48%,
-            rgba(14, 12, 16, 0.8) 100%
+            rgba(14, 12, 16, 0.92) 0%,
+            rgba(14, 12, 16, 0.8) 48%,
+            rgba(14, 12, 16, 0.86) 100%
         ),
-        linear-gradient(0deg, var(--bg-primary) 0%, rgba(14, 12, 16, 0) 32%);
+        linear-gradient(0deg, var(--bg-primary) 0%, rgba(14, 12, 16, 0) 34%);
 }
 
 .light-mode .hero-hand-scrim {
@@ -351,10 +352,154 @@ body {
     padding: 0.5rem 1rem;
 }
 
+/* --- Flagship case extras: capability list, metrics, access proof --- */
+
+/* Capability checklist — "what it actually does" */
+.case-highlights {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem 1.6rem;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem;
+}
+
+.case-highlights li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: clamp(0.92rem, 1.05vw, 1.05rem);
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.case-highlights li i {
+    display: grid;
+    place-items: center;
+    width: 1.35rem;
+    height: 1.35rem;
+    flex: none;
+    font-size: 0.66rem;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 50%;
+}
+
+/* Numeric metrics — data as a design element */
+.case-metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem;
+}
+
+.case-metrics li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.75rem 1.15rem;
+    min-width: 5.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--bg-secondary) 55%, transparent);
+}
+
+.case-metrics li b {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 2.3vw, 2.05rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--accent);
+}
+
+.case-metrics li b i {
+    font-style: normal;
+    font-size: 0.55em;
+    color: var(--text-muted);
+}
+
+.case-metrics li span {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+/* Access / proof line — live address or private status */
+.case-access {
+    margin: 0 0 1.5rem;
+}
+
+.case-access-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.62rem 1.05rem;
+    border: 1px solid var(--border-hover);
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: var(--accent-soft);
+    transition: transform 0.3s var(--ease-out-expo, cubic-bezier(0.22, 1, 0.36, 1)),
+        box-shadow 0.3s ease, border-color 0.25s ease;
+}
+
+.case-access-link > i:first-child {
+    color: var(--accent);
+}
+
+.case-access-go {
+    font-size: 0.78rem;
+    opacity: 0.65;
+}
+
+a.case-access-link:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+    box-shadow: 0 14px 30px -14px var(--accent-glow);
+}
+
+a.case-access-link:hover .case-access-go {
+    opacity: 1;
+}
+
+.case-access.is-locked .case-access-link {
+    background: transparent;
+    border-style: dashed;
+    color: var(--text-muted);
+    font-weight: 500;
+    cursor: default;
+}
+
+.case-access.is-locked .case-access-link i {
+    color: var(--text-secondary);
+}
+
+/* Flagship distinction — accent rail on the top three cases */
+.case-stack .case-card:nth-child(-n+3) {
+    border-color: var(--border-hover);
+}
+
+.case-stack .case-card:nth-child(-n+3)::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-secondary, #f2a65a), transparent 78%);
+    z-index: 2;
+}
+
 @media (max-width: 768px) {
     .case-card {
         min-height: 64vh;
         top: calc(80px + var(--i, 0) * 12px);
+    }
+
+    .case-metrics li {
+        flex: 1 1 calc(50% - 0.4rem);
+        min-width: 0;
     }
 }
 

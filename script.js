@@ -427,6 +427,38 @@ function buildRepoCard(repo) {
     return el;
 }
 
+// Fetch the public repos once every few hours and cache them. The unauthenticated
+// GitHub API allows only 60 requests/hour per IP, so on a busy day a live-every-visit
+// fetch would start failing and the section would vanish. Cache keeps it fresh AND
+// resilient: on a network/API error we fall back to the last good list (stale-while-error).
+async function fetchReposCached() {
+    const KEY = 'gh_repos_cache_v1';
+    const TTL = 6 * 60 * 60 * 1000; // 6 hours
+    let cached = null;
+    try {
+        cached = JSON.parse(localStorage.getItem(KEY) || 'null');
+    } catch (e) {
+        cached = null;
+    }
+    if (cached && Array.isArray(cached.d) && Date.now() - cached.t < TTL) {
+        return cached.d;
+    }
+    try {
+        const res = await fetch('https://api.github.com/users/Amanch1ik/repos?sort=pushed&per_page=100');
+        if (!res.ok) throw new Error('GitHub API ' + res.status);
+        const data = await res.json();
+        try {
+            localStorage.setItem(KEY, JSON.stringify({ t: Date.now(), d: data }));
+        } catch (e) {
+            /* storage full / private mode — fine, just skip caching */
+        }
+        return data;
+    } catch (err) {
+        if (cached && Array.isArray(cached.d)) return cached.d; // serve stale on error
+        throw err;
+    }
+}
+
 async function initGitHubRepos() {
     const projectsGrid = document.querySelector('.projects-grid');
     if (!projectsGrid) return;
@@ -449,16 +481,16 @@ async function initGitHubRepos() {
     projectsGrid.parentNode.insertBefore(githubSection, projectsGrid.nextSibling);
 
     try {
-        // Live fetch keeps the public projects always up to date.
-        const response = await fetch('https://api.github.com/users/Amanch1ik/repos?sort=pushed&per_page=100');
-        const repos = await response.json();
+        // Cached live fetch keeps the public projects fresh as new work ships.
+        const repos = await fetchReposCached();
         const reposGrid = githubSection.querySelector('.repos-grid');
         reposGrid.innerHTML = '';
 
         const bigPublic = (Array.isArray(repos) ? repos : [])
-            .filter((r) => !r.fork && r.description && r.size > 5000 && !REPO_BLOCKLIST.includes(r.name))
-            .sort((a, b) => new Date(b.pushed_at) - new Date(a.pushed_at))
-            .slice(0, 4);
+            .filter((r) => !r.fork && !r.archived && r.description && !REPO_BLOCKLIST.includes(r.name))
+            // Biggest projects first — repo size (KB of code) is a decent proxy for scope.
+            .sort((a, b) => b.size - a.size)
+            .slice(0, 9);
 
         bigPublic.forEach((r) => reposGrid.appendChild(buildRepoCard(r)));
         PRIVATE_PROJECTS.forEach((p) =>
@@ -468,6 +500,12 @@ async function initGitHubRepos() {
         );
 
         initScrollAnimations();
+        // This section is injected after enhance.js wired up its title/label reveal
+        // observers, so the new heading never gets observed and would stay invisible.
+        // Reveal it explicitly.
+        githubSection.querySelectorAll('.section-title, .section-label').forEach((el) => {
+            el.classList.add('is-in', 'visible');
+        });
         // re-apply current language to the freshly injected bilingual bits
         const lang = localStorage.getItem('portfolio-lang') || 'ru';
         githubSection.querySelectorAll('[data-lang-ru][data-lang-en]').forEach((el) => {
