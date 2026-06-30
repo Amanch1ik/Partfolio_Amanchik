@@ -204,7 +204,9 @@
                     }
                 });
             },
-            { threshold: 0.2, rootMargin: '0px 0px -8% 0px' }
+            // Trigger early (before the element reaches the comfortable viewport)
+            // so headings/steps are already revealed as they scroll up — no empty gap.
+            { threshold: 0, rootMargin: '0px 0px 20% 0px' }
         );
         all.forEach((el) => io.observe(el));
 

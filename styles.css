@@ -38,8 +38,8 @@
     --font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-display: 'Space Grotesk', 'Manrope', sans-serif;
 
-    /* Spacing — responsive section rhythm (not uniform) */
-    --section-padding: clamp(72px, 9vw, 128px) 0;
+    /* Spacing — responsive section rhythm (compact, not cavernous) */
+    --section-padding: clamp(40px, 3.2vw, 60px) 0;
     --container-padding: 0 24px;
 
     /* Transitions */
@@ -335,7 +335,9 @@ body.light-mode .navbar.scrolled {
    ======================================== */
 .hero {
     min-height: 100vh;
-    min-height: 100svh;
+    /* Fill the screen on normal laptops, but cap on tall monitors so the
+       centered content doesn't float with big empty bands above/below. */
+    min-height: clamp(600px, 100svh, 860px);
     display: flex;
     align-items: center;
     /* Padding scales with viewport height so the whole hero fits one screen
@@ -605,7 +607,7 @@ section {
 
 .section-header {
     text-align: center;
-    margin-bottom: clamp(36px, 4.5vh, 56px);
+    margin-bottom: clamp(28px, 3.5vh, 44px);
 }
 
 /* Small eyebrow above the title — a category tag, intentionally compact */
